@@ -1,4 +1,4 @@
-/***************************************************************************************
+/**************************************************************************************
 * Copyright (c) 2014-2024 Zihao Yu, Nanjing University
 *
 * NEMU is licensed under Mulan PSL v2.
@@ -40,7 +40,7 @@ static struct rule {
   {"\\)", TK_RPAREN},                         // right parenthesis
   {"==", TK_EQ},                              // equal
   {"!=", TK_NEQ},                             // not equal
-  {"||", TK_OR},                              // or
+  {"|", TK_OR},                            // or
   {"&&", TK_AND},                             // and
   {"!", TK_NOT},                              // not
   {"0[xX][0-9a-fA-F]+", TK_HEX},              // hex number
