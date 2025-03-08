@@ -24,6 +24,12 @@ const char *regs[] = {
 };
 
 void isa_reg_display() {
+  for(int i = 0; i < 32; ++i) {
+    printf("%-3s = ", reg_name(i));
+    printf(FMT_WORD, gpr(i));
+    printf(" ");
+    if ((i+1)%8 == 0) printf("\n");
+  }
 }
 
 word_t isa_reg_str2val(const char *s, bool *success) {

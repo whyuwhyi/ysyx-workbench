@@ -17,6 +17,7 @@
 #include <cpu/cpu.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <memory/vaddr.h>
 #include "sdb.h"
 
 static int is_batch_mode = false;
@@ -54,6 +55,12 @@ static int cmd_q(char *args) {
 
 static int cmd_help(char *args);
 
+static int cmd_si(char *argd);
+
+static int cmd_info(char *args);
+
+static int cmd_x(char *args);
+
 static struct {
   const char *name;
   const char *description;
@@ -62,8 +69,12 @@ static struct {
   { "help", "Display information about all supported commands", cmd_help },
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
-
-  /* TODO: Add more commands */
+  { "si [N]", "Step an instruction exactly", cmd_si },
+  { "info SUBCMD", "Show information about registers or watchpoints", cmd_info },
+  { "x N EXPR", "Scan memory according to EXPR", cmd_x },
+  // { "p EXPR", "Evaluate EXPR and print the result", cmd_p },
+  // { "w EXPR", "Set a watchpoint at EXPR", cmd_w },
+  // { "d N", "Delete watchpoint N", cmd_d },
 
 };
 
@@ -89,6 +100,64 @@ static int cmd_help(char *args) {
     }
     printf("Unknown command '%s'\n", arg);
   }
+  return 0;
+}
+
+static int cmd_si(char *args) {
+  int n = 1;
+  if (args != NULL) {
+    sscanf(args, "%d", &n);
+    if (n <= 0) {
+      printf("Invalid argument: %s\n", args);
+      return 0;
+    }
+  }
+  cpu_exec(n);
+  return 0;
+}
+
+static int cmd_info(char *args) {
+  if (args == NULL) {
+    printf("Usage: info SUBCMD\n");
+    return 0;
+  }
+
+  if (strcmp(args, "r") == 0) {
+    isa_reg_display();
+  }
+  else if (strcmp(args, "w") == 0) {
+    // display_wp();
+  }
+  else {
+    printf("Unknown subcommand '%s'\n", args);
+  }
+
+  return 0;
+}
+
+static int cmd_x(char *args) {
+  if (args == NULL) {
+    printf("Usage: x N EXPR");
+    return 0;
+  }
+  
+  int n;
+  char expr[32];
+  sscanf(args, "%d %s", &n, expr);
+
+  if (n <= 0) {
+    printf("Invalid argument: %s\n", args);
+    return 0;
+  }
+  
+  word_t addr = 0x80000000;
+
+  for (int i = 0; i < n; ++i) {
+    printf(FMT_WORD, vaddr_read(addr, 4));
+    printf(" "); addr += 4;
+    if ((i+1)%8 == 0) printf("\n");
+  }
+
   return 0;
 }
 
