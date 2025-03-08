@@ -104,13 +104,9 @@ static int cmd_help(char *args) {
 }
 
 static int cmd_si(char *args) {
-  int n = 1;
+  uint64_t n = 1;
   if (args != NULL) {
-    sscanf(args, "%d", &n);
-    if (n <= 0) {
-      printf("Invalid argument: %s\n", args);
-      return 0;
-    }
+    sscanf(args, "%lu", &n);
   }
   cpu_exec(n);
   return 0;
