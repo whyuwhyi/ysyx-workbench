@@ -103,7 +103,7 @@ static bool make_token(char *e) {
         }
 
         if (nr_token >= 32) {
-          printf("Too many tokens\n");
+          printf("too many tokens\n");
           return false;
         }
 
@@ -152,7 +152,7 @@ static bool check_parentheses(int s, int e, bool * success) {
     }
 
     if (level < 0) {
-      printf("unmatched parentheses\n");
+      printf("Unmatched parentheses\n");
       *success = false;
       return false;
     }
@@ -201,7 +201,7 @@ static word_t eval(int s, int e, bool *success) {
   } 
 
   if (s > e) {
-    printf("invalid expression\n");
+    printf("Invalid expression\n");
     *success = false;
     return 0;
   }
@@ -214,7 +214,7 @@ static word_t eval(int s, int e, bool *success) {
       case TK_REG:
         return isa_reg_str2val(tokens[s].str + 1, NULL);
       default:
-        printf("invalid expression\n");
+        printf("Invalid expression\n");
         *success = false;
         return 0;
     }
@@ -229,7 +229,7 @@ static word_t eval(int s, int e, bool *success) {
     int op_pos = get_pos_of_main_op(s, e);
     
     if (op_pos == -1) {
-      printf("invalid expression\n");
+      printf("Invalid expression\n");
       *success = false;
       return 0;
     }
@@ -255,7 +255,7 @@ static word_t eval(int s, int e, bool *success) {
       case TK_AND:
         return left_val && right_val;
       default:
-        printf("invalid operator\n");
+        printf("Invalid operator\n");
         *success = false;
         return 0;
     }

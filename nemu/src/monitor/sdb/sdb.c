@@ -138,15 +138,26 @@ static int cmd_x(char *args) {
   }
   
   int n;
-  char expr[32];
-  sscanf(args, "%d %s", &n, expr);
+  char *exp = malloc(32*32*sizeof(char));
+  sscanf(args, "%d %s", &n, exp);
 
   if (n <= 0) {
     printf("Invalid argument: %s\n", args);
     return 0;
   }
-  
-  word_t addr = 0x80000000;
+
+  if (exp == NULL) {
+    printf("No expression for address is provided\n");
+    return 0;
+  }
+
+  bool success = true;  
+  word_t addr = expr(exp, &success);
+
+  if (success == false) {
+    printf("Invalid expression: %s\n", exp);
+    return 0;
+  }
 
   for (int i = 0; i < n; ++i) {
     printf(FMT_WORD, vaddr_read(addr, 4));
