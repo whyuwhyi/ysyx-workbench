@@ -113,7 +113,10 @@ static bool make_token(char *e) {
         switch (rules[i].token_type) {
           case TK_NOTYPE:
             break;
-          case TK_DEC || TK_HEX || TK_ID || TK_REG:
+          case TK_DEC:
+          case TK_HEX:
+          case TK_ID:
+          case TK_REG:
             tokens[nr_token].type = rules[i].token_type;
             strncpy(tokens[nr_token].str, substr_start, substr_len);
             printf("tokens[%d].str = %s\n", nr_token, tokens[nr_token].str);
