@@ -119,7 +119,6 @@ static bool make_token(char *e) {
           case TK_REG:
             tokens[nr_token].type = rules[i].token_type;
             strncpy(tokens[nr_token].str, substr_start, substr_len);
-            printf("tokens[%d].str = %s\n", nr_token, tokens[nr_token].str);
             tokens[nr_token].str[substr_len] = '\0';
             nr_token++;
             break;
@@ -154,7 +153,6 @@ static bool check_parentheses(int s, int e, bool * success) {
     }
 
     if (level < 0) {
-      printf("Unmatched parentheses\n");
       *success = false;
       return false;
     }
