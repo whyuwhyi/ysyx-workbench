@@ -206,7 +206,9 @@ static word_t eval(int s, int e, bool *success) {
   else if (s == e) {
     switch (tokens[s].type) {
       case TK_DEC:
-        return (word_t)atoi(tokens[s].str);
+        word_t val = 0;
+        sscanf(tokens[s].str, "%d", &val);
+        return val;
       case TK_HEX:
         return (word_t)strtol(tokens[s].str, NULL, 16);
       case TK_REG:
