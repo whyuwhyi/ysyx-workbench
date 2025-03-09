@@ -19,10 +19,12 @@
  * Type 'man regex' for more information about POSIX regex functions.
  */
 #include <regex.h>
+#include <memory/vaddr.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ, TK_NEQ, TK_OR, TK_AND, TK_NOT,
-  TK_ADD, TK_SUB, TK_MUL, TK_DIV, TK_LPAREN, TK_RPAREN, 
+  TK_NOTYPE = 256, TK_EQ, TK_NEQ,
+  TK_ADD, TK_SUB, TK_MUL, TK_DIV, TK_OR, TK_AND, TK_NOT, TK_BIT_OR, TK_BIT_AND,
+  TK_LPAREN, TK_RPAREN, 
   TK_DEC, TK_HEX, TK_REG, TK_ID, TK_NUM,
   TK_DEREF,
 };
@@ -205,15 +207,18 @@ static word_t eval(int s, int e, bool *success) {
     return 0;
   }
   else if (s == e) {
+    word_t val = 0;
     switch (tokens[s].type) {
       case TK_DEC:
-        word_t val = 0;
         sscanf(tokens[s].str, "%d", &val);
         return val;
       case TK_HEX:
-        return (word_t)strtol(tokens[s].str, NULL, 16);
+        sscanf(tokens[s].str, FMT_WORD, &val);
+        return val;
       case TK_REG:
         return isa_reg_str2val(tokens[s].str + 1, NULL);
+      // case TK_ID:
+      //   return bsearch(tokens[s].str);
       default:
         *success = false;
         return 0;
@@ -230,8 +235,12 @@ static word_t eval(int s, int e, bool *success) {
       return 0;
     }
 
-    word_t left_val = eval(s, op_pos - 1, success);
+    word_t left_val = 0;
     word_t right_val = eval(op_pos + 1, e, success);
+
+    if (op_pos != 0) {
+      left_val = eval(s, op_pos - 1, success);
+    }
     
     switch (tokens[op_pos].type) {
       case TK_ADD:
@@ -242,6 +251,10 @@ static word_t eval(int s, int e, bool *success) {
         return left_val * right_val;
       case TK_DIV:
         return left_val / right_val;
+      case TK_BIT_OR:
+        return left_val | right_val;
+      case TK_BIT_AND:
+        return left_val & right_val;
       case TK_EQ:
         return left_val == right_val;
       case TK_NEQ:
@@ -250,6 +263,10 @@ static word_t eval(int s, int e, bool *success) {
         return left_val || right_val;
       case TK_AND:
         return left_val && right_val;
+      case TK_NOT:
+        return !right_val;
+      case TK_DEREF:
+        return vaddr_read(right_val, 4);
       default:
         *success = false;
         return 0;
