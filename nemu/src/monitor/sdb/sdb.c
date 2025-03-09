@@ -107,9 +107,11 @@ static int cmd_help(char *args) {
 
 static int cmd_si(char *args) {
   uint64_t n = 1;
-  if (args != NULL) {
-    sscanf(args, "%lu", &n);
-  }
+  if (args != NULL && sscanf(args, "%lu", &n) != 1) {
+      printf("Invalid argument: %s\n", args);
+      printf("Usage: si [N]\n");
+      return 0;
+    }
   cpu_exec(n);
   return 0;
 }
@@ -166,6 +168,7 @@ static int cmd_x(char *args) {
     printf(" "); addr += 4;
     if ((i+1)%8 == 0) printf("\n");
   }
+  printf("\n");
 
   return 0;
 }
