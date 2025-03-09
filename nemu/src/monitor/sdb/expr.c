@@ -203,7 +203,6 @@ static word_t eval(int s, int e, bool *success) {
   } 
 
   if (s > e) {
-    printf("Invalid expression\n");
     *success = false;
     return 0;
   }
@@ -218,7 +217,6 @@ static word_t eval(int s, int e, bool *success) {
       case TK_REG:
         return isa_reg_str2val(tokens[s].str + 1, NULL);
       default:
-        printf("Invalid expression\n");
         *success = false;
         return 0;
     }
@@ -233,14 +231,12 @@ static word_t eval(int s, int e, bool *success) {
     int op_pos = get_pos_of_main_op(s, e);
     
     if (op_pos == -1) {
-      printf("Invalid expression\n");
       *success = false;
       return 0;
     }
 
     word_t left_val = eval(s, op_pos - 1, success);
     word_t right_val = eval(op_pos + 1, e, success);
-    printf("left_val = %d, right_val = %d\n", left_val, right_val);
     
     switch (tokens[op_pos].type) {
       case TK_ADD:
@@ -260,7 +256,6 @@ static word_t eval(int s, int e, bool *success) {
       case TK_AND:
         return left_val && right_val;
       default:
-        printf("Invalid operator\n");
         *success = false;
         return 0;
     }
