@@ -25,6 +25,7 @@ const char *regs[] = {
 
 void isa_reg_display() {
   for(int i = 0; i < 32; ++i) {
+    printf("%-3s = " FMT_WORD " ", reg_name(i), gpr(i));
     printf("%-3s = ", reg_name(i));
     printf(FMT_WORD, gpr(i));
     printf(" ");
