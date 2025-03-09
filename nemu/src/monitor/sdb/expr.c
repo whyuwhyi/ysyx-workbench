@@ -208,9 +208,9 @@ static word_t eval(int s, int e, bool *success) {
   else if (s == e) {
     switch (tokens[s].type) {
       case TK_DEC:
-        return atoi(tokens[s].str);
+        return (word_t)atoi(tokens[s].str);
       case TK_HEX:
-        return strtol(tokens[s].str, NULL, 16);
+        return (word_t)strtol(tokens[s].str, NULL, 16);
       case TK_REG:
         return isa_reg_str2val(tokens[s].str + 1, NULL);
       default:
