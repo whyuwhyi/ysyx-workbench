@@ -184,7 +184,7 @@ static int cmd_p(char *args) {
     return 0;
   }
 
-  printf("%s = " FMT_WORD "\n", args, result);
+  printf("%s = %d \n", args, result);
   return 0;
 }
 
