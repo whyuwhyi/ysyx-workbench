@@ -116,6 +116,7 @@ static bool make_token(char *e) {
           case TK_DEC | TK_HEX | TK_ID | TK_REG:
             tokens[nr_token].type = rules[i].token_type;
             strncpy(tokens[nr_token].str, substr_start, substr_len);
+            printf("tokens[%d].str = %s\n", nr_token, tokens[nr_token].str);
             tokens[nr_token].str[substr_len] = '\0';
             nr_token++;
             break;
@@ -207,7 +208,6 @@ static word_t eval(int s, int e, bool *success) {
     switch (tokens[s].type) {
       case TK_DEC:
         word_t val = 0;
-        printf("%s\n", tokens[s].str);
         sscanf(tokens[s].str, "%d", &val);
         return val;
       case TK_HEX:
