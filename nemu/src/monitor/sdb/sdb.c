@@ -61,6 +61,8 @@ static int cmd_info(char *args);
 
 static int cmd_x(char *args);
 
+static int cmd_p(char *args);
+
 static struct {
   const char *name;
   const char *description;
@@ -72,7 +74,7 @@ static struct {
   { "si", "Step an instruction exactly", cmd_si },
   { "info", "Show information about registers or watchpoints", cmd_info },
   { "x", "Scan memory according to EXPR", cmd_x },
-  // { "p EXPR", "Evaluate EXPR and print the result", cmd_p },
+  { "p", "Evaluate EXPR and print the result", cmd_p },
   // { "w EXPR", "Set a watchpoint at EXPR", cmd_w },
   // { "d N", "Delete watchpoint N", cmd_d },
 
@@ -165,6 +167,24 @@ static int cmd_x(char *args) {
     if ((i+1)%8 == 0) printf("\n");
   }
 
+  return 0;
+}
+
+static int cmd_p(char *args) {
+  if (args == NULL) {
+    printf("Usage: p EXPR");
+    return 0;
+  }
+
+  bool success = true;
+  word_t result = expr(args, &success);
+
+  if (success == false) {
+    printf("Invalid expression: %s\n", args);
+    return 0;
+  }
+
+  printf("%s = " FMT_WORD "\n", args, result);
   return 0;
 }
 
