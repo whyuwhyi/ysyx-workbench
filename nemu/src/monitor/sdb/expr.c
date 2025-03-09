@@ -224,9 +224,6 @@ static word_t eval(int s, int e, bool *success) {
   else if (check_parentheses(s, e, success) == true) {
     return eval(s + 1, e - 1, success);
   }
-  else if (success == false) {
-    return 0;
-  }
   else {
     int op_pos = get_pos_of_main_op(s, e);
     
