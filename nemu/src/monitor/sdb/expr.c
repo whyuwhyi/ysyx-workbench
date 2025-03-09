@@ -45,8 +45,6 @@ static struct rule {
   {"!", TK_NOT},                              // not
   {"0[xX][0-9a-fA-F]+", TK_HEX},              // hex number
   {"\\$[a-zA-Z][a-zA-Z0-9_]*", TK_REG},       // register
-  {"\\$[a-zA-Z][a-zA-Z0-9_]*", TK_ID},        // identifier
-  {"\\$[a-zA-Z][a-zA-Z0-9_]*", TK_ID},        // identifier
   {"\\$[a-zA-Z][a-zA-Z0-9_]*", TK_REG},       // register
   {"0[xX][0-9a-fA-F]+", TK_HEX},              // hex number
   {"[0-9]+", TK_DEC},                         // decimal number
@@ -236,6 +234,7 @@ static word_t eval(int s, int e, bool *success) {
 
     word_t left_val = eval(s, op_pos - 1, success);
     word_t right_val = eval(op_pos + 1, e, success);
+    printf("left_val = %d, right_val = %d\n", left_val, right_val);
     
     switch (tokens[op_pos].type) {
       case TK_ADD:
