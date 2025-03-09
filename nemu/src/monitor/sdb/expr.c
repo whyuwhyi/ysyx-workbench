@@ -207,6 +207,7 @@ static word_t eval(int s, int e, bool *success) {
     switch (tokens[s].type) {
       case TK_DEC:
         word_t val = 0;
+        printf("%s", tokens[s].str);
         sscanf(tokens[s].str, "%d", &val);
         return val;
       case TK_HEX:
