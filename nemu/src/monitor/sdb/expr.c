@@ -58,8 +58,8 @@ static struct rule {
   {"&",                        TK_BIT_AND},   // bitwise and
   {"~",                        TK_BIT_NOT},   // bitwise not
   {"\\^",                      TK_BIT_XOR},   // bitwise xor
-  {"[0-9]+",                   TK_DEC},       // decimal number
   {"0[xX][0-9a-fA-F]+",        TK_HEX},       // hex number
+  {"[0-9]+",                   TK_DEC},       // decimal number
   {"\\$[a-zA-Z][a-zA-Z0-9_]*", TK_REG},       // register
   {"\\(",                      TK_LPAREN},    // left parenthesis
   {"\\)",                      TK_RPAREN}     // right parenthesis
