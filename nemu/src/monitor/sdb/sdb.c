@@ -63,6 +63,10 @@ static int cmd_x(char *args);
 
 static int cmd_p(char *args);
 
+static int cmd_w(char *args);
+
+static int cmd_d(char *args);
+
 static struct {
   const char *name;
   const char *description;
@@ -75,8 +79,8 @@ static struct {
   { "info", "Show information about registers or watchpoints", cmd_info },
   { "x", "Scan memory according to EXPR", cmd_x },
   { "p", "Evaluate EXPR and print the result", cmd_p },
-  // { "w EXPR", "Set a watchpoint at EXPR", cmd_w },
-  // { "d N", "Delete watchpoint N", cmd_d },
+  { "w EXPR", "Set a watchpoint at EXPR", cmd_w },
+  { "d N", "Delete watchpoint N", cmd_d },
 
 };
 
@@ -106,26 +110,42 @@ static int cmd_help(char *args) {
 }
 
 static int cmd_si(char *args) {
+  char *arg = strtok(NULL, " ");
+  char *remaining = strtok(NULL, " ");
   uint64_t n = 1;
-  if (args != NULL && sscanf(args, "%lu", &n) != 1) {
-      printf("Invalid argument: %s\n", args);
-      printf("Usage: si [N]\n");
-      return 0;
-    }
+  
+  if (arg != NULL && sscanf(arg, "%lu", &n) != 1) {
+    printf("Invalid argument: %s\nUsage: si [N]\n", arg);
+    return 0;
+  }
+
+  if (remaining != NULL) {
+    printf("Too many arguments\nUsage: si [N]\n");
+    return 0;
+  }
+
   cpu_exec(n);
   return 0;
 }
 
 static int cmd_info(char *args) {
-  if (args == NULL) {
-    printf("Usage: info SUBCMD\n");
+  char *arg = strtok(NULL, " ");
+  char *remaining = strtok(NULL, " ");
+  
+  if (arg == NULL) {
+    printf("Too few argument\nUsage: info SUBCMD\n");
     return 0;
   }
 
-  if (strcmp(args, "r") == 0) {
+  if (remaining != NULL) {
+    printf("Too many arguments\nUsage: info SUBCMD\n");
+    return 0;
+  }
+
+  if (strcmp(arg, "r") == 0) {
     isa_reg_display();
   }
-  else if (strcmp(args, "w") == 0) {
+  else if (strcmp(arg, "w") == 0) {
     // display_wp();
   }
   else {
@@ -136,22 +156,19 @@ static int cmd_info(char *args) {
 }
 
 static int cmd_x(char *args) {
-  if (args == NULL) {
-    printf("Usage: x N EXPR");
-    return 0;
-  }
-  
-  int n;
-  char *exp = malloc(32*32*sizeof(char));
-  sscanf(args, "%d %s", &n, exp);
+  char *arg1 = strtok(NULL, " ");
+  char *arg_end = args + strlen(args);
+  char *temptr = arg1 + strlen(arg1) + 1;
+  char *exp = (temptr < arg_end) ? temptr : NULL;
+  int n = -1;
 
-  if (n <= 0) {
-    printf("Invalid argument: %s\n", args);
+  if (arg1 == NULL || exp == NULL) {
+    printf("Too few argument\nUsage: x N EXPR\n");
     return 0;
   }
 
-  if (exp == NULL) {
-    printf("No expression for address is provided\n");
+  if (sscanf(arg1, "%d", &n) != 1 || n <= 0) {
+    printf("Invalid argument: %s\nUsage: x N EXPR", arg1);
     return 0;
   }
 
@@ -174,6 +191,7 @@ static int cmd_x(char *args) {
 }
 
 static int cmd_p(char *args) {
+
   if (args == NULL) {
     printf("Usage: p EXPR");
     return 0;
@@ -188,6 +206,31 @@ static int cmd_p(char *args) {
   }
 
   printf("%s = %d \n", args, (int)result);
+  return 0;
+}
+
+static int cmd_w(char *args) {
+  if (args == NULL) {
+    printf("Usage: w EXPR");
+    return 0;
+  }
+
+  return 0;
+}
+
+static int cmd_d(char *args) {
+  if (args == NULL) {
+    printf("Usage: d N");
+    return 0;
+  }
+
+  int n;
+  if (sscanf(args, "%d", &n) != 1) {
+    printf("Invalid argument: %s\n", args);
+    return 0;
+  }
+
+  // free_wp(n);
   return 0;
 }
 

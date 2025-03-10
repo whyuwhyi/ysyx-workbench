@@ -22,10 +22,10 @@
 #include <memory/vaddr.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ, TK_NEQ,
+  TK_NOTYPE = 256, TK_EQ, TK_NEQ, TK_GT, TK_LT, TK_GE, TK_LE,
   TK_ADD, TK_SUB, TK_MUL, TK_DIV, TK_OR, TK_AND, TK_NOT, TK_BIT_OR, TK_BIT_AND,
-  TK_LPAREN, TK_RPAREN, 
-  TK_DEC, TK_HEX, TK_REG, TK_ID, TK_NUM,
+  TK_LPAREN, TK_RPAREN,
+  TK_DEC, TK_HEX, TK_REG, TK_NUM,
   TK_DEREF,
 };
 
@@ -35,22 +35,26 @@ static struct rule {
 } rules[] = {
   {" +", TK_NOTYPE},                          // spaces
   {"\\+", TK_ADD},                            // plus
-  {"-", TK_ADD},                              // subtract
+  {"-", TK_SUB},                              // subtract
   {"\\*", TK_MUL},                            // multiply
   {"/", TK_DIV},                              // divide
   {"\\(", TK_LPAREN},                         // left parenthesis
   {"\\)", TK_RPAREN},                         // right parenthesis
   {"==", TK_EQ},                              // equal
   {"!=", TK_NEQ},                             // not equal
+  {">=", TK_GE},                              // greater or equal
+  {"<=", TK_LE},                              // less or equal
+  {">", TK_GT},                               // greater than
+  {"<", TK_LT},                               // less than
   {"--+-", TK_OR},                            // or
   {"&&", TK_AND},                             // and
   {"!", TK_NOT},                              // not
-  {"0[xX][0-9a-fA-F]+", TK_HEX},              // hex number
-  {"\\$[a-zA-Z][a-zA-Z0-9_]*", TK_REG},       // register
+  {"+", TK_BIT_OR},                           // bitwise or
+  {"&", TK_BIT_AND},                          // bitwise and
+  {"~", TK_NOT},                              // bitwise not
   {"\\$[a-zA-Z][a-zA-Z0-9_]*", TK_REG},       // register
   {"0[xX][0-9a-fA-F]+", TK_HEX},              // hex number
   {"[0-9]+", TK_DEC},                         // decimal number
-  {"[a-zA-Z_][a-zA-Z0-9_]*", TK_ID},          // identifier
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -117,7 +121,6 @@ static bool make_token(char *e) {
             break;
           case TK_DEC:
           case TK_HEX:
-          case TK_ID:
           case TK_REG:
             tokens[nr_token].type = rules[i].token_type;
             strncpy(tokens[nr_token].str, substr_start, substr_len);
@@ -217,8 +220,6 @@ static word_t eval(int s, int e, bool *success) {
         return val;
       case TK_REG:
         return isa_reg_str2val(tokens[s].str + 1, NULL);
-      // case TK_ID:
-      //   return bsearch(tokens[s].str);
       default:
         *success = false;
         return 0;
