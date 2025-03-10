@@ -49,7 +49,7 @@ static struct rule {
   {"--+-", TK_OR},                            // or
   {"&&", TK_AND},                             // and
   {"!", TK_NOT},                              // not
-  {"+", TK_BIT_OR},                           // bitwise or
+  {"", TK_BIT_OR},                           // bitwise or
   {"&", TK_BIT_AND},                          // bitwise and
   {"~", TK_NOT},                              // bitwise not
   {"\\$[a-zA-Z][a-zA-Z0-9_]*", TK_REG},       // register
