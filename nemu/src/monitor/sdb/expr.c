@@ -60,7 +60,7 @@ static struct rule {
   {"\\^",                      TK_BIT_XOR},   // bitwise xor
   {"0[xX][0-9a-fA-F]+",        TK_HEX},       // hex number
   {"[0-9]+",                   TK_DEC},       // decimal number
-  {"\\$(0|[a-zA-Z])[a-zA-Z0-9_]*", TK_REG},       // register
+  {"\\$(d|[a-zA-Z])[a-zA-Z0-9_]*", TK_REG},       // register
   {"\\(",                      TK_LPAREN},    // left parenthesis
   {"\\)",                      TK_RPAREN}     // right parenthesis
 };
