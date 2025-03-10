@@ -22,11 +22,14 @@
 #include <memory/vaddr.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ, TK_NEQ, TK_GT, TK_LT, TK_GE, TK_LE,
-  TK_ADD, TK_SUB, TK_MUL, TK_DIV, TK_OR, TK_AND, TK_NOT, TK_BIT_OR, TK_BIT_AND,
+  TK_NOTYPE = 256,
+  TK_ADD, TK_SUB, TK_MUL, TK_DIV, TK_MOD,
+  TK_EQ, TK_NEQ, TK_GE, TK_LE, TK_GT, TK_LT,
+  TK_OR, TK_AND, TK_NOT,
+  TK_BIT_OR, TK_BIT_AND, TK_BIT_NOT, TK_BIT_XOR,
+  TK_DEC, TK_HEX, TK_REG,
   TK_LPAREN, TK_RPAREN,
-  TK_DEC, TK_HEX, TK_REG, TK_NUM,
-  TK_DEREF,
+  TK_DEREF, TK_NEG,
 };
 
 static struct rule {
@@ -38,23 +41,25 @@ static struct rule {
   {"-", TK_SUB},                              // subtract
   {"\\*", TK_MUL},                            // multiply
   {"/", TK_DIV},                              // divide
-  {"\\(", TK_LPAREN},                         // left parenthesis
-  {"\\)", TK_RPAREN},                         // right parenthesis
+  {"%", TK_MOD},                              // modulo
   {"==", TK_EQ},                              // equal
   {"!=", TK_NEQ},                             // not equal
   {">=", TK_GE},                              // greater or equal
   {"<=", TK_LE},                              // less or equal
   {">", TK_GT},                               // greater than
   {"<", TK_LT},                               // less than
-  {"--+-", TK_OR},                            // or
+  {"||", TK_OR},                              // or
   {"&&", TK_AND},                             // and
   {"!", TK_NOT},                              // not
-  {"", TK_BIT_OR},                           // bitwise or
+  {"|", TK_BIT_OR},                           // bitwise or
   {"&", TK_BIT_AND},                          // bitwise and
-  {"~", TK_NOT},                              // bitwise not
-  {"\\$[a-zA-Z][a-zA-Z0-9_]*", TK_REG},       // register
-  {"0[xX][0-9a-fA-F]+", TK_HEX},              // hex number
+  {"~", TK_BIT_NOT},                          // bitwise not
+  {"^", TK_BIT_XOR},                          // bitwise xor
   {"[0-9]+", TK_DEC},                         // decimal number
+  {"0[xX][0-9a-fA-F]+", TK_HEX},              // hex number
+  {"\\$[a-zA-Z][a-zA-Z0-9_]*", TK_REG},       // register
+  {"\\(", TK_LPAREN},                         // left parenthesis
+  {"\\)", TK_RPAREN},                         // right parenthesis
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -166,9 +171,60 @@ static bool check_parentheses(int s, int e, bool * success) {
   return level == 0;
 }
 
+static int get_op_priority(int i) {
+  if (i < 0 || i >= nr_token) {
+    return -1;
+  }
+
+  switch (tokens[i].type) {
+    case TK_OR:
+      return 9;
+    case TK_AND:
+      return 8;
+    case TK_BIT_OR:
+      return 7;
+    case TK_BIT_XOR:
+      return 6;
+    case TK_BIT_AND:
+      return 5;
+    case TK_EQ:
+    case TK_NEQ:
+      return 4;
+    case TK_GE:
+    case TK_LE:
+    case TK_GT:
+    case TK_LT:
+      return 3;
+    case TK_ADD:
+    case TK_SUB:
+      return 2;
+    case TK_MUL:
+    case TK_DIV:
+    case TK_MOD:
+      return 1;
+    case TK_DEREF:
+    case TK_NEG:
+    case TK_NOT:
+    case TK_BIT_NOT:
+      return 0;
+
+    default:
+      return -1;
+  }
+}
+
+static bool is_op(int i) {
+  return get_op_priority(i) >= 0;
+}
+
+static bool is_binary(int i) {
+  return get_op_priority(i) > 0;
+}
+
 static int get_pos_of_main_op(int s, int e) {
   int pos = -1;
   int level = 0;
+  int cur_priority = -1;
 
   for (int i = e; i >= s; i--) {
     if (tokens[i].type == TK_RPAREN) {
@@ -177,23 +233,9 @@ static int get_pos_of_main_op(int s, int e) {
     else if (tokens[i].type == TK_LPAREN) {
       level--;
     }
-    else if (level == 0) {
-      if (tokens[i].type == TK_ADD || tokens[i].type == TK_SUB) {
-        pos = i;
-        break;
-      }
-      else if (tokens[i].type == TK_EQ || tokens[i].type == TK_NEQ) {
-        pos = i;
-      }
-      else if (tokens[i].type == TK_OR) {
-        pos = i;
-      }
-      else if (tokens[i].type == TK_MUL || tokens[i].type == TK_DIV) {
-        pos = i;
-      }
-      else if (tokens[i].type == TK_AND) {
-        pos = i;
-      }
+    else if (level == 0 && cur_priority < get_op_priority(i)) {
+      cur_priority = get_op_priority(i);
+      pos = i;
     }
   }
 
@@ -213,7 +255,7 @@ static word_t eval(int s, int e, bool *success) {
     word_t val = 0;
     switch (tokens[s].type) {
       case TK_DEC:
-        sscanf(tokens[s].str, "%d", &val);
+        sscanf(tokens[s].str, "%u", &val);
         return val;
       case TK_HEX:
         sscanf(tokens[s].str, FMT_WORD, &val);
@@ -237,10 +279,10 @@ static word_t eval(int s, int e, bool *success) {
     }
 
     word_t left_val = 0;
-    word_t right_val = eval(op_pos + 1, e, success);
+    word_t right_val = eval(op_pos+1, e, success);
 
-    if (op_pos != 0) {
-      left_val = eval(s, op_pos - 1, success);
+    if (is_binary(op_pos)) {
+      left_val = eval(s, op_pos -1, success);
     }
     
     switch (tokens[op_pos].type) {
@@ -252,25 +294,57 @@ static word_t eval(int s, int e, bool *success) {
         return left_val * right_val;
       case TK_DIV:
         return left_val / right_val;
-      case TK_BIT_OR:
-        return left_val | right_val;
-      case TK_BIT_AND:
-        return left_val & right_val;
+      case TK_MOD:
+        return left_val % right_val;
       case TK_EQ:
         return left_val == right_val;
       case TK_NEQ:
         return left_val != right_val;
+      case TK_GE:
+        return left_val >= right_val;
+      case TK_LE:
+        return left_val <= right_val;
+      case TK_GT:
+        return left_val > right_val;
+      case TK_LT:
+        return left_val < right_val;
       case TK_OR:
         return left_val || right_val;
       case TK_AND:
         return left_val && right_val;
       case TK_NOT:
         return !right_val;
+      case TK_BIT_OR:
+        return left_val | right_val;
+      case TK_BIT_AND:
+        return left_val & right_val;
+      case TK_BIT_XOR:
+        return left_val ^ right_val;
+      case TK_BIT_NOT:
+        return ~right_val;
       case TK_DEREF:
         return vaddr_read(right_val, 4);
+      case TK_NEG:
+        return -right_val;
       default:
         *success = false;
-        return 0;
+        printf("unknown operator: %d\n", tokens[op_pos].type);
+        return -1;
+      }
+  }
+}
+
+static bool is_certain_type(int i) {
+  return i == 0 || is_op(i-1) || tokens[i-1].type == TK_LPAREN;
+}
+
+static void parse_deref_neg() {
+  for (int i = 0; i < nr_token; i++) {
+    if (tokens[i].type == TK_MUL && is_certain_type(i)) {
+      tokens[i].type = TK_DEREF;
+    }
+    else if (tokens[i].type == TK_SUB && is_certain_type(i)) {
+      tokens[i].type = TK_NEG;
     }
   }
 }
@@ -280,6 +354,8 @@ word_t expr(char *e, bool *success) {
     *success = false;
     return 0;
   }
+
+  parse_deref_neg();
 
   *success = true;
 
