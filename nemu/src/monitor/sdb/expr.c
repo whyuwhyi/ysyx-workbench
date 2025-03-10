@@ -21,6 +21,9 @@
 #include <regex.h>
 #include <memory/vaddr.h>
 
+#define MAX_TOKEN_LEN 32
+#define MAX_TOKENS 32
+
 enum {
   TK_NOTYPE = 256,
   TK_ADD, TK_SUB, TK_MUL, TK_DIV, TK_MOD,
@@ -36,30 +39,30 @@ static struct rule {
   const char *regex;
   int token_type;
 } rules[] = {
-  {" +", TK_NOTYPE},                          // spaces
-  {"\\+", TK_ADD},                            // plus
-  {"-", TK_SUB},                              // subtract
-  {"\\*", TK_MUL},                            // multiply
-  {"/", TK_DIV},                              // divide
-  {"%", TK_MOD},                              // modulo
-  {"==", TK_EQ},                              // equal
-  {"!=", TK_NEQ},                             // not equal
-  {">=", TK_GE},                              // greater or equal
-  {"<=", TK_LE},                              // less or equal
-  {">", TK_GT},                               // greater than
-  {"<", TK_LT},                               // less than
-  {"\\|\\|", TK_OR},                              // or
-  {"&&", TK_AND},                             // and
-  {"!", TK_NOT},                              // not
-  {"\\|", TK_BIT_OR},                           // bitwise or
-  {"&", TK_BIT_AND},                          // bitwise and
-  {"~", TK_BIT_NOT},                          // bitwise not
-  {"\\^", TK_BIT_XOR},                          // bitwise xor
-  {"[0-9]+", TK_DEC},                         // decimal number
-  {"0[xX][0-9a-fA-F]+", TK_HEX},              // hex number
+  {" +",                       TK_NOTYPE},    // spaces
+  {"\\+",                      TK_ADD},       // plus
+  {"-",                        TK_SUB},       // subtract
+  {"\\*",                      TK_MUL},       // multiply
+  {"/",                        TK_DIV},       // divide
+  {"%",                        TK_MOD},       // modulo
+  {"==",                       TK_EQ},        // equal
+  {"!=",                       TK_NEQ},       // not equal
+  {">=",                       TK_GE},        // greater or equal
+  {"<=",                       TK_LE},        // less or equal
+  {">",                        TK_GT},        // greater than
+  {"<",                        TK_LT},        // less than
+  {"\\|\\|",                   TK_OR},        // or
+  {"&&",                       TK_AND},       // and
+  {"!",                        TK_NOT},       // not
+  {"\\|",                      TK_BIT_OR},    // bitwise or
+  {"&",                        TK_BIT_AND},   // bitwise and
+  {"~",                        TK_BIT_NOT},   // bitwise not
+  {"\\^",                      TK_BIT_XOR},   // bitwise xor
+  {"[0-9]+",                   TK_DEC},       // decimal number
+  {"0[xX][0-9a-fA-F]+",        TK_HEX},       // hex number
   {"\\$[a-zA-Z][a-zA-Z0-9_]*", TK_REG},       // register
-  {"\\(", TK_LPAREN},                         // left parenthesis
-  {"\\)", TK_RPAREN},                         // right parenthesis
+  {"\\(",                      TK_LPAREN},    // left parenthesis
+  {"\\)",                      TK_RPAREN}     // right parenthesis
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -85,10 +88,10 @@ void init_regex() {
 
 typedef struct token {
   int type;
-  char str[32];
+  char str[MAX_TOKEN_LEN];
 } Token;
 
-static Token tokens[32] __attribute__((used)) = {};
+static Token tokens[MAX_TOKENS] __attribute__((used)) = {};
 static int nr_token __attribute__((used))  = 0;
 
 static bool make_token(char *e) {
@@ -105,13 +108,13 @@ static bool make_token(char *e) {
         char *substr_start = e + position;
         int substr_len = pmatch.rm_eo;
 
-        if (substr_len >= 32) {
+        if (substr_len >= MAX_TOKEN_LEN) {
           printf("Token string at position %d is too long: %.*s\n",
                  position, substr_len, substr_start);
           return false;
         }
 
-        if (nr_token >= 32) {
+        if (nr_token >= MAX_TOKENS) {
           printf("too many tokens\n");
           return false;
         }
