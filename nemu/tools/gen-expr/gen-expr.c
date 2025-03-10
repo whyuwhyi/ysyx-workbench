@@ -31,7 +31,7 @@ static char *code_format =
 "  return 0; "
 "}";
 
-static void gen_rand_expr();
+static void gen_rand_expr(int *pos);
 
 int main(int argc, char *argv[]) {
   int seed = time(0);
@@ -66,11 +66,38 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 
-void gen_rand_expr() {
+static void gen_num(int *pos) {
+  int num = rand() % 1000 - 500;
+  sprintf(buf + *pos, "%d", num);
+  *pos += strlen(buf + *pos);
+}
+
+static void gen_ch(int *pos, char ch) {
+  buf[*pos] = ch;
+  *pos += 1;
+}
+
+static void gen_rand_op(int *pos) {
+  switch (choose(6)) {
+    case 0: gen_ch(pos, '+'); break;
+    case 1: gen_ch(pos, '-'); break;
+    case 2: gen_ch(pos, '*'); break;
+    case 3: gen_ch(pos, '/'); break;
+    case 4: gen_ch(pos, '%'); break;
+    case 5: gen_ch(pos, '^'); break;
+  }
+}
+
+static void gen_rand_expr(int *pos) {
+  if (*pos >= 60000) {
+    gen_num(pos);
+  }
+
   switch (choose(3)) {
-    case 0: gen_num(); break;
-    case 1: gen('('); gen_rand_expr(); gen(')'); break;
-    default: gen_rand_expr(); gen_rand_op(); gen_rand_expr(); break;
+    case 0: gen_num(pos); break;
+    case 1: gen_ch(pos, '('); gen_rand_expr(pos); gen_ch(pos, ')'); break;
+    case 2: gen_rand_expr(pos); gen_rand_op(pos); gen_rand_expr(pos); break;
+    default: ;
   }
 }
 
