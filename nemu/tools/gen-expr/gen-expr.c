@@ -42,7 +42,8 @@ int main(int argc, char *argv[]) {
   }
   int i;
   for (i = 0; i < loop; i ++) {
-    gen_rand_expr();
+    int pos = 0
+    gen_rand_expr(&pos);
 
     sprintf(code_buf, code_format, buf);
 
