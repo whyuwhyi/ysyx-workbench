@@ -79,8 +79,8 @@ static struct {
   { "info", "Show information about registers or watchpoints", cmd_info },
   { "x", "Scan memory according to EXPR", cmd_x },
   { "p", "Evaluate EXPR and print the result", cmd_p },
-  { "w EXPR", "Set a watchpoint at EXPR", cmd_w },
-  { "d N", "Delete watchpoint N", cmd_d },
+  { "w", "Set a watchpoint at EXPR", cmd_w },
+  { "d", "Delete watchpoint N", cmd_d },
 
 };
 
