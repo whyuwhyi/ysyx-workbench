@@ -1,4 +1,4 @@
-/***************************************************************************************
+/**************************************************************************************
 * Copyright (c) 2014-2024 Zihao Yu, Nanjing University
 *
 * NEMU is licensed under Mulan PSL v2.
@@ -19,26 +19,42 @@
  * Type 'man regex' for more information about POSIX regex functions.
  */
 #include <regex.h>
+#include <memory/vaddr.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ,
-
-  /* TODO: Add more token types */
-
+  TK_NOTYPE = 256, TK_EQ, TK_NEQ, TK_GT, TK_LT, TK_GE, TK_LE,
+  TK_ADD, TK_SUB, TK_MUL, TK_DIV, TK_OR, TK_AND, TK_NOT, TK_BIT_OR, TK_BIT_AND,
+  TK_LPAREN, TK_RPAREN,
+  TK_DEC, TK_HEX, TK_REG, TK_NUM,
+  TK_DEREF,
 };
 
 static struct rule {
   const char *regex;
   int token_type;
 } rules[] = {
-
-  /* TODO: Add more rules.
-   * Pay attention to the precedence level of different rules.
-   */
-
-  {" +", TK_NOTYPE},    // spaces
-  {"\\+", '+'},         // plus
-  {"==", TK_EQ},        // equal
+  {" +", TK_NOTYPE},                          // spaces
+  {"\\+", TK_ADD},                            // plus
+  {"-", TK_SUB},                              // subtract
+  {"\\*", TK_MUL},                            // multiply
+  {"/", TK_DIV},                              // divide
+  {"\\(", TK_LPAREN},                         // left parenthesis
+  {"\\)", TK_RPAREN},                         // right parenthesis
+  {"==", TK_EQ},                              // equal
+  {"!=", TK_NEQ},                             // not equal
+  {">=", TK_GE},                              // greater or equal
+  {"<=", TK_LE},                              // less or equal
+  {">", TK_GT},                               // greater than
+  {"<", TK_LT},                               // less than
+  {"--+-", TK_OR},                            // or
+  {"&&", TK_AND},                             // and
+  {"!", TK_NOT},                              // not
+  {"", TK_BIT_OR},                           // bitwise or
+  {"&", TK_BIT_AND},                          // bitwise and
+  {"~", TK_NOT},                              // bitwise not
+  {"\\$[a-zA-Z][a-zA-Z0-9_]*", TK_REG},       // register
+  {"0[xX][0-9a-fA-F]+", TK_HEX},              // hex number
+  {"[0-9]+", TK_DEC},                         // decimal number
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -84,20 +100,36 @@ static bool make_token(char *e) {
         char *substr_start = e + position;
         int substr_len = pmatch.rm_eo;
 
+        if (substr_len >= 32) {
+          printf("Token string at position %d is too long: %.*s\n",
+                 position, substr_len, substr_start);
+          return false;
+        }
+
+        if (nr_token >= 32) {
+          printf("too many tokens\n");
+          return false;
+        }
+
         Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s",
             i, rules[i].regex, position, substr_len, substr_len, substr_start);
 
         position += substr_len;
 
-        /* TODO: Now a new token is recognized with rules[i]. Add codes
-         * to record the token in the array `tokens'. For certain types
-         * of tokens, some extra actions should be performed.
-         */
-
         switch (rules[i].token_type) {
-          default: TODO();
+          case TK_NOTYPE:
+            break;
+          case TK_DEC:
+          case TK_HEX:
+          case TK_REG:
+            tokens[nr_token].type = rules[i].token_type;
+            strncpy(tokens[nr_token].str, substr_start, substr_len);
+            tokens[nr_token].str[substr_len] = '\0';
+            nr_token++;
+            break;
+          default:
+            tokens[nr_token++].type = rules[i].token_type;
         }
-
         break;
       }
     }
@@ -111,6 +143,137 @@ static bool make_token(char *e) {
   return true;
 }
 
+static bool check_parentheses(int s, int e, bool * success) {
+  if (tokens[s].type != TK_LPAREN || tokens[e].type != TK_RPAREN) {
+    return false;
+  }
+
+  int level = 0;
+  for (int i = s+1; i < e; i++) {
+    if (tokens[i].type == TK_LPAREN) {
+      level++;
+    }
+    else if (tokens[i].type == TK_RPAREN) {
+      level--;
+    }
+
+    if (level < 0) {
+      *success = false;
+      return false;
+    }
+  }
+
+  return level == 0;
+}
+
+static int get_pos_of_main_op(int s, int e) {
+  int pos = -1;
+  int level = 0;
+
+  for (int i = e; i >= s; i--) {
+    if (tokens[i].type == TK_RPAREN) {
+      level++;
+    }
+    else if (tokens[i].type == TK_LPAREN) {
+      level--;
+    }
+    else if (level == 0) {
+      if (tokens[i].type == TK_ADD || tokens[i].type == TK_SUB) {
+        pos = i;
+        break;
+      }
+      else if (tokens[i].type == TK_EQ || tokens[i].type == TK_NEQ) {
+        pos = i;
+      }
+      else if (tokens[i].type == TK_OR) {
+        pos = i;
+      }
+      else if (tokens[i].type == TK_MUL || tokens[i].type == TK_DIV) {
+        pos = i;
+      }
+      else if (tokens[i].type == TK_AND) {
+        pos = i;
+      }
+    }
+  }
+
+  return pos;
+}
+
+static word_t eval(int s, int e, bool *success) {
+  if (success == false) {
+    return 0;
+  } 
+
+  if (s > e) {
+    *success = false;
+    return 0;
+  }
+  else if (s == e) {
+    word_t val = 0;
+    switch (tokens[s].type) {
+      case TK_DEC:
+        sscanf(tokens[s].str, "%d", &val);
+        return val;
+      case TK_HEX:
+        sscanf(tokens[s].str, FMT_WORD, &val);
+        return val;
+      case TK_REG:
+        return isa_reg_str2val(tokens[s].str + 1, NULL);
+      default:
+        *success = false;
+        return 0;
+    }
+  }
+  else if (check_parentheses(s, e, success) == true) {
+    return eval(s + 1, e - 1, success);
+  }
+  else {
+    int op_pos = get_pos_of_main_op(s, e);
+    
+    if (op_pos == -1) {
+      *success = false;
+      return 0;
+    }
+
+    word_t left_val = 0;
+    word_t right_val = eval(op_pos + 1, e, success);
+
+    if (op_pos != 0) {
+      left_val = eval(s, op_pos - 1, success);
+    }
+    
+    switch (tokens[op_pos].type) {
+      case TK_ADD:
+        return left_val + right_val;
+      case TK_SUB:
+        return left_val - right_val;
+      case TK_MUL:
+        return left_val * right_val;
+      case TK_DIV:
+        return left_val / right_val;
+      case TK_BIT_OR:
+        return left_val | right_val;
+      case TK_BIT_AND:
+        return left_val & right_val;
+      case TK_EQ:
+        return left_val == right_val;
+      case TK_NEQ:
+        return left_val != right_val;
+      case TK_OR:
+        return left_val || right_val;
+      case TK_AND:
+        return left_val && right_val;
+      case TK_NOT:
+        return !right_val;
+      case TK_DEREF:
+        return vaddr_read(right_val, 4);
+      default:
+        *success = false;
+        return 0;
+    }
+  }
+}
 
 word_t expr(char *e, bool *success) {
   if (!make_token(e)) {
@@ -118,8 +281,7 @@ word_t expr(char *e, bool *success) {
     return 0;
   }
 
-  /* TODO: Insert codes to evaluate the expression. */
-  TODO();
+  *success = true;
 
-  return 0;
+  return eval(0, nr_token - 1, success);
 }

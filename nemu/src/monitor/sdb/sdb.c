@@ -17,6 +17,7 @@
 #include <cpu/cpu.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <memory/vaddr.h>
 #include "sdb.h"
 
 static int is_batch_mode = false;
@@ -54,6 +55,18 @@ static int cmd_q(char *args) {
 
 static int cmd_help(char *args);
 
+static int cmd_si(char *argd);
+
+static int cmd_info(char *args);
+
+static int cmd_x(char *args);
+
+static int cmd_p(char *args);
+
+static int cmd_w(char *args);
+
+static int cmd_d(char *args);
+
 static struct {
   const char *name;
   const char *description;
@@ -62,8 +75,12 @@ static struct {
   { "help", "Display information about all supported commands", cmd_help },
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
-
-  /* TODO: Add more commands */
+  { "si", "Step an instruction exactly", cmd_si },
+  { "info", "Show information about registers or watchpoints", cmd_info },
+  { "x", "Scan memory according to EXPR", cmd_x },
+  { "p", "Evaluate EXPR and print the result", cmd_p },
+  { "w", "Set a watchpoint at EXPR", cmd_w },
+  { "d", "Delete watchpoint N", cmd_d },
 
 };
 
@@ -89,6 +106,131 @@ static int cmd_help(char *args) {
     }
     printf("Unknown command '%s'\n", arg);
   }
+  return 0;
+}
+
+static int cmd_si(char *args) {
+  char *arg = strtok(NULL, " ");
+  char *remaining = strtok(NULL, " ");
+  uint64_t n = 1;
+  
+  if (arg != NULL && sscanf(arg, "%lu", &n) != 1) {
+    printf("Invalid argument: %s\nUsage: si [N]\n", arg);
+    return 0;
+  }
+
+  if (remaining != NULL) {
+    printf("Too many arguments\nUsage: si [N]\n");
+    return 0;
+  }
+
+  cpu_exec(n);
+  return 0;
+}
+
+static int cmd_info(char *args) {
+  char *arg = strtok(NULL, " ");
+  char *remaining = strtok(NULL, " ");
+  
+  if (arg == NULL) {
+    printf("Too few argument\nUsage: info SUBCMD\n");
+    return 0;
+  }
+
+  if (remaining != NULL) {
+    printf("Too many arguments\nUsage: info SUBCMD\n");
+    return 0;
+  }
+
+  if (strcmp(arg, "r") == 0) {
+    isa_reg_display();
+  }
+  else if (strcmp(arg, "w") == 0) {
+    // display_wp();
+  }
+  else {
+    printf("Unknown subcommand '%s'\n", args);
+  }
+
+  return 0;
+}
+
+static int cmd_x(char *args) {
+  char *arg1 = strtok(NULL, " ");
+  char *arg_end = args + strlen(args);
+  char *temptr = arg1 + strlen(arg1) + 1;
+  char *exp = (temptr < arg_end) ? temptr : NULL;
+  int n = -1;
+
+  if (arg1 == NULL || exp == NULL) {
+    printf("Too few argument\nUsage: x N EXPR\n");
+    return 0;
+  }
+
+  if (sscanf(arg1, "%d", &n) != 1 || n <= 0) {
+    printf("Invalid argument: %s\nUsage: x N EXPR", arg1);
+    return 0;
+  }
+
+  bool success = true;  
+  word_t addr = expr(exp, &success);
+
+  if (success == false) {
+    printf("Invalid expression: %s\n", exp);
+    return 0;
+  }
+
+  for (int i = 0; i < n; ++i) {
+    printf(FMT_WORD, vaddr_read(addr, 4));
+    printf(" "); addr += 4;
+    if ((i+1)%8 == 0) printf("\n");
+  }
+  printf("\n");
+
+  return 0;
+}
+
+static int cmd_p(char *args) {
+
+  if (args == NULL) {
+    printf("Usage: p EXPR");
+    return 0;
+  }
+
+  bool success = true;
+  word_t result = expr(args, &success);
+
+  if (success == false) {
+    printf("Invalid expression: %s\n", args);
+    return 0;
+  }
+
+  printf("%s = %d \n", args, (int)result);
+  return 0;
+}
+
+static int cmd_w(char *args) {
+  if (args == NULL) {
+    printf("Usage: w EXPR");
+    return 0;
+  }
+
+  return 0;
+}
+
+static int cmd_d(char *args) {
+  if (args == NULL) {
+    printf("Usage: d N");
+    return 0;
+  }
+
+  int n;
+  if (sscanf(args, "%d", &n) != 1) {
+    printf("Invalid argument: %s\n", args);
+    return 0;
+  }
+
+  // free_wp(n);
   return 0;
 }
 
