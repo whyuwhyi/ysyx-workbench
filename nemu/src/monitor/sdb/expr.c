@@ -26,13 +26,13 @@
 
 enum {
   TK_NOTYPE = 256,
-  TK_ADD, TK_SUB, TK_MUL, TK_DIV, TK_MOD,
-  TK_EQ, TK_NEQ, TK_GE, TK_LE, TK_GT, TK_LT,
-  TK_OR, TK_AND, TK_NOT,
+  TK_ADD,    TK_SUB,     TK_MUL,     TK_DIV,     TK_MOD,
+  TK_EQ,     TK_NEQ,     TK_GE,      TK_LE,      TK_GT,  TK_LT,
+  TK_OR,     TK_AND,     TK_NOT,
   TK_BIT_OR, TK_BIT_AND, TK_BIT_NOT, TK_BIT_XOR,
-  TK_DEC, TK_HEX, TK_REG,
+  TK_DEC,    TK_HEX,     TK_REG,
   TK_LPAREN, TK_RPAREN,
-  TK_DEREF, TK_NEG,
+  TK_DEREF,  TK_NEG,
 };
 
 static struct rule {
@@ -60,7 +60,7 @@ static struct rule {
   {"\\^",                      TK_BIT_XOR},   // bitwise xor
   {"0[xX][0-9a-fA-F]+",        TK_HEX},       // hex number
   {"[0-9]+",                   TK_DEC},       // decimal number
-  {"\\$(d|[a-zA-Z])[a-zA-Z0-9_]*", TK_REG},       // register
+  {"\\$[a-zA-Z][a-zA-Z0-9_]*", TK_REG},       // register
   {"\\(",                      TK_LPAREN},    // left parenthesis
   {"\\)",                      TK_RPAREN}     // right parenthesis
 };
