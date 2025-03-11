@@ -40,7 +40,7 @@ void init_wp_pool() {
   free_ = wp_pool;
 }
 
-WP* new_wp(char *exp, word_t value) {
+void new_wp(char *exp, word_t value) {
   if (free_ == NULL) {
     printf("No enough watchpoints.\n");
     assert(0);
@@ -51,7 +51,6 @@ WP* new_wp(char *exp, word_t value) {
   head = new;
   strcpy(new->exp, exp);
   new->value = value;
-  return new;
 }
 
 void free_wp(int NO) {

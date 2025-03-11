@@ -226,23 +226,41 @@ static int cmd_w(char *args) {
     printf("Too few arguments\nUsage: w EXPR\n");
     return 0;
   }
+  
+  bool success = true;
+  word_t value = expr(args, &success);
+  
+  if (success == false) {
+    printf("Invalid expression\n");
+    return 0;
+  }
+
+  new_wp(args, value);
 
   return 0;
 }
 
 static int cmd_d(char *args) {
-  if (args == NULL) {
-    printf("Usage: d N");
+  char *arg = strtok(NULL, " ");
+  char *remaining = strtok(NULL, " ");
+
+  if (arg == NULL) {
+    printf("Too few arguments\nUsage: d N\n");
+    return 0;
+  }
+
+  if (remaining != NULL) {
+    printf("Too many arguments\nUsage: d N\n");
     return 0;
   }
 
   int n;
   if (sscanf(args, "%d", &n) != 1) {
-    printf("Invalid argument: %s\n", args);
+    printf("Invalid argument: %s\n", arg);
     return 0;
   }
 
-  // free_wp(n);
+  free_wp(n);
   return 0;
 }
 
