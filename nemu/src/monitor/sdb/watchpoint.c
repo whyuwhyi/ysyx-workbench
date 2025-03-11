@@ -77,3 +77,16 @@ void free_wp(int NO) {
   }
   printf("No watchpoint with NO %d.\n", NO);
 }
+
+void display_wp() {
+  WP* p = head;
+  if (p == NULL) {
+    printf("No watchpoints.\n");
+    return;
+  }
+  printf("Num\tWhat\n");
+  while (p != NULL) {
+    printf("%d\t%s\n", p->NO, p->exp);
+    p = p->next;
+  }
+}
