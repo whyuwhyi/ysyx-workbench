@@ -21,7 +21,8 @@ typedef struct watchpoint {
   int NO;
   struct watchpoint *next;
 
-  /* TODO: Add more members if necessary */
+  char exp[100];
+  word_t value;
 
 } WP;
 
@@ -39,7 +40,7 @@ void init_wp_pool() {
   free_ = wp_pool;
 }
 
-WP* new_wp() {
+WP* new_wp(char *exp, word_t value) {
   if (free_ == NULL) {
     printf("No enough watchpoints.\n");
     assert(0);
@@ -48,6 +49,8 @@ WP* new_wp() {
   free_ = free_->next;
   new->next = head;
   head = new;
+  strcpy(new->exp, exp);
+  new->value = value;
   return new;
 }
 

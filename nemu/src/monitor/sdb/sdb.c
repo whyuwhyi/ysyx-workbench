@@ -166,7 +166,7 @@ static int cmd_x(char *args) {
     exp++;
   }
 
-  if (arg1 == NULL || exp == NULL) {
+  if (arg1 == NULL || exp == NULL || *exp == '\0') {
     printf("Too few argument\nUsage: x N EXPR\n");
     return 0;
   }
@@ -201,7 +201,7 @@ static int cmd_p(char *args) {
   }
 
   if (args == NULL || *args == '\0') {
-    printf("Usage: p EXPR");
+    printf("Too few arguments\nUsage: p EXPR\n");
     return 0;
   }
 
@@ -222,7 +222,7 @@ static int cmd_w(char *args) {
     args++;
   }
 
-  if (args == NULL) {
+  if (args == NULL || *args == '\0') {
     printf("Too few arguments\nUsage: w EXPR\n");
     return 0;
   }
