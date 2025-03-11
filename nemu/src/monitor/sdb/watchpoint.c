@@ -45,6 +45,8 @@ void new_wp(char *exp, word_t value) {
     printf("No enough watchpoints.\n");
     assert(0);
   }
+  assert(strlen(exp) < 100);
+
   WP* new = free_;
   free_ = free_->next;
   new->next = head;
