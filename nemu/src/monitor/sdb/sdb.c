@@ -172,6 +172,10 @@ static int cmd_x(char *args) {
     return 0;
   }
 
+  while (exp != NULL && *exp == ' ') {
+    exp++;
+  }
+
   bool success = true;  
   word_t addr = expr(exp, &success);
 
@@ -191,6 +195,10 @@ static int cmd_x(char *args) {
 }
 
 static int cmd_p(char *args) {
+
+  while (args != NULL &&*args == ' ') {
+    args++;
+  }
 
   if (args == NULL) {
     printf("Usage: p EXPR");
