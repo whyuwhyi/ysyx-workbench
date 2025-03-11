@@ -146,7 +146,7 @@ static int cmd_info(char *args) {
     isa_reg_display();
   }
   else if (strcmp(arg, "w") == 0) {
-    // display_wp();
+    display_wp();
   }
   else {
     printf("Unknown subcommand '%s'\n", args);
