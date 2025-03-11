@@ -161,6 +161,10 @@ static int cmd_x(char *args) {
   char *temptr = arg1 + strlen(arg1) + 1;
   char *exp = (temptr < arg_end) ? temptr : NULL;
   int n = -1;
+  
+  while (exp != NULL && *exp == ' ') {
+    exp++;
+  }
 
   if (arg1 == NULL || exp == NULL) {
     printf("Too few argument\nUsage: x N EXPR\n");
@@ -170,10 +174,6 @@ static int cmd_x(char *args) {
   if (sscanf(arg1, "%d", &n) != 1 || n <= 0) {
     printf("Invalid argument: %s\nUsage: x N EXPR", arg1);
     return 0;
-  }
-
-  while (exp != NULL && *exp == ' ') {
-    exp++;
   }
 
   bool success = true;  
