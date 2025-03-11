@@ -200,7 +200,7 @@ static int cmd_p(char *args) {
     args++;
   }
 
-  if (args == NULL) {
+  if (args == NULL || *args == '\0') {
     printf("Usage: p EXPR");
     return 0;
   }
