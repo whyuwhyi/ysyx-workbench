@@ -92,3 +92,18 @@ void display_wp() {
     p = p->next;
   }
 }
+
+void watchpoint_check() {
+  WP* p = head;
+  while (p != NULL) {
+    word_t value = expr(p->exp, NULL);
+    if (value != p->value) {
+      printf("Watchpoint %d: %s\n", p->NO, p->exp);
+      printf("Old value = %d\n", p->value);
+      printf("New value = %d\n", value);
+      p->value = value;
+    }
+    p = p->next;
+  }
+  nemu_state.state = NEMU_STOP;
+}
