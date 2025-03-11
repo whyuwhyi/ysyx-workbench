@@ -86,9 +86,9 @@ void display_wp() {
     printf("No watchpoints.\n");
     return;
   }
-  printf("Num\tWhat\n");
+  printf("Num\tWhat\tValue\n");
   while (p != NULL) {
-    printf("%d\t%s\n", p->NO, p->exp);
+    printf("%d\t%s\t%d\n", p->NO, p->exp, p->value);
     p = p->next;
   }
 }
