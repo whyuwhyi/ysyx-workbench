@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
   }
   int i;
   for (i = 0; i < loop; i ++) {
-    int pos = 0
+    int pos = 0;
     gen_rand_expr(&pos);
 
     sprintf(code_buf, code_format, buf);
@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
 }
 
 static void gen_num(int *pos) {
-  int num = rand() % 1000 - 500;
+  int num = rand() % 1000;
   sprintf(buf + *pos, "%d", num);
   *pos += strlen(buf + *pos);
 }
@@ -79,7 +79,7 @@ static void gen_ch(int *pos, char ch) {
 }
 
 static void gen_rand_op(int *pos) {
-  switch (choose(6)) {
+  switch (rand()%6) {
     case 0: gen_ch(pos, '+'); break;
     case 1: gen_ch(pos, '-'); break;
     case 2: gen_ch(pos, '*'); break;
@@ -94,7 +94,7 @@ static void gen_rand_expr(int *pos) {
     gen_num(pos);
   }
 
-  switch (choose(3)) {
+  switch (rand()%3) {
     case 0: gen_num(pos); break;
     case 1: gen_ch(pos, '('); gen_rand_expr(pos); gen_ch(pos, ')'); break;
     case 2: gen_rand_expr(pos); gen_rand_op(pos); gen_rand_expr(pos); break;

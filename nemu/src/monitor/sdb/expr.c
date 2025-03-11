@@ -264,7 +264,7 @@ static word_t eval(int s, int e, bool *success) {
         sscanf(tokens[s].str, FMT_WORD, &val);
         return val;
       case TK_REG:
-        return isa_reg_str2val(tokens[s].str + 1, NULL);
+        return isa_reg_str2val(tokens[s].str + 1, success);
       default:
         *success = false;
         return 0;
