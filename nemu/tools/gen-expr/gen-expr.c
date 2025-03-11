@@ -68,7 +68,13 @@ int main(int argc, char *argv[]) {
 }
 
 static void gen_num(int *pos) {
-  int num = rand() % 1000;
+  int num = rand()%1000 - 500;
+  sprintf(buf + *pos, "%d", num);
+  *pos += strlen(buf + *pos);
+}
+
+static void gen_no_zero_num(int *pos) {
+  int num = rand() % 1000 + 1;
   sprintf(buf + *pos, "%d", num);
   *pos += strlen(buf + *pos);
 }
@@ -78,15 +84,26 @@ static void gen_ch(int *pos, char ch) {
   *pos += 1;
 }
 
-static void gen_rand_op(int *pos) {
-  switch (rand()%6) {
-    case 0: gen_ch(pos, '+'); break;
-    case 1: gen_ch(pos, '-'); break;
-    case 2: gen_ch(pos, '*'); break;
-    case 3: gen_ch(pos, '/'); break;
-    case 4: gen_ch(pos, '%'); break;
-    case 5: gen_ch(pos, '^'); break;
+static int gen_rand_op(int *pos) {
+  int op = rand() % 14;
+  switch (op) {
+    case 0: gen_ch(pos, '/'); break;
+    case 1: gen_ch(pos, '%'); break;
+    case 2: gen_ch(pos, '+'); break;
+    case 3: gen_ch(pos, '-'); break;
+    case 4: gen_ch(pos, '*'); break;
+    case 5: gen_ch(pos, '&'); break;
+    case 6: gen_ch(pos, '|'); break;
+    case 7: gen_ch(pos, '^'); break;
+    case 8: gen_ch(pos, '<'); break;
+    case 9: gen_ch(pos, '>'); break;
+    case 10: gen_ch(pos, '='); gen_ch(pos, '='); break;
+    case 11: gen_ch(pos, '!'); gen_ch(pos, '='); break;
+    case 12: gen_ch(pos, '&'); gen_ch(pos, '&'); break;
+    case 13: gen_ch(pos, '|'); gen_ch(pos, '|'); break;
+    default: ;
   }
+  return op;
 }
 
 static void gen_rand_expr(int *pos) {
@@ -97,7 +114,10 @@ static void gen_rand_expr(int *pos) {
   switch (rand()%3) {
     case 0: gen_num(pos); break;
     case 1: gen_ch(pos, '('); gen_rand_expr(pos); gen_ch(pos, ')'); break;
-    case 2: gen_rand_expr(pos); gen_rand_op(pos); gen_rand_expr(pos); break;
+    case 2: gen_rand_expr(pos);
+            if (gen_rand_op(pos) <= 1 ) gen_no_zero_num(pos);
+            else gen_rand_expr(); 
+            break;
     default: ;
   }
 }
