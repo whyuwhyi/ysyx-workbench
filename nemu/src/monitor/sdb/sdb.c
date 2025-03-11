@@ -172,7 +172,7 @@ static int cmd_x(char *args) {
   }
 
   if (sscanf(arg1, "%d", &n) != 1 || n <= 0) {
-    printf("Invalid argument: %s\nUsage: x N EXPR", arg1);
+    printf("Invalid argument: '%s'\nUsage: x N EXPR", arg1);
     return 0;
   }
 
@@ -180,7 +180,7 @@ static int cmd_x(char *args) {
   word_t addr = expr(exp, &success);
 
   if (success == false) {
-    printf("Invalid expression: %s\n", exp);
+    printf("Invalid expression\n");
     return 0;
   }
 
@@ -209,17 +209,21 @@ static int cmd_p(char *args) {
   word_t result = expr(args, &success);
 
   if (success == false) {
-    printf("Invalid expression: %s\n", args);
+    printf("Invalid expression\n");
     return 0;
   }
 
-  printf("%s = %d \n", args, (int)result);
+  printf("result = %d \n", (int)result);
   return 0;
 }
 
 static int cmd_w(char *args) {
+  while (args != NULL && *args == ' ') {
+    args++;
+  }
+
   if (args == NULL) {
-    printf("Usage: w EXPR");
+    printf("Too few arguments\nUsage: w EXPR\n");
     return 0;
   }
 
