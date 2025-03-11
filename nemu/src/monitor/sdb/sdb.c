@@ -156,8 +156,8 @@ static int cmd_info(char *args) {
 }
 
 static int cmd_x(char *args) {
-  char *arg1 = strtok(NULL, " ");
   char *arg_end = args + strlen(args);
+  char *arg1 = strtok(NULL, " ");
   char *temptr = arg1 + strlen(arg1) + 1;
   char *exp = (temptr < arg_end) ? temptr : NULL;
   int n = -1;
