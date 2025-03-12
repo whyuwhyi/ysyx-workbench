@@ -13,16 +13,17 @@ void reset(int n);
 void nvboard_bind_all_pins(TOP_NAME* top);
 
 int main(int argc, char **argv) {
-  nvboard_bind_all_pins(top);
-  nvboard_init();
-
   VerilatedContext *contextp = new VerilatedContext;
-  VerilatedFstC* tfp = new VerilatedFstC;
-
   contextp->commandArgs(argc, argv);
   contextp->traceEverOn(true);
+
+  VerilatedFstC* tfp = new VerilatedFstC;
+  top = new TOP_NAME(contextp);
   top->trace(tfp, 0);
   tfp->open("./build/wave.fst");
+  
+  nvboard_bind_all_pins(top);
+  nvboard_init();
 
   reset(10);
 
