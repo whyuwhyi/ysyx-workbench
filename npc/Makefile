@@ -49,7 +49,7 @@ run: $(BIN)
 
 sim: $(BIN)
 	$(call git_commit, "sim RTL")
-	@$^
+	$^
 	$(GTKWAVE) $(WAVE)
 
 
