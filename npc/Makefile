@@ -1,4 +1,4 @@
-TOPNAME = switch
+TOPNAME = light
 NXDC_FILES = constr/top.nxdc
 INC_PATH ?=
 
@@ -50,7 +50,7 @@ run: $(BIN)
 sim: $(BIN)
 	@$(call git_commit, "sim RTL")
 	@$^
-	$(GTKWAVE) $(WAVE)
+	@$(GTKWAVE) $(WAVE)
 
 
 clean:
