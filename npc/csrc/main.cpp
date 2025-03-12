@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
   top->b = 0;
 
   int i;
-  for (i = 0; i < 10; i++) {
+  for (i = 0; i < 100; i++) {
     int a = rand() & 1;
     int b = rand() & 1;
     top->a = a;
