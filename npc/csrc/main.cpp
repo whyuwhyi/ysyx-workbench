@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
   contextp->commandArgs(argc, argv);
   contextp->traceEverOn(true);
   top->trace(tfp, 0);
-  tfp->open("wave.fst");
+  tfp->open("./build/wave.fst");
 
   top->a = 0;
   top->b = 0;
