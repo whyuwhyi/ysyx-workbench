@@ -158,7 +158,7 @@ static bool check_parentheses(int s, int e, bool * success) {
 
   int level = 1;
   bool matched = true;
-  for (int i = s+1; i < e; i++) {
+  for (int i = s + 1; i < e; i++) {
     if (tokens[i].type == TK_LPAREN) {
       level++;
     }
@@ -215,7 +215,6 @@ static int get_op_priority(int i) {
     case TK_NOT:
     case TK_BIT_NOT:
       return 0;
-
     default:
       return -1;
   }
@@ -414,5 +413,4 @@ void test_expr() {
     assert(result == exp_result);
 
   }
-
 }
