@@ -377,7 +377,6 @@ void test_expr() {
   while (1) {
     char exp[65536+128];
     fgets(exp, sizeof(exp), fp);
-    printf("exp: %s\n", exp);
     if (feof(fp)) break;
     char *result_str = strtok(exp, " ");
     word_t result;
@@ -385,7 +384,7 @@ void test_expr() {
     bool success = true;
     word_t exp_result = expr(exp+strlen(result_str), &success);
     
-    printf("exp: %s\n", exp+strlen(result_str));
+    printf("exp: %s\n", exp+strlen(result_str)+1);
 
     if (!success) {
       printf("exp: %s\n", exp);
