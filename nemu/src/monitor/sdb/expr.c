@@ -287,7 +287,7 @@ static word_t eval(int s, int e, bool *success) {
     
     if (op_pos == -1) {
       for (int i = s; i <= e; i++) {
-        printf("%d ", tokens[i].type);
+        printf("%c ", tokens[i].type);
       }
 
       *success = false;
