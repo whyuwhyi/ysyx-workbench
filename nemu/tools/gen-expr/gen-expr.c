@@ -110,9 +110,9 @@ static void gen_rand_binary_op() {
     case 6: gen_char('>'); gen_char('='); break;
     case 7: gen_char('<'); break;
     case 8: gen_char('>'); break;
-    case 9: gen_char('+'); break;
-    case 10: gen_char('-'); break;
-    case 11: gen_char('*'); break;
+    case 9: gen_char('&'); break;
+    case 10: gen_char('|'); break;
+    case 11: gen_char('^'); break;
     case 12: gen_char('&'); gen_char('&'); break;
     case 13: gen_char('|'); gen_char('|'); break;
     default: assert(0);
@@ -122,8 +122,8 @@ static void gen_rand_binary_op() {
 static void gen_rand_unary_op() {
   switch (rand() % 2) {
     case 0: gen_char('!'); break;
-    case 1: gen_char('!'); break;
-    case 2: gen_char('!'); break;
+    case 1: gen_char('~'); break;
+    case 2: gen_char('_'); break;
     default: assert(0);
   }
 }
