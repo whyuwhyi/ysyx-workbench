@@ -412,8 +412,8 @@ void test_expr() {
     word_t res = !((~(! 13u )) < (!(!(~(~  20u /67u  )))));
     word_t res1 = (~(! 13u ));
     word_t res2 = (!(!(~(~  20u /67u  ))));
-    word_t res3 = (word_t)res1 < (word_t)res2;
-    word_t res4 = (~(! 13u )) < (!(!(~(~  20u /67u  ))));
+    word_t res3 = res1 < res2;
+    word_t res4 = (word_t)(~(! 13u )) < (word_t)(!(!(~(~  20u /67u  ))));
     word_t res5 = !res4;
     printf("res: %u\n", res);
     printf("res1: %u\n", res1);
