@@ -166,6 +166,7 @@ static bool check_parentheses(int s, int e, bool * success) {
     }
 
     if (level < 0) {
+      printf("start:%d end:%d\n", s, e);
       printf("unmatched parentheses\n");
       *success = false;
       return false;
@@ -249,7 +250,7 @@ static int get_pos_of_main_op(int s, int e) {
 static word_t eval(int s, int e, bool *success) {
   if (success == false) {
     return 0;
-  } 
+  }
 
   if (s > e) {
     *success = false;
@@ -407,7 +408,7 @@ void test_expr() {
     }
 
     printf("result_expr: %u\n", exp_result);
-    // assert(result == exp_result);
+    assert(result == exp_result);
 
   }
 
