@@ -158,7 +158,7 @@ static bool check_parentheses(int s, int e, bool * success) {
 
   int level = 1;
   bool matched = true;
-  for (int i = s; i < e; i++) {
+  for (int i = s+1; i < e; i++) {
     if (tokens[i].type == TK_LPAREN) {
       level++;
     }
@@ -286,10 +286,6 @@ static word_t eval(int s, int e, bool *success) {
     int op_pos = get_pos_of_main_op(s, e);
     
     if (op_pos == -1) {
-      for (int i = s; i <= e; i++) {
-        printf("%c ", tokens[i].type);
-      }
-
       *success = false;
       printf("Invalid expression\n");
       assert(0);
