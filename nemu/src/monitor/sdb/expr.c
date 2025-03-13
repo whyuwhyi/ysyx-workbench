@@ -403,6 +403,8 @@ void test_expr() {
     }
 
     printf("line %d: %s\n", i, exp);
+    printf("result: %u\n", result);
+    printf("result_expr: %u\n", exp_result);
     assert(result == exp_result);
 
   }
