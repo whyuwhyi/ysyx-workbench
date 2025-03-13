@@ -295,7 +295,7 @@ static word_t eval(int s, int e, bool *success) {
     word_t right_val = eval(op_pos+1, e, success);
 
     if (is_binary(op_pos)) {
-      left_val = eval(s, op_pos -1, success);
+      left_val = eval(s, op_pos-1, success);
     }
     
     switch (tokens[op_pos].type) {
@@ -410,7 +410,9 @@ void test_expr() {
     }
 
     word_t res = ((!((~(!(( 13u ))))<(!(!(~(~  20u /67u  )))))));
+    word_t res1 = ~  20u /67u;
     printf("res: %u\n", res);
+    printf("res1: %u\n", res1);
 
     printf("result_exp: %u\n", exp_result);
     assert(result == exp_result);
