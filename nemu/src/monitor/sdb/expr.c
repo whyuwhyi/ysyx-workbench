@@ -166,6 +166,7 @@ static bool check_parentheses(int s, int e, bool * success) {
     }
 
     if (level < 0) {
+      printf("unmatched parentheses\n");
       *success = false;
       return false;
     }
@@ -176,7 +177,7 @@ static bool check_parentheses(int s, int e, bool * success) {
 
 static int get_op_priority(int i) {
   if (i < 0 || i >= nr_token) {
-    return -1;
+    assert(0);
   }
 
   switch (tokens[i].type) {
@@ -252,6 +253,8 @@ static word_t eval(int s, int e, bool *success) {
 
   if (s > e) {
     *success = false;
+    printf("Invalid expression\n");
+    assert(0);
     return 0;
   }
   else if (s == e) {
@@ -267,6 +270,8 @@ static word_t eval(int s, int e, bool *success) {
         return isa_reg_str2val(tokens[s].str + 1, success);
       default:
         *success = false;
+        printf("Invalid expression\n");
+        assert(0);
         return 0;
     }
   }
@@ -278,6 +283,8 @@ static word_t eval(int s, int e, bool *success) {
     
     if (op_pos == -1) {
       *success = false;
+      printf("Invalid expression\n");
+      assert(0);
       return 0;
     }
 
@@ -332,6 +339,7 @@ static word_t eval(int s, int e, bool *success) {
       default:
         *success = false;
         printf("unknown operator: %d\n", tokens[op_pos].type);
+        assert(0);
         return -1;
       }
   }
