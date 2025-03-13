@@ -409,7 +409,7 @@ void test_expr() {
       panic("expr error");
     }
 
-    word_t res = !((~(! 13u )) < (!(!(~(~  20u /67u  )))));
+    word_t res = ((!((~(!(( 13u ))))<(!(!(~(~  20u /67u  )))))));
     word_t res1 = (~(!(( 13u ))));
     word_t res2 = (!(!(~(~  20u /67u  ))));
     word_t res3 = res1 < res2;
