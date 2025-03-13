@@ -166,7 +166,6 @@ static bool check_parentheses(int s, int e, bool * success) {
     }
 
     if (level < 0) {
-      printf("start:%d end:%d\n", s, e);
       printf("unmatched parentheses\n");
       *success = false;
       return false;
