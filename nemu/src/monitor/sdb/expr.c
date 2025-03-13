@@ -384,7 +384,7 @@ void test_expr() {
     bool success = true;
     word_t exp_result = expr(exp+strlen(result_str), &success);
     
-    printf("exp: %s\n", exp);
+    printf("exp: %s\n", exp+strlen(result_str));
 
     if (!success) {
       printf("exp: %s\n", exp);
