@@ -286,6 +286,10 @@ static word_t eval(int s, int e, bool *success) {
     int op_pos = get_pos_of_main_op(s, e);
     
     if (op_pos == -1) {
+      for (int i = s; i <= e; i++) {
+        printf("%d ", tokens[i].type);
+      }
+
       *success = false;
       printf("Invalid expression\n");
       assert(0);
