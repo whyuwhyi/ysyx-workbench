@@ -364,3 +364,29 @@ word_t expr(char *e, bool *success) {
 
   return eval(0, nr_token - 1, success);
 }
+
+void test_expr() {
+  const char *file_path = "tools/gen-expr/input";
+  FILE *fp = fopen(file_path, "r");
+
+  while (1) {
+    char exp[65536+128];
+    fgets(exp, sizeof(exp), fp);
+    if (feof(fp)) break;
+    char *result_str = strtok(exp, " ");
+    word_t result;
+    sscanf(result_str, "%u", &result);
+    bool success = true;
+    word_t exp_result = expr(exp+strlen(result_str), &success);
+
+    if (!success) {
+      printf("exp: %s\n", exp);
+      printf("result: %u\n", result);
+      printf("result_expr: %u\n", exp_result);
+      panic("expr error");
+    }
+    assert(result == exp_result);
+
+  }
+
+}

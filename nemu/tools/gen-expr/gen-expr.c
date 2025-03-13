@@ -74,7 +74,7 @@ static void gen_char(char c) {
 }
 
 static void gen_rand_space() {
-  int num = rand() % 10;
+  int num = rand() % 3;
 
   for (int i = 0; i < num; i ++) {
     gen_char(' ');
@@ -83,7 +83,7 @@ static void gen_rand_space() {
 
 static void gen_rand_num() {
   gen_rand_space();
-  int num = rand() % 1000 - 500;
+  int num = rand() % 1000;
   sprintf(buf + pos, "%d", num);
   pos += strlen(buf + pos);
   buf[pos] = '\0';
@@ -120,9 +120,10 @@ static void gen_rand_binary_op() {
 }
 
 static void gen_rand_unary_op() {
-  switch (rand() % 2) {
+  switch (rand() % 3) {
     case 0: gen_char('~'); break;
     case 1: gen_char('!'); break;
+    case 2: gen_char('-'); break;
     default: assert(0);
   }
 }
@@ -144,7 +145,7 @@ static void gen_rand_expr() {
   switch (rand() % 5) {
     case 0: gen_rand_num(); break;
     case 1: gen_char('('); gen_rand_expr(); gen_char(')'); break;
-    case 2: gen_rand_unary_op(); gen_rand_expr(); break;
+    case 2: gen_char('('); gen_rand_unary_op(); gen_rand_expr();  gen_char(')'); break;
     case 3: gen_rand_expr(); gen_rand_binary_op(); gen_rand_expr(); break;
     case 4: gen_rand_expr(); gen_rand_spec_op(); gen_rand_none_zero(); break;
     default: assert(0);
