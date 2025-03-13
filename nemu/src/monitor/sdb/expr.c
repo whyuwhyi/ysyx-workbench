@@ -165,11 +165,11 @@ static bool check_parentheses(int s, int e, bool * success) {
       level--;
     }
 
-    if (level < 0) {
-      printf("unmatched parentheses\n");
-      *success = false;
-      return false;
-    }
+    // if (level < 0) {
+      // printf("unmatched parentheses\n");
+      // *success = false;
+      // return false;
+    // }
   }
 
   return level == 0;
