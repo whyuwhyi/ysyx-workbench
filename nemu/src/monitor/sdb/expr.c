@@ -368,13 +368,15 @@ word_t expr(char *e, bool *success) {
 void test_expr() {
   const char *file_path = "tools/gen-expr/input";
   FILE *fp = fopen(file_path, "r");
+  int i = 0;
 
   if (fp == NULL) {
     printf("Can not open file %s\n", file_path);
     return;
   }
+  
 
-  while (1) {
+  while (++i) {
     char exp[65536+128];
     fgets(exp, sizeof(exp), fp);
     if (feof(fp)) break;
@@ -382,16 +384,16 @@ void test_expr() {
     word_t result;
     sscanf(result_str, "%u", &result);
     bool success = true;
-    word_t exp_result = expr(exp+strlen(result_str), &success);
-    
-    printf("exp: %s\n", exp+strlen(result_str)+1);
+    word_t exp_result = expr(exp+strlen(result_str)+1, &success);
 
     if (!success) {
-      printf("exp: %s\n", exp);
+      printf("line %d: %s\n", i, exp);
       printf("result: %u\n", result);
       printf("result_expr: %u\n", exp_result);
       panic("expr error");
     }
+
+    printf("line %d: %s\n", i, exp);
     assert(result == exp_result);
 
   }
