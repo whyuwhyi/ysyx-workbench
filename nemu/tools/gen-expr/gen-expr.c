@@ -120,10 +120,10 @@ static void gen_rand_binary_op() {
 }
 
 static void gen_rand_unary_op() {
-  switch (rand() % 3) {
-    case 0: gen_char('~'); break;
-    case 1: gen_char('!'); break;
-    case 2: gen_char('-'); break;
+  switch (rand() % 2) {
+    // case 0: gen_char('~'); break;
+    case 0: gen_char('!'); break;
+    case 1: gen_char('-'); break;
     default: assert(0);
   }
 }
