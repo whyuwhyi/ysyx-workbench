@@ -366,7 +366,7 @@ word_t expr(char *e, bool *success) {
 }
 
 void test_expr() {
-  const char *file_path = "tools/gen-expr/input.txt";
+  const char *file_path = "tools/gen-expr/input";
   FILE *fp = fopen(file_path, "r");
 
   if (fp == NULL) {
