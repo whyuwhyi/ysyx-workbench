@@ -369,6 +369,11 @@ void test_expr() {
   const char *file_path = "tools/gen-expr/input.txt";
   FILE *fp = fopen(file_path, "r");
 
+  if (fp == NULL) {
+    printf("Can not open file %s\n", file_path);
+    return;
+  }
+
   while (1) {
     char exp[65536+128];
     fgets(exp, sizeof(exp), fp);
