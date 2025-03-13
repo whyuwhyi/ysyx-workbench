@@ -385,15 +385,18 @@ void test_expr() {
   
 
   while (++i) {
-    char exp[65536+128];
-    fgets(exp, sizeof(exp), fp);
-    exp[strlen(exp)-1] = '\0';
+    char str[65536+128];
+    fgets(str, sizeof(str), fp);
+    str[strlen(str)-1] = '\0';
     if (feof(fp)) break;
-    char *result_str = strtok(exp, " ");
+    char *result_str = strtok(str, " ");
+    char *exp = result_str + strlen(result_str) + 1;
     word_t result;
+
     sscanf(result_str, "%u", &result);
+
     bool success = true;
-    word_t exp_result = expr(exp+strlen(result_str)+1, &success);
+    word_t exp_result = expr(exp, &success);
 
     printf("line %d: %s\n", i, exp);
     printf("result: %u\n", result);
