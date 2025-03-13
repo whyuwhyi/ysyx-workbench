@@ -395,15 +395,14 @@ void test_expr() {
     bool success = true;
     word_t exp_result = expr(exp+strlen(result_str)+1, &success);
 
+    printf("line %d: %s\n", i, exp);
+    printf("result: %u\n", result);
+
     if (!success) {
-      printf("line %d: %s\n", i, exp);
-      printf("result: %u\n", result);
       printf("result_expr: %u\n", exp_result);
       panic("expr error");
     }
 
-    printf("line %d: %s\n", i, exp);
-    printf("result: %u\n", result);
     printf("result_expr: %u\n", exp_result);
     assert(result == exp_result);
 
