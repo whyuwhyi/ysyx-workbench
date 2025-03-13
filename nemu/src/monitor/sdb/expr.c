@@ -405,11 +405,14 @@ void test_expr() {
     printf("result: %u\n", result);
 
     if (!success) {
-      printf("result_expr: %u\n", exp_result);
+      printf("result_exp: %u\n", exp_result);
       panic("expr error");
     }
 
-    printf("result_expr: %u\n", exp_result);
+    word_t res = ((!((~(!(( 13u ))))<(!(!(~(~  20u /67u  )))))));
+    printf("res: %u\n", res);
+
+    printf("result_exp: %u\n", exp_result);
     assert(result == exp_result);
 
   }
