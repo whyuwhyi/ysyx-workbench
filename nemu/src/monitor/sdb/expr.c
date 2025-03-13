@@ -410,8 +410,6 @@ void test_expr() {
     }
 
     printf("result_expr: %u\n", exp_result);
-    unsigned r = 1 > -1;
-    printf("1 > -1: %u\n", r);
     assert(result == exp_result);
 
   }
