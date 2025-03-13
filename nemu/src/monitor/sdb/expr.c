@@ -22,7 +22,7 @@
 #include <memory/vaddr.h>
 
 #define MAX_TOKEN_LEN 32
-#define MAX_TOKENS 3200
+#define MAX_TOKENS 65535
 
 enum {
   TK_NOTYPE = 256,
