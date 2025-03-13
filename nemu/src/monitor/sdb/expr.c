@@ -383,6 +383,8 @@ void test_expr() {
     sscanf(result_str, "%u", &result);
     bool success = true;
     word_t exp_result = expr(exp+strlen(result_str), &success);
+    
+    printf("exp: %s\n", exp);
 
     if (!success) {
       printf("exp: %s\n", exp);
