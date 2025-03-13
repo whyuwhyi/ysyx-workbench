@@ -156,8 +156,9 @@ static bool check_parentheses(int s, int e, bool * success) {
     return false;
   }
 
-  int level = 0;
-  for (int i = s+1; i < e; i++) {
+  int level = 1;
+  bool matched = true;
+  for (int i = s; i < e; i++) {
     if (tokens[i].type == TK_LPAREN) {
       level++;
     }
@@ -165,14 +166,17 @@ static bool check_parentheses(int s, int e, bool * success) {
       level--;
     }
 
-    if (level < 0) {
+    if (level == 0) {
+      matched = false;
+    }
+    else if (level < 0) {
       printf("unmatched parentheses\n");
       *success = false;
       return false;
     }
   }
 
-  return level == 0;
+  return matched;
 }
 
 static int get_op_priority(int i) {
