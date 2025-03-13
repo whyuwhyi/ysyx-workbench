@@ -413,10 +413,12 @@ void test_expr() {
     word_t res1 = ~  20u /67u;
     word_t res2 = (!(!(~(~  20u /67u  ))));
     word_t res3 = (~(!(( 13u ))));
+    word_t res4 = res3 < res2;
     printf("res: %u\n", res);
     printf("res1: %u\n", res1);
     printf("res2: %u\n", res2);
     printf("res3: %u\n", res3);
+    printf("res4: %u\n", res4);
 
     printf("result_exp: %u\n", exp_result);
     assert(result == exp_result);
