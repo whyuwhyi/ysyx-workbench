@@ -84,7 +84,7 @@ static void gen_rand_space() {
 static void gen_rand_num() {
   gen_rand_space();
   int num = rand() % 1000;
-  sprintf(buf + pos, "%d", num);
+  sprintf(buf + pos, "%du", num);
   pos += strlen(buf + pos);
   buf[pos] = '\0';
   gen_rand_space();
@@ -93,7 +93,7 @@ static void gen_rand_num() {
 static void gen_rand_none_zero() {
   gen_rand_space();
   int num = rand()%1000 + 1;
-  sprintf(buf + pos, "%d", num);
+  sprintf(buf + pos, "%du", num);
   pos += strlen(buf + pos);
   buf[pos] = '\0';
   gen_rand_space();
