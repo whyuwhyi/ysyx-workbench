@@ -179,6 +179,7 @@ static int cmd_x(char *args) {
 
   bool success = true;  
   word_t addr = expr(exp, &success);
+  word_t value = 0;
 
   if (success == false) {
     printf("Invalid expression\n");
@@ -186,9 +187,9 @@ static int cmd_x(char *args) {
   }
   
   printf("address \t hex \t\t dec\n");
-
   for (int i = 0; i < n; ++i) {
-    printf(""FMT_WORD"\t "FMT_WORD"\t %d\n", addr, vaddr_read(addr, 4), vaddr_read(addr, 4));
+    value = vaddr_read(addr, 4);
+    printf(""FMT_WORD"\t "FMT_WORD"\t %d\n", addr, value, value);
     addr += 4;
   }
   printf("\n");
