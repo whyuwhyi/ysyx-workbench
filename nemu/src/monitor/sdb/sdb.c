@@ -185,7 +185,7 @@ static int cmd_x(char *args) {
     return 0;
   }
   
-  printf("address \t\t hex \t\t dec\n");
+  printf("address \t hex \t\t dec\n");
 
   for (int i = 0; i < n; ++i) {
     printf(""FMT_WORD"\t "FMT_WORD"\t %d\n", addr, vaddr_read(addr, 4), vaddr_read(addr, 4));
