@@ -50,6 +50,7 @@ static int cmd_c(char *args) {
 
 
 static int cmd_q(char *args) {
+  nemu_state.state = NEMU_QUIT;
   return -1;
 }
 
@@ -146,7 +147,7 @@ static int cmd_info(char *args) {
     isa_reg_display();
   }
   else if (strcmp(arg, "w") == 0) {
-    // display_wp();
+    display_wp();
   }
   else {
     printf("Unknown subcommand '%s'\n", args);
@@ -156,19 +157,23 @@ static int cmd_info(char *args) {
 }
 
 static int cmd_x(char *args) {
-  char *arg1 = strtok(NULL, " ");
   char *arg_end = args + strlen(args);
+  char *arg1 = strtok(NULL, " ");
   char *temptr = arg1 + strlen(arg1) + 1;
   char *exp = (temptr < arg_end) ? temptr : NULL;
   int n = -1;
+  
+  while (exp != NULL && *exp == ' ') {
+    exp++;
+  }
 
-  if (arg1 == NULL || exp == NULL) {
+  if (arg1 == NULL || exp == NULL || *exp == '\0') {
     printf("Too few argument\nUsage: x N EXPR\n");
     return 0;
   }
 
   if (sscanf(arg1, "%d", &n) != 1 || n <= 0) {
-    printf("Invalid argument: %s\nUsage: x N EXPR", arg1);
+    printf("Invalid argument: '%s'\nUsage: x N EXPR", arg1);
     return 0;
   }
 
@@ -176,7 +181,7 @@ static int cmd_x(char *args) {
   word_t addr = expr(exp, &success);
 
   if (success == false) {
-    printf("Invalid expression: %s\n", exp);
+    printf("Invalid expression\n");
     return 0;
   }
 
@@ -192,8 +197,12 @@ static int cmd_x(char *args) {
 
 static int cmd_p(char *args) {
 
-  if (args == NULL) {
-    printf("Usage: p EXPR");
+  while (args != NULL &&*args == ' ') {
+    args++;
+  }
+
+  if (args == NULL || *args == '\0') {
+    printf("Too few arguments\nUsage: p EXPR\n");
     return 0;
   }
 
@@ -201,36 +210,58 @@ static int cmd_p(char *args) {
   word_t result = expr(args, &success);
 
   if (success == false) {
-    printf("Invalid expression: %s\n", args);
+    printf("Invalid expression\n");
     return 0;
   }
 
-  printf("%s = %d \n", args, (int)result);
+  printf("result = %d \n", (int)result);
   return 0;
 }
 
 static int cmd_w(char *args) {
-  if (args == NULL) {
-    printf("Usage: w EXPR");
+  while (args != NULL && *args == ' ') {
+    args++;
+  }
+
+  if (args == NULL || *args == '\0') {
+    printf("Too few arguments\nUsage: w EXPR\n");
     return 0;
   }
+  
+  bool success = true;
+  word_t value = expr(args, &success);
+  
+  if (success == false) {
+    printf("Invalid expression\n");
+    return 0;
+  }
+
+  new_wp(args, value);
 
   return 0;
 }
 
 static int cmd_d(char *args) {
-  if (args == NULL) {
-    printf("Usage: d N");
+  char *arg = strtok(NULL, " ");
+  char *remaining = strtok(NULL, " ");
+
+  if (arg == NULL) {
+    printf("Too few arguments\nUsage: d N\n");
+    return 0;
+  }
+
+  if (remaining != NULL) {
+    printf("Too many arguments\nUsage: d N\n");
     return 0;
   }
 
   int n;
   if (sscanf(args, "%d", &n) != 1) {
-    printf("Invalid argument: %s\n", args);
+    printf("Invalid argument: %s\n", arg);
     return 0;
   }
 
-  // free_wp(n);
+  free_wp(n);
   return 0;
 }
 
@@ -282,4 +313,6 @@ void init_sdb() {
 
   /* Initialize the watchpoint pool. */
   init_wp_pool();
+
+  test_expr();
 }

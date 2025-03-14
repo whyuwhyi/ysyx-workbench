@@ -32,6 +32,7 @@ static char *code_format =
 "}";
 
 static void gen_rand_expr();
+int pos = 0;
 
 int main(int argc, char *argv[]) {
   int seed = time(0);
@@ -42,6 +43,7 @@ int main(int argc, char *argv[]) {
   }
   int i;
   for (i = 0; i < loop; i ++) {
+    pos = 0;
     gen_rand_expr();
 
     sprintf(code_buf, code_format, buf);
@@ -66,11 +68,86 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 
-void gen_rand_expr() {
-  switch (choose(3)) {
-    case 0: gen_num(); break;
-    case 1: gen('('); gen_rand_expr(); gen(')'); break;
-    default: gen_rand_expr(); gen_rand_op(); gen_rand_expr(); break;
+static void gen_char(char c) {
+  buf[pos++] = c;
+  buf[pos] = '\0';
+}
+
+static void gen_rand_space() {
+  int num = rand() % 3;
+
+  for (int i = 0; i < num; i ++) {
+    gen_char(' ');
   }
 }
 
+static void gen_rand_num() {
+  gen_rand_space();
+  int num = rand() % 100;
+  sprintf(buf + pos, "%du", num);
+  pos += strlen(buf + pos);
+  buf[pos] = '\0';
+  gen_rand_space();
+}
+
+static void gen_rand_none_zero() {
+  gen_rand_space();
+  int num = rand() % 100 + 1;
+  sprintf(buf + pos, "%du", num);
+  pos += strlen(buf + pos);
+  buf[pos] = '\0';
+  gen_rand_space();
+}
+
+static void gen_rand_binary_op() {
+  switch (rand() % 14) {
+    case 0: gen_char('+'); break;
+    case 1: gen_char('-'); break;
+    case 2: gen_char('*'); break;
+    case 3: gen_char('='); gen_char('='); break;
+    case 4: gen_char('!'); gen_char('='); break;
+    case 5: gen_char('<'); gen_char('='); break;
+    case 6: gen_char('>'); gen_char('='); break;
+    case 7: gen_char('<'); break;
+    case 8: gen_char('>'); break;
+    case 9: gen_char('&'); break;
+    case 10: gen_char('|'); break;
+    case 11: gen_char('^'); break;
+    case 12: gen_char('&'); gen_char('&'); break;
+    case 13: gen_char('|'); gen_char('|'); break;
+    default: assert(0);
+  }
+}
+
+static void gen_rand_unary_op() {
+  switch (rand() % 2) {
+    case 0: gen_char('!'); break;
+    case 1: gen_char('~'); break;
+    case 2: gen_char('_'); break;
+    default: assert(0);
+  }
+}
+
+static void gen_rand_spec_op() {
+  switch (rand() % 2) {
+    case 0: gen_char('/'); break;
+    case 1: gen_char('%'); break;
+    default: assert(0);
+  }
+}
+
+static void gen_rand_expr() {
+  if (pos > 60000) {
+    gen_rand_num();
+    return ;
+  }
+
+  switch (rand() % 5) {
+    case 0: gen_rand_num(); break;
+    case 1: gen_char('('); gen_rand_expr(); gen_char(')'); break;
+    case 2: gen_char('('); gen_rand_unary_op(); gen_rand_expr();  gen_char(')'); break;
+    case 3: gen_rand_expr(); gen_rand_binary_op(); gen_rand_expr(); break;
+    case 4: gen_rand_expr(); gen_rand_spec_op(); gen_rand_none_zero(); break;
+    default: assert(0);
+  }
+}
