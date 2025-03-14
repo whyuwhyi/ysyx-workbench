@@ -184,11 +184,12 @@ static int cmd_x(char *args) {
     printf("Invalid expression\n");
     return 0;
   }
+  
+  printf("address \t hex \t dec\n");
 
   for (int i = 0; i < n; ++i) {
-    printf(FMT_WORD, vaddr_read(addr, 4));
-    printf(" "); addr += 4;
-    if ((i+1)%8 == 0) printf("\n");
+    printf(""FMT_WORD" "FMT_WORD" %d\n", addr, vaddr_read(addr, 4), vaddr_read(addr, 4));
+    addr += 4;
   }
   printf("\n");
 
