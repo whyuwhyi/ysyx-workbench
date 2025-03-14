@@ -86,9 +86,9 @@ void display_wp() {
     printf("No watchpoints.\n");
     return;
   }
-  printf("Num\tWhat\tValue\n");
+  printf("Num\t What\t Value\n");
   while (p != NULL) {
-    printf("%d\t%s\t%d\n", p->NO, p->exp, p->value);
+    printf("%d\t %s\t %d\n", p->NO, p->exp, p->value);
     p = p->next;
   }
 }
@@ -102,8 +102,8 @@ void watchpoint_check() {
       printf("Old value = %d\n", p->value);
       printf("New value = %d\n", value);
       p->value = value;
+      nemu_state.state = NEMU_STOP;
     }
     p = p->next;
   }
-  nemu_state.state = NEMU_STOP;
 }
