@@ -179,16 +179,18 @@ static int cmd_x(char *args) {
 
   bool success = true;  
   word_t addr = expr(exp, &success);
+  word_t value = 0;
 
   if (success == false) {
     printf("Invalid expression\n");
     return 0;
   }
-
+  
+  printf("address \t hex \t\t dec\n");
   for (int i = 0; i < n; ++i) {
-    printf(FMT_WORD, vaddr_read(addr, 4));
-    printf(" "); addr += 4;
-    if ((i+1)%8 == 0) printf("\n");
+    value = vaddr_read(addr, 4);
+    printf(""FMT_WORD"\t "FMT_WORD"\t %d\n", addr, value, value);
+    addr += 4;
   }
   printf("\n");
 
@@ -314,5 +316,5 @@ void init_sdb() {
   /* Initialize the watchpoint pool. */
   init_wp_pool();
 
-  test_expr();
+  // test_expr();
 }

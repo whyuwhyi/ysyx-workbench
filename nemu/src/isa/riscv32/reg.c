@@ -24,15 +24,15 @@ const char *regs[] = {
 };
 
 void isa_reg_display() {
+  printf("name\t hex\t\t dec\n");
   for(int i = 0; i < 32; ++i) {
-    printf("%-3s = "FMT_WORD" ", reg_name(i), gpr(i));
-    if ((i+1)%8 == 0) printf("\n");
+    printf("%s\t "FMT_WORD"\t %d\n", regs[i], gpr(i), gpr(i));
   }
+  printf("pc\t "FMT_WORD"\t %d\n", cpu.pc, cpu.pc);
 }
 
 word_t isa_reg_str2val(const char *s, bool *success) {
   for(int i = 0; i < 32; ++i) {
-    printf("%s %s\n", regs[i], s);
     if(strcmp(regs[i], s) == 0) {
       *success = true;
       return gpr(i);

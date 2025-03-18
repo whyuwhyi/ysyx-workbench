@@ -24,6 +24,6 @@ void test_expr();
 void new_wp(char *exp, word_t value);
 void free_wp(int NO);
 void display_wp();
-void watchpoint_check();
+extern void watchpoint_check();
 
 #endif
