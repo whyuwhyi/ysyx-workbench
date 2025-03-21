@@ -1,17 +1,17 @@
 /***************************************************************************************
-* Copyright (c) 2014-2024 Zihao Yu, Nanjing University
-*
-* NEMU is licensed under Mulan PSL v2.
-* You can use this software according to the terms and conditions of the Mulan PSL v2.
-* You may obtain a copy of Mulan PSL v2 at:
-*          http://license.coscl.org.cn/MulanPSL2
-*
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-* EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-* MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-*
-* See the Mulan PSL v2 for more details.
-***************************************************************************************/
+ * Copyright (c) 2014-2024 Zihao Yu, Nanjing University
+ *
+ * NEMU is licensed under Mulan PSL v2.
+ * You can use this software according to the terms and conditions of the Mulan
+ *PSL v2. You may obtain a copy of Mulan PSL v2 at:
+ *          http://license.coscl.org.cn/MulanPSL2
+ *
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY
+ *KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+ *NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ *
+ * See the Mulan PSL v2 for more details.
+ ***************************************************************************************/
 
 #include "sdb.h"
 
@@ -31,7 +31,7 @@ static WP *head = NULL, *free_ = NULL;
 
 void init_wp_pool() {
   int i;
-  for (i = 0; i < NR_WP; i ++) {
+  for (i = 0; i < NR_WP; i++) {
     wp_pool[i].NO = i;
     wp_pool[i].next = (i == NR_WP - 1 ? NULL : &wp_pool[i + 1]);
   }
@@ -47,7 +47,7 @@ void new_wp(char *exp, word_t value) {
   }
   assert(strlen(exp) < 100);
 
-  WP* new = free_;
+  WP *new = free_;
   free_ = free_->next;
   new->next = head;
   head = new;
@@ -56,7 +56,7 @@ void new_wp(char *exp, word_t value) {
 }
 
 void free_wp(int NO) {
-  WP* p = head;
+  WP *p = head;
   if (p == NULL) {
     printf("No watchpoint with NO %d.\n", NO);
     return;
@@ -69,7 +69,7 @@ void free_wp(int NO) {
   }
   while (p->next != NULL) {
     if (p->next->NO == NO) {
-      WP* q = p->next;
+      WP *q = p->next;
       p->next = q->next;
       q->next = free_;
       free_ = q;
@@ -81,21 +81,22 @@ void free_wp(int NO) {
 }
 
 void display_wp() {
-  WP* p = head;
+  WP *p = head;
   if (p == NULL) {
     printf("No watchpoints.\n");
     return;
   }
-  printf("Num\t What\t Value\n");
+  printf("Num\t Value\t What\n");
   while (p != NULL) {
-    printf("%d\t %s\t %d\n", p->NO, p->exp, p->value);
+    printf("%d\t %d\t %s\n", p->NO, p->value, p->exp);
     p = p->next;
   }
 }
 
 void watchpoint_check() {
-  WP* p = head;
+  WP *p = head;
   while (p != NULL) {
+    printf("Checking watchpoint %d: %s\n", p->NO, p->exp);
     word_t value = expr(p->exp, NULL);
     if (value != p->value) {
       printf("Watchpoint %d: %s\n", p->NO, p->exp);
