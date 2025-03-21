@@ -103,6 +103,8 @@ void watchpoint_check() {
       printf("Watchpoint %d: %s\n", p->NO, p->exp);
       printf("Old value = %d\n", p->value);
       printf("New value = %d\n", value);
+      printf("The value of watchpoint %d has changed.\n", p->NO);
+      printf("The program will stop at the next instruction.\n");
       p->value = value;
       nemu_state.state = NEMU_STOP;
     }
