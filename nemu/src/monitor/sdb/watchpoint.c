@@ -99,7 +99,6 @@ void watchpoint_check() {
     printf("Checking watchpoint %d: %s\n", p->NO, p->exp);
     bool success = true;
     word_t value = expr(p->exp, &success);
-    panic();
     if (value != p->value) {
       printf("Watchpoint %d: %s\n", p->NO, p->exp);
       printf("Old value = %d\n", p->value);
