@@ -61,9 +61,8 @@ enum {
   } while (0)
 #define immJ()                                                                 \
   do {                                                                         \
-    *imm =                                                                     \
-        (SEXT(BITS(i, 31, 31), 1) << 20) | (SEXT(BITS(i, 19, 12), 8) << 12) |  \
-        (SEXT(BITS(i, 20, 20), 1) << 11) | (SEXT(BITS(i, 30, 21), 10) << 1);   \
+    *imm = (SEXT(BITS(i, 31, 31), 1) << 20) | (BITS(i, 19, 12) << 12) |        \
+           (BITS(i, 20, 20) << 11) | (BITS(i, 30, 21) << 1);                   \
   } while (0)
 
 static void decode_operand(Decode *s, int *rd, word_t *src1, word_t *src2,
