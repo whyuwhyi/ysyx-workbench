@@ -42,6 +42,7 @@ $(BIN): $(VSRCS) $(CSRCS)
 		--trace-fst \
 		--Mdir $(OBJ_DIR) --exe -o $(abspath $(BIN))
 
+$(NVBOARD_BIN): CXXFLAGS += -D_NVBOARD_
 $(NVBOARD_BIN): CSRCS += $(SRC_AUTO_BIND)
 $(NVBOARD_BIN): $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
 	@rm -rf $(OBJ_DIR)
@@ -54,17 +55,14 @@ $(NVBOARD_BIN): $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
 nvboard: $(NVBOARD_BIN)
 	$^
 
-all: default
-
 run: $(BIN)
 	@$^
 
-sim: CFLAGS += -D_SIMULATION_
+sim: CFLAGS += -D_SIMULATE_
 sim: $(BIN)
 	@$(call git_commit, "sim RTL")
 	@$^
 	@$(GTKWAVE) $(WAVE)
-
 
 clean:
 	rm -rf $(BUILD_DIR)

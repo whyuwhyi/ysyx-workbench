@@ -18,6 +18,7 @@ word_t res[NR_INST];
 
 void load_inst();
 void single_cycle();
+void step_and_dump_wave();
 void reset(int n);
 void sim_init();
 void sim_exit();
@@ -58,9 +59,9 @@ void load_inst() {
 
 void single_cycle() {
   top->clk = 0;
-  top->eval();
+  step_and_dump_wave();
   top->clk = 1;
-  top->eval();
+  step_and_dump_wave();
 }
 
 void reset(int n) {
@@ -72,18 +73,33 @@ void reset(int n) {
 
 void sim_init() {
   contextp = new VerilatedContext;
-  tfp = new VerilatedFstC;
   top = new TOP_NAME{contextp};
+
+#ifdef _SIMULATE_
+  tfp = new VerilatedFstC;
   contextp->traceEverOn(true);
   top->trace(tfp, 0);
   tfp->open("build/wave.fst");
+#endif
 }
 
 void sim_exit() {
   single_cycle();
+
+#ifdef _SIMULATE_
   tfp->close();
+  delete tfp;
+#endif
 
   delete top;
-  delete tfp;
   delete contextp;
+}
+
+void step_and_dump_wave() {
+  top->eval();
+
+#ifdef _SIMULATE_
+  tfp->dump(contextp->time());
+  contextp->timeInc(1);
+#endif
 }
