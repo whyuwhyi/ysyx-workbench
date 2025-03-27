@@ -12,6 +12,7 @@ WAVE = $(BUILD_DIR)/wave.fst
 BUILD_DIR = ./build
 OBJ_DIR = $(BUILD_DIR)/obj_dir
 BIN = $(BUILD_DIR)/$(TOPNAME)
+NVBOARD_BIN = $(BUILD_DIR)/$(TOPNAME)
 
 default: $(BIN)
 
@@ -25,7 +26,6 @@ $(SRC_AUTO_BIND): $(NXDC_FILES)
 # project source
 VSRCS = $(shell find $(abspath ./vsrc) -name "*.v")
 CSRCS = $(shell find $(abspath ./csrc) -name "*.c" -or -name "*.cc" -or -name "*.cpp")
-# CSRCS += $(SRC_AUTO_BIND)
 
 # rules for NVBoard
 include $(NVBOARD_HOME)/scripts/nvboard.mk
@@ -42,7 +42,8 @@ $(BIN): $(VSRCS) $(CSRCS)
 		--trace-fst \
 		--Mdir $(OBJ_DIR) --exe -o $(abspath $(BIN))
 
-nvboard: $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
+$(NVBOARD_BIN): CSRCS += $(SRC_AUTO_BIND)
+$(NVBOARD_BIN): $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
 	@rm -rf $(OBJ_DIR)
 	$(VERILATOR) $(VERILATOR_CFLAGS) \
 		--top-module $(TOPNAME) $^ \
@@ -50,11 +51,15 @@ nvboard: $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
 		--trace-fst \
 		--Mdir $(OBJ_DIR) --exe -o $(abspath $(BIN))
 
+nvboard: $(NVBOARD_BIN)
+	$^
+
 all: default
 
 run: $(BIN)
 	@$^
 
+sim: CFLAGS += -D_SIMULATION_
 sim: $(BIN)
 	@$(call git_commit, "sim RTL")
 	@$^
