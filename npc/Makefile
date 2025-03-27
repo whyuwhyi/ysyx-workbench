@@ -15,8 +15,6 @@ BIN = $(BUILD_DIR)/$(TOPNAME)
 
 default: $(BIN)
 
-$(shell mkdir -p $(BUILD_DIR))
-
 # project source
 VSRCS = $(shell find $(abspath ./vsrc) -name "*.v")
 CSRCS = $(shell find $(abspath ./csrc) -name "*.c" -or -name "*.cc" -or -name "*.cpp")
@@ -25,6 +23,7 @@ CSRCS = $(shell find $(abspath ./csrc) -name "*.c" -or -name "*.cc" -or -name "*
 INCFLAGS = $(addprefix -I, $(INC_PATH))
 CXXFLAGS += $(INCFLAGS) -DTOP_NAME="\"V$(TOPNAME)\""
 
+# $(BIN): $(shell mkdir -p $(BUILD_DIR))
 $(BIN): $(VSRCS) $(CSRCS)
 	@rm -rf $(OBJ_DIR)
 	$(VERILATOR) $(VERILATOR_CFLAGS) \
@@ -38,17 +37,21 @@ SRC_AUTO_BIND = $(abspath $(BUILD_DIR)/auto_bind.cpp)
 $(SRC_AUTO_BIND): $(NXDC_FILES)
 	python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $^ $@
 
-NVBOARD_BIN: $(eval include $(NVBOARD_HOME)/scripts/nvboard.mk)
-NVBOARD_BIN: CXXFLAGS += -D_NVBOARD_
-NVBOARD_BIN: CSRCS += $(SRC_AUTO_BIND)
-NVBOARD_BIN: $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
 
-nvboard: $(BIN) $(NVBOARD_ARCHIVE) NVBOARD_BIN
-	@$<
+nvboard: $(shell rm -rf build)
+nvboard: $(shell mkdir -p $(BUILD_DIR))
+nvboard: $(eval include $(NVBOARD_HOME)/scripts/nvboard.mk)
+nvboard: CXXFLAGS += -D_NVBOARD_
+nvboard: CSRCS += $(SRC_AUTO_BIND)
+
+nvboard: $(NVBOARD_ARCHIVE) $(BIN)
+	@$(BIN)
 
 run: $(BIN)
 	@$^
 
+sim: $(shell rm -rf build)
+sim: $(shell mkdir -p $(BUILD_DIR))
 sim: CXXFLAGS += -D_SIMULATE_
 sim: $(BIN)
 	@$(call git_commit, "sim RTL")
