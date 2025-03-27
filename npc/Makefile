@@ -23,7 +23,6 @@ CSRCS = $(shell find $(abspath ./csrc) -name "*.c" -or -name "*.cc" -or -name "*
 INCFLAGS = $(addprefix -I, $(INC_PATH))
 CXXFLAGS += $(INCFLAGS) -DTOP_NAME="\"V$(TOPNAME)\""
 
-# $(BIN): $(shell mkdir -p $(BUILD_DIR))
 $(BIN): $(VSRCS) $(CSRCS)
 	@rm -rf $(OBJ_DIR)
 	$(VERILATOR) $(VERILATOR_CFLAGS) \
@@ -38,7 +37,7 @@ $(SRC_AUTO_BIND): $(NXDC_FILES)
 	python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $^ $@
 
 
-nvboard: $(shell rm -rf build)
+nvboard: $(shell rm -rf $(BUILD_DIR))
 nvboard: $(shell mkdir -p $(BUILD_DIR))
 nvboard: $(eval include $(NVBOARD_HOME)/scripts/nvboard.mk)
 nvboard: CXXFLAGS += -D_NVBOARD_
@@ -50,7 +49,7 @@ nvboard: $(NVBOARD_ARCHIVE) $(BIN)
 run: $(BIN)
 	@$^
 
-sim: $(shell rm -rf build)
+sim: $(shell rm -rf $(BUILD_DIR))
 sim: $(shell mkdir -p $(BUILD_DIR))
 sim: CXXFLAGS += -D_SIMULATE_
 sim: $(BIN)
