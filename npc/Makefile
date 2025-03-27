@@ -18,6 +18,15 @@ default: $(BIN)
 
 $(shell mkdir -p $(BUILD_DIR))
 
+run: $(BIN)
+	@$^
+
+sim: CFLAGS += -D_SIMULATE_
+sim: $(BIN)
+	@$(call git_commit, "sim RTL")
+	@$^
+	@$(GTKWAVE) $(WAVE)
+
 # constraint file
 SRC_AUTO_BIND = $(abspath $(BUILD_DIR)/auto_bind.cpp)
 $(SRC_AUTO_BIND): $(NXDC_FILES)
@@ -28,7 +37,7 @@ VSRCS = $(shell find $(abspath ./vsrc) -name "*.v")
 CSRCS = $(shell find $(abspath ./csrc) -name "*.c" -or -name "*.cc" -or -name "*.cpp")
 
 # rules for NVBoard
-# include $(NVBOARD_HOME)/scripts/nvboard.mk
+include $(NVBOARD_HOME)/scripts/nvboard.mk
 
 # rules for verilator
 INCFLAGS = $(addprefix -I, $(INC_PATH))
@@ -54,15 +63,6 @@ $(NVBOARD_BIN): $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
 
 nvboard: $(NVBOARD_BIN)
 	$^
-
-run: $(BIN)
-	@$^
-
-sim: CFLAGS += -D_SIMULATE_
-sim: $(BIN)
-	@$(call git_commit, "sim RTL")
-	@$^
-	@$(GTKWAVE) $(WAVE)
 
 clean:
 	rm -rf $(BUILD_DIR)
