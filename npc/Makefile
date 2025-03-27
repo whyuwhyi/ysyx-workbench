@@ -21,7 +21,7 @@ $(shell mkdir -p $(BUILD_DIR))
 run: $(BIN)
 	@$^
 
-sim: CFLAGS += -D_SIMULATE_
+sim: CXXFLAGS += -D_SIMULATE_
 sim: $(BIN)
 	@$(call git_commit, "sim RTL")
 	@$^
