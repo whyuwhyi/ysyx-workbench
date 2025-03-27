@@ -18,15 +18,6 @@ default: $(BIN)
 
 $(shell mkdir -p $(BUILD_DIR))
 
-run: $(BIN)
-	@$^
-
-sim: CXXFLAGS += -D_SIMULATE_
-sim: $(BIN)
-	@$(call git_commit, "sim RTL")
-	@$^
-	@$(GTKWAVE) $(WAVE)
-
 # constraint file
 SRC_AUTO_BIND = $(abspath $(BUILD_DIR)/auto_bind.cpp)
 $(SRC_AUTO_BIND): $(NXDC_FILES)
@@ -63,6 +54,15 @@ $(NVBOARD_BIN): $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
 
 nvboard: $(NVBOARD_BIN)
 	$^
+
+run: $(BIN)
+	@$^
+
+sim: CXXFLAGS += -D_SIMULATE_
+sim: $(BIN)
+	@$(call git_commit, "sim RTL")
+	@$^
+	@$(GTKWAVE) $(WAVE)
 
 clean:
 	rm -rf $(BUILD_DIR)
