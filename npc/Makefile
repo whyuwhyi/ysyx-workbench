@@ -31,11 +31,13 @@ $(BIN): $(VSRCS) $(CSRCS)
 		--trace-fst \
 		--Mdir $(OBJ_DIR) --exe -o $(abspath $(BIN))
 
+run: $(BIN)
+	@$^
+
 # constraint file
 SRC_AUTO_BIND = $(abspath $(BUILD_DIR)/auto_bind.cpp)
 $(SRC_AUTO_BIND): $(NXDC_FILES)
 	python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $^ $@
-
 
 nvboard: $(shell rm -rf $(BUILD_DIR))
 nvboard: $(shell mkdir -p $(BUILD_DIR))
@@ -45,9 +47,6 @@ nvboard: CSRCS += $(SRC_AUTO_BIND)
 
 nvboard: $(NVBOARD_ARCHIVE) $(BIN)
 	@$(BIN)
-
-run: $(BIN)
-	@$^
 
 sim: $(shell rm -rf $(BUILD_DIR))
 sim: $(shell mkdir -p $(BUILD_DIR))
