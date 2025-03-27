@@ -28,7 +28,7 @@ VSRCS = $(shell find $(abspath ./vsrc) -name "*.v")
 CSRCS = $(shell find $(abspath ./csrc) -name "*.c" -or -name "*.cc" -or -name "*.cpp")
 
 # rules for NVBoard
-include $(NVBOARD_HOME)/scripts/nvboard.mk
+# include $(NVBOARD_HOME)/scripts/nvboard.mk
 
 # rules for verilator
 INCFLAGS = $(addprefix -I, $(INC_PATH))
@@ -42,6 +42,7 @@ $(BIN): $(VSRCS) $(CSRCS)
 		--trace-fst \
 		--Mdir $(OBJ_DIR) --exe -o $(abspath $(BIN))
 
+$(NVBOARD_BIN): $(eval include $(NVBOARD_HOME)/scripts/nvboard.mk)
 $(NVBOARD_BIN): CXXFLAGS += -D_NVBOARD_
 $(NVBOARD_BIN): CSRCS += $(SRC_AUTO_BIND)
 $(NVBOARD_BIN): $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
