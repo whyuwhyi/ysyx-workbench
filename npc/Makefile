@@ -52,7 +52,7 @@ run: $(BIN)
 sim: CXXFLAGS += -D_SIMULATE_
 sim: $(BIN)
 	@$(call git_commit, "sim RTL")
-	@$^
+	@$(BIN)
 	@$(GTKWAVE) $(WAVE)
 
 clean:
