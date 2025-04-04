@@ -76,7 +76,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
   disassemble(p, s->logbuf + sizeof(s->logbuf) - p,
               MUXDEF(CONFIG_ISA_x86, s->snpc, s->pc), (uint8_t *)&s->isa.inst,
               ilen);
-  void itrace_push(paddr_t pc);
+  extern void itrace_push(paddr_t pc);
   itrace_push(s->pc);
 #endif
 }
@@ -147,7 +147,7 @@ void cpu_exec(uint64_t n) {
                     : ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED))),
         nemu_state.halt_pc);
     // fall through
-    void itrace_display();
+    extern void itrace_display();
     itrace_display();
   case NEMU_QUIT:
     statistic();
