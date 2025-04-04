@@ -25,6 +25,7 @@ void itrace_display() {
                      int nbyte);
     inst = vaddr_ifetch(pc, ilen);
     disassemble(buffer, sizeof(buffer), pc, (uint8_t *)&inst, ilen);
+    printf("%s\n", buffer);
     index++;
   }
 }
