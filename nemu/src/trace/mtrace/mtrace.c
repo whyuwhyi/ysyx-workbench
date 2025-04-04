@@ -11,7 +11,7 @@ void mtrace_read(paddr_t addr, int len) {
 
 void mtrace_write(paddr_t addr, int len) {
   if (addr >= PMEM_LEFT && addr <= PMEM_RIGHT) {
-    printf("Write to address " FMT_PADDR " with length %d", addr, len);
+    printf("Write to address " FMT_PADDR " with length %d\n", addr, len);
   } else {
     printf("Invalid write address " FMT_PADDR "\n", addr);
   }
