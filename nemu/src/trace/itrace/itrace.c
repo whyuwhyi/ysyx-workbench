@@ -25,7 +25,7 @@ void itrace_display() {
     void disassemble(char *str, int size, uint64_t pc, uint8_t *code,
                      int nbyte);
     disassemble(buffer, sizeof(buffer), pc, (uint8_t *)&inst, ilen);
-    printf("%08x:\t%08x:\t%s\n", pc, inst, buffer);
+    printf("" FMT_WORD ":\t%08x:\t%s\n", pc, inst, buffer);
     pc = i_trace.inst_addr[++index];
   }
 }
