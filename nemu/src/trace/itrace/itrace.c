@@ -21,11 +21,11 @@ void itrace_display() {
   vaddr_t pc = i_trace.inst_addr[0];
   uint32_t inst = 0;
   while (index < MAX_TRACE_LEN && pc != 0) {
+    inst = vaddr_ifetch(pc, ilen);
     void disassemble(char *str, int size, uint64_t pc, uint8_t *code,
                      int nbyte);
-    inst = vaddr_ifetch(pc, ilen);
     disassemble(buffer, sizeof(buffer), pc, (uint8_t *)&inst, ilen);
-    printf("%s\n", buffer);
-    index++;
+    printf("%08x:\t%08x:\t%s\n", pc, inst, buffer);
+    pc = i_trace.inst_addr[++index];
   }
 }
