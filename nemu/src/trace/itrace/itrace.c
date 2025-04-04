@@ -15,7 +15,7 @@ void itrace_push(paddr_t pc) {
 }
 
 void itrace_display() {
-  char buffer[128];
+  char buffer[32];
   int index = 0;
   int ilen = 4;
   vaddr_t pc = i_trace.inst_addr[0];
