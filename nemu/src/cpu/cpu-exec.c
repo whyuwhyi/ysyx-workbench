@@ -148,7 +148,8 @@ void cpu_exec(uint64_t n) {
         nemu_state.halt_pc);
     // fall through
     void itrace_display();
-    itrace_display();
+    if (nemu_state.halt_ret != 0)
+      itrace_display();
   case NEMU_QUIT:
     statistic();
   }
