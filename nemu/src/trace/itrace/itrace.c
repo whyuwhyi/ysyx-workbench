@@ -9,9 +9,8 @@ void init_itrace() {
 }
 
 void itrace_push(paddr_t pc) {
-  i_trace.inst_addr[i_trace.current] = pc;
+  i_trace.inst_addr[i_trace.current++] = pc;
   i_trace.current %= MAX_TRACE_LEN;
-  i_trace.current++;
 }
 
 void itrace_display() {
@@ -21,7 +20,7 @@ void itrace_display() {
   vaddr_t pc = i_trace.inst_addr[0];
   uint32_t inst = 0;
   while (index < MAX_TRACE_LEN && pc != 0) {
-    if (index == i_trace.current) {
+    if (((index + 1) % MAX_TRACE_LEN) == i_trace.current) {
       printf("-->");
     } else {
       printf("   ");
