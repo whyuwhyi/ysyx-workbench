@@ -90,6 +90,7 @@ CFLAGS   += -O2 -MMD -Wall -Werror $(INCFLAGS) \
 CXXFLAGS +=  $(CFLAGS) -ffreestanding -fno-rtti -fno-exceptions
 ASFLAGS  += -MMD $(INCFLAGS)
 LDFLAGS  += -z noexecstack $(addprefix -T, $(LDSCRIPTS))
+NEMUFLAGS += -b
 
 ## 4. Arch-Specific Configurations
 
