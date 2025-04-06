@@ -1,4 +1,4 @@
-module ysyx_25020081_alu #(DATA_WIDTH=32)(
+module ysyx_25030081_alu #(DATA_WIDTH=32)(
   input [3:0] alu_op,
   input [DATA_WIDTH-1:0] op1,
   input [DATA_WIDTH-1:0] op2,

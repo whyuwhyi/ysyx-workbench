@@ -1,4 +1,4 @@
-module ysyx_25020081_idu #(RF_ADDR_WIDTH=5,DATA_WIDTH=32)
+module ysyx_25030081_idu #(RF_ADDR_WIDTH=5,DATA_WIDTH=32)
 (
   input [DATA_WIDTH-1:0] inst,
   output [6:0] funct7,

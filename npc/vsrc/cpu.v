@@ -1,6 +1,6 @@
 import "DPI-C" function void ebreak();
 
-module ysyx_25020081_cpu #(RF_ADDR_WIDTH=5,ADDR_WIDTH=32,DATA_WIDTH=32)(
+module ysyx_25030081_cpu #(RF_ADDR_WIDTH=5,ADDR_WIDTH=32,DATA_WIDTH=32)(
   input clk,
   input rst,
   input [DATA_WIDTH-1:0] inst,
@@ -30,13 +30,13 @@ wire [2:0] ext_op;
 wire [2:0] branch;
 wire [2:0] mem_op;
 
-ysyx_25020081_pc pc_inst(
+ysyx_25030081_pc pc_inst(
   .clk(clk),
   .rst(rst),
   .pc(pc)
 );
 
-ysyx_25020081_idu idu_inst(
+ysyx_25030081_idu idu_inst(
   .inst(inst),
   .funct7(funct7),
   .rs2(rs2),
@@ -46,7 +46,7 @@ ysyx_25020081_idu idu_inst(
   .opcode(opcode)
 );
 
-ysyx_25020081_cu cu_inst(
+ysyx_25030081_cu cu_inst(
   .funct7(funct7),
   .funct3(funct3),
   .opcode(opcode),
@@ -61,13 +61,13 @@ ysyx_25020081_cu cu_inst(
   .alu_op(alu_op)
 );
 
-ysyx_25020081_ext ext_inst(
+ysyx_25030081_ext ext_inst(
   .inst(inst[31:7]),
   .ext_op(ext_op),
   .imm(imm)
 );
 
-ysyx_25020081_regfile regfile_inst(
+ysyx_25030081_regfile regfile_inst(
   .clk(clk),
   .wen(reg_wr),
   .raddr1(rs1),
@@ -86,7 +86,7 @@ MuxKey #(1 , 2, 32) mux_inst_2 (op2, alu_b_src, {
   2'b01, imm
 });
 
-ysyx_25020081_alu alu_inst(
+ysyx_25030081_alu alu_inst(
   .alu_op(alu_op),
   .op1(op1),
   .op2(op2),

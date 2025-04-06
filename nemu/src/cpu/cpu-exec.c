@@ -79,6 +79,18 @@ static void exec_once(Decode *s, vaddr_t pc) {
   void itrace_push(paddr_t pc);
   itrace_push(s->pc);
 #endif
+
+#ifdef CONFIG_FTRACE
+  void ftrace_call(vaddr_t from, vaddr_t to);
+  void ftrace_ret(vaddr_t from, vaddr_t to);
+  bool is_fcall(uint32_t inst);
+  bool is_fret(uint32_t inst);
+  if (is_fcall(s->isa.inst)) {
+    ftrace_call(s->pc, s->snpc);
+  } else if (is_fret(s->isa.inst)) {
+    ftrace_ret(s->pc, s->snpc);
+  }
+#endif
 }
 
 static void execute(uint64_t n) {

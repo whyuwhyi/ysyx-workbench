@@ -1,4 +1,4 @@
-TOPNAME = ysyx_25020081_cpu
+TOPNAME = ysyx_25030081_cpu
 NXDC_FILES = constr/top.nxdc
 INC_PATH ?=
 

@@ -1,4 +1,4 @@
-module ysyx_25020081_pc #(ADDR_WIDTH=32,PC_RST=32'h8000_0000)(
+module ysyx_25030081_pc #(ADDR_WIDTH=32,PC_RST=32'h8000_0000)(
     input clk,
     input rst,
     output reg [ADDR_WIDTH-1:0] pc
