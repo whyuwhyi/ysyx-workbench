@@ -86,9 +86,9 @@ static void exec_once(Decode *s, vaddr_t pc) {
   bool is_fcall(uint32_t inst);
   bool is_fret(uint32_t inst);
   if (is_fcall(s->isa.inst)) {
-    ftrace_call(s->pc, s->snpc);
+    ftrace_call(s->pc, s->dnpc);
   } else if (is_fret(s->isa.inst)) {
-    ftrace_ret(s->pc, s->snpc);
+    ftrace_ret(s->pc, s->dnpc);
   }
 #endif
 }
