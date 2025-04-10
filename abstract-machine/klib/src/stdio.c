@@ -42,7 +42,7 @@ int vprintf(const char *fmt, va_list ap) {
 
 int vsprintf(char *out, const char *fmt, va_list ap) {
 
-  int ret = vsnprintf(out, -1, fmt, ap);
+  int ret = vsnprintf(out, 1024, fmt, ap);
 
   return ret;
 }
