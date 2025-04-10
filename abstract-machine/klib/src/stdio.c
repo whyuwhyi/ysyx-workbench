@@ -33,8 +33,8 @@ int vprintf(const char *fmt, va_list ap) {
   char buf[1024] = {0};
   int ret = vsnprintf(buf, 1024, fmt, ap);
 
-  for (int i = 0; buf[i] != '\0' && i < 1; i++) {
-    // putch(buf[i]);
+  for (int i = 0; buf[i] != '\0'; i++) {
+    putch(buf[i]);
   }
 
   return ret;
