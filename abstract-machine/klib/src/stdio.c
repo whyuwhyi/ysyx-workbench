@@ -31,7 +31,7 @@ int snprintf(char *out, size_t n, const char *fmt, ...) {
 
 int vprintf(const char *fmt, va_list ap) {
   char buf[1024];
-  int ret = vsnprintf(buf, 1024, fmt, ap);
+  int ret = vsnprintf(buf, 100, fmt, ap);
 
   for (int i = 0; i < ret; i++) {
     putch(buf[i]);
@@ -42,7 +42,7 @@ int vprintf(const char *fmt, va_list ap) {
 
 int vsprintf(char *out, const char *fmt, va_list ap) {
 
-  int ret = vsnprintf(out, 1024, fmt, ap);
+  int ret = vsnprintf(out, -1, fmt, ap);
 
   return ret;
 }
