@@ -30,14 +30,14 @@ int snprintf(char *out, size_t n, const char *fmt, ...) {
 }
 
 int vprintf(const char *fmt, va_list ap) {
-  char buf[1024];
-  int ret = vsnprintf(buf, 1024, fmt, ap);
+  char buf[1024] = {0};
+  // int ret = vsnprintf(buf, 1024, fmt, ap);
 
   for (int i = 0; buf[i] != '\0'; i++) {
     putch(buf[i]);
   }
 
-  return ret;
+  return 0;
 }
 
 int vsprintf(char *out, const char *fmt, va_list ap) {
