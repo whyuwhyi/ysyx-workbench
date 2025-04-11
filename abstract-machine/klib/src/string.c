@@ -84,13 +84,24 @@ void *memset(void *s, int c, size_t n) {
 void *memmove(void *dst, const void *src, size_t n) {
   assert(dst != NULL && src != NULL);
 
-  void *tmp = malloc(n);
-  assert(tmp != NULL);
+  char *d = (char *)dst;
+  const char *s = (const char *)src;
 
-  memcpy(tmp, src, n);
-  memcpy(dst, tmp, n);
+  if (d == s) {
+    return dst;
+  }
 
-  free(tmp);
+  if (d < s || d >= s + n) {
+    while (n--) {
+      *d++ = *s++;
+    }
+  } else {
+    d += n;
+    s += n;
+    while (n--) {
+      *(--d) = *(--s);
+    }
+  }
 
   return dst;
 }
