@@ -101,8 +101,8 @@ void watchpoint_check() {
     word_t value = expr(p->exp, &success);
     if (value != p->value) {
       printf("Watchpoint %d: %s\n", p->NO, p->exp);
-      printf("Old value = %d\n", p->value);
-      printf("New value = %d\n", value);
+      printf("Old value = " FMT_WORD " %d\n", p->value, p->value);
+      printf("New value = " FMT_WORD " %d\n", value, value);
       printf("The value of watchpoint %d has changed.\n", p->NO);
       printf("The program will stop at the next instruction.\n");
       p->value = value;
