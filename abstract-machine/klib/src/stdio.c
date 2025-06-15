@@ -135,20 +135,23 @@ static int format_number(char *out, size_t available, long long num, int base,
     }
   }
   
-  return written + (pad_len > 0 ? pad_len : 0);
+  return width > len ? width : len;
 }
 
 int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {
-  if (!out || !fmt || n == 0) return -1;
+  if (!out || !fmt) return -1;
   
   size_t total = 0;
   char *ptr = out;
   size_t available = n;
 
-  while (*fmt && available > 1) {
+  while (*fmt) {
     if (*fmt != '%') {
-      *ptr++ = *fmt++;
-      available--;
+      if (available > 1) {
+        *ptr++ = *fmt;
+        available--;
+      }
+      fmt++;
       total++;
     } else {
       fmt++; // skip '%'
@@ -175,8 +178,11 @@ int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {
         case 'i': {
           int num = va_arg(ap, int);
           int len = format_number(ptr, available, num, 10, 0, width, zero_pad && !left_align);
-          ptr += (len < available - 1) ? len : available - 1;
-          available -= (len < available - 1) ? len : available - 1;
+          if (available > 1) {
+            int written = (len < available - 1) ? len : available - 1;
+            ptr += written;
+            available -= written;
+          }
           total += len;
           break;
         }
@@ -184,8 +190,11 @@ int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {
         case 'u': {
           unsigned int num = va_arg(ap, unsigned int);
           int len = format_number(ptr, available, (long long)num, 10, 0, width, zero_pad && !left_align);
-          ptr += (len < available - 1) ? len : available - 1;
-          available -= (len < available - 1) ? len : available - 1;
+          if (available > 1) {
+            int written = (len < available - 1) ? len : available - 1;
+            ptr += written;
+            available -= written;
+          }
           total += len;
           break;
         }
@@ -193,8 +202,11 @@ int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {
         case 'x': {
           unsigned int num = va_arg(ap, unsigned int);
           int len = format_number(ptr, available, (long long)num, 16, 0, width, zero_pad && !left_align);
-          ptr += (len < available - 1) ? len : available - 1;
-          available -= (len < available - 1) ? len : available - 1;
+          if (available > 1) {
+            int written = (len < available - 1) ? len : available - 1;
+            ptr += written;
+            available -= written;
+          }
           total += len;
           break;
         }
@@ -202,8 +214,11 @@ int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {
         case 'X': {
           unsigned int num = va_arg(ap, unsigned int);
           int len = format_number(ptr, available, (long long)num, 16, 1, width, zero_pad && !left_align);
-          ptr += (len < available - 1) ? len : available - 1;
-          available -= (len < available - 1) ? len : available - 1;
+          if (available > 1) {
+            int written = (len < available - 1) ? len : available - 1;
+            ptr += written;
+            available -= written;
+          }
           total += len;
           break;
         }
@@ -211,8 +226,11 @@ int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {
         case 'o': {
           unsigned int num = va_arg(ap, unsigned int);
           int len = format_number(ptr, available, (long long)num, 8, 0, width, zero_pad && !left_align);
-          ptr += (len < available - 1) ? len : available - 1;
-          available -= (len < available - 1) ? len : available - 1;
+          if (available > 1) {
+            int written = (len < available - 1) ? len : available - 1;
+            ptr += written;
+            available -= written;
+          }
           total += len;
           break;
         }
@@ -227,8 +245,11 @@ int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {
           total += 2;
           unsigned long addr = (unsigned long)p;
           int len = format_number(ptr, available, (long long)addr, 16, 0, 0, 0);
-          ptr += (len < available - 1) ? len : available - 1;
-          available -= (len < available - 1) ? len : available - 1;
+          if (available > 1) {
+            int written = (len < available - 1) ? len : available - 1;
+            ptr += written;
+            available -= written;
+          }
           total += len;
           break;
         }
@@ -236,13 +257,29 @@ int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {
         case 's': {
           const char *s = va_arg(ap, const char *);
           if (!s) s = "(null)";
-          int len = 0;
-          while (s[len] && available > 1 && len < width) {
-            *ptr++ = s[len];
-            available--;
-            len++;
+          
+          // Calculate actual string length (up to width limit if specified)
+          int str_len = 0;
+          while (s[str_len] && (width == 0 || str_len < width)) {
+            str_len++;
           }
-          total += len;
+          
+          // Add padding if width is specified and string is shorter
+          int pad_len = (width > str_len) ? width - str_len : 0;
+          
+          // Add left padding (spaces)
+          for (int i = 0; i < pad_len && available > 1; i++) {
+            *ptr++ = ' ';
+            available--;
+          }
+          
+          // Copy the string
+          for (int i = 0; i < str_len && available > 1; i++) {
+            *ptr++ = s[i];
+            available--;
+          }
+          
+          total += str_len + pad_len;
           break;
         }
         
@@ -279,7 +316,9 @@ int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {
     }
   }
   
-  *ptr = '\0';
+  if (n > 0) {
+    *ptr = '\0';
+  }
   return (int)total;
 }
 
