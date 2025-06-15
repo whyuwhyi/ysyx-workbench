@@ -45,6 +45,21 @@ char *strcat(char *dst, const char *src) {
   return dst;
 }
 
+char *strncat(char *dst, const char *src, size_t n) {
+  assert(dst != NULL && src != NULL);
+
+  size_t dst_len = strlen(dst);
+  size_t i = 0;
+
+  while (i < n && src[i] != '\0') {
+    dst[dst_len + i] = src[i];
+    i++;
+  }
+
+  dst[dst_len + i] = '\0';
+  return dst;
+}
+
 int strcmp(const char *s1, const char *s2) {
   assert(s1 != NULL && s2 != NULL);
   size_t i = 0;
