@@ -17,6 +17,7 @@ int main(int argc, char **argv) {
 
   while (!is_sim_end) {
     single_cycle();
+    printf("........\n");
   }
 
   sim_exit();
