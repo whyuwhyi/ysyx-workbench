@@ -1,4 +1,4 @@
-module ysyx_25030081_regfile #(RF_ADDR_WIDTH = 5, DATA_WIDTH = 32) (
+module ysyx_25030081_rf #(RF_ADDR_WIDTH = 5, DATA_WIDTH = 32) (
   input clk,
   input wen,
   input [RF_ADDR_WIDTH-1:0] raddr1,

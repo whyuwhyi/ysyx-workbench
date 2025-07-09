@@ -13,20 +13,61 @@ module ysyx_25030081_cu(
   output [3:0] alu_op
 );
 
-  wire opcode_check, addi;
+  wire opcode_check;
+
+  wire addi;
+  wire auipc, lui;
+  wire jal, jalr;
+
+  wire r_type, i_type, s_type, b_type, u_type, j_type;
 
   assign opcode_check = opcode[1] & opcode[0];
-  assign addi = ~funct3[2] & ~funct3[1] & ~funct3[0] & opcode_check &
-                ~opcode[6] & ~opcode[5] & opcode[4] & ~opcode[3] & ~opcode[2];
 
-  assign reg_wr = addi;
-  assign alu_b_src[0] = addi;
+  // R型
 
+  // I型
+  assign addi = ~funct3[2] & ~funct3[1] & ~funct3[0] &
+                ~opcode[6] & ~opcode[5] &  opcode[4] &
+                ~opcode[3] & ~opcode[2] &  opcode_check;
+  assign jalr = ~funct3[2] & ~funct3[1] & ~funct3[0] &
+                 opcode[6] &  opcode[5] & ~opcode[4] &
+                ~opcode[3] &  opcode[2] &  opcode_check;
 
+  // S型
 
+  // B型
 
+  // U型
+  assign auipc = ~opcode[6] & ~opcode[5] &  opcode[4] &
+                  opcode[3] & ~opcode[2] &  opcode_check;
 
+  assign lui = ~opcode[6] & opcode[5] &  opcode[4] &
+               ~opcode[3] & opcode[2] & ~opcode_check;
 
+  // J型
+  assign jal = opcode[6] & opcode[5] & ~opcode[4] &
+               opcode[3] & opcode[2] &  opcode_check;
 
+  assign r_type = 1'b0;
+  assign i_type = addi | jalr;
+  // assign s_type;
+  // assign b_type;
+  assign u_type = auipc | lui;
+  assign j_type = jal;
+
+  assign ext_op = {u_type, j_type, i_type};
+  assign reg_wr = r_type | i_type | u_type | j_type;
+  assign branch = {b_type, j_type, jalr};
+  assign mem_to_reg = i_type | u_type | j_type;
+  assign mem_wr = s_type;
+  assign mem_op = {s_type, i_type | u_type, j_type};
+  assign alu_a_src = auipc ? 1'b1 : 1'b0;
+  assign alu_b_src = (i_type | u_type) ? 2'b01 : 2'b00;
+  assign alu_op = (addi) ? 4'b0000 :
+                  (auipc) ? 4'b0000 :
+                  (lui) ? 4'b0011 :
+                  (jal) ? 4'b0000 :
+                  (jalr) ? 4'b0000 :
+                  4'b0000;
 
 endmodule

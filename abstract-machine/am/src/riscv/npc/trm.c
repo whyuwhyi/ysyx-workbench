@@ -15,8 +15,10 @@ static const char mainargs[MAINARGS_MAX_LEN] =
 void putch(char ch) {}
 
 void halt(int code) {
-  while (1)
-    ;
+  asm volatile("ebreak");
+  while (1) {
+    // Infinite loop to halt the system
+  }
 }
 
 void _trm_init() {
