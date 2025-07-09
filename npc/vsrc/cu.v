@@ -42,7 +42,7 @@ module ysyx_25030081_cu(
                   opcode[3] & ~opcode[2] &  opcode_check;
 
   assign lui = ~opcode[6] & opcode[5] &  opcode[4] &
-               ~opcode[3] & opcode[2] & ~opcode_check;
+               ~opcode[3] & opcode[2] &  opcode_check;
 
   // J型
   assign jal = opcode[6] & opcode[5] & ~opcode[4] &

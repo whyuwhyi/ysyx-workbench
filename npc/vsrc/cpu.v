@@ -16,7 +16,6 @@ wire [DATA_WIDTH-1:0] rdata1;
 wire [DATA_WIDTH-1:0] rdata2;
 wire [DATA_WIDTH-1:0] op1;
 wire [DATA_WIDTH-1:0] op2;
-// wire [DATA_WIDTH-1:0] alu_out;
 wire [DATA_WIDTH-1:0] imm;
 wire zero;
 wire less;
@@ -35,7 +34,6 @@ wire [2:0] mem_op;
 assign zero = (alu_out == 0);
 assign less = alu_out[31];
 
-// PC选择逻辑
 wire [DATA_WIDTH-1:0] pc_plus_4;
 wire [DATA_WIDTH-1:0] pc_plus_imm;
 wire [DATA_WIDTH-1:0] rs1_plus_imm;
