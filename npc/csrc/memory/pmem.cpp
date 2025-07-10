@@ -7,6 +7,10 @@
 static u_int8_t pmem[MEM_SIZE];
 
 extern "C" int pmem_read(int raddr) {
+  if (raddr < MEM_BASE || raddr >= MEM_BASE + MEM_SIZE) {
+    fprintf(stderr, "Read address out of bounds: 0x%x\n", raddr);
+    return 0; // Return 0 or handle error as needed
+  }
   return *(int *)(pmem + (raddr & ~0x3u) - MEM_BASE);
 }
 
