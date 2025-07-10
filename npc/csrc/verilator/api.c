@@ -29,7 +29,7 @@ void single_cycle() {
   step_and_dump_wave();
   top->clk = 1;
   step_and_dump_wave();
-  printf("PC: 0x%lx, INST: 0x%lx\n", top->pc, top->inst);
+  printf("PC: 0x%lx\n", top->pc);
   getchar();
 }
 
