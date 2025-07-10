@@ -1,6 +1,6 @@
-#include "include/simulator.h"
-#include "include/memory.h"
 #include "Vysyx_25030081_cpu.h"
+#include "include/memory.h"
+#include "include/simulator.h"
 #include "verilated.h"
 #include "verilated_fst_c.h"
 #include <nvboard.h>
@@ -36,6 +36,7 @@ void single_cycle() {
 void run(int n) {
   for (int i = 0; i < n; i++) {
     top->inst = pmem_read(top->pc);
+    printf("pc: 0x%08x, inst: 0x%08x\n", top->pc, top->inst);
     single_cycle();
   }
 }
