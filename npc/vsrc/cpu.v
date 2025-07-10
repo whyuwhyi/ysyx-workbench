@@ -1,15 +1,13 @@
 import "DPI-C" function void ebreak();
-import "DPI-C" function int pmem_read(int addr);
 
 module ysyx_25030081_cpu #(RF_ADDR_WIDTH=5,ADDR_WIDTH=32,DATA_WIDTH=32)(
   input clk,
   input rst,
-  // input [DATA_WIDTH-1:0] inst,
+  input [DATA_WIDTH-1:0] inst,
   output [ADDR_WIDTH-1:0] pc,
   output [DATA_WIDTH-1:0] alu_out
 );
 
-wire [DATA_WIDTH-1:0] inst;
 wire [RF_ADDR_WIDTH-1:0] rs1;
 wire [RF_ADDR_WIDTH-1:0] rs2;
 wire [RF_ADDR_WIDTH-1:0] rd;
@@ -32,8 +30,6 @@ wire [3:0] alu_op;
 wire [2:0] ext_op;
 wire [2:0] branch;
 wire [2:0] mem_op;
-
-assign inst = pmem_read(pc);
 
 assign zero = (alu_out == 0);
 assign less = alu_out[31];

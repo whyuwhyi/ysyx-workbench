@@ -1,4 +1,5 @@
-#include "api.h"
+#include "include/simulator.h"
+#include "include/memory.h"
 #include "Vysyx_25030081_cpu.h"
 #include "verilated.h"
 #include "verilated_fst_c.h"
@@ -29,8 +30,14 @@ void single_cycle() {
   step_and_dump_wave();
   top->clk = 1;
   step_and_dump_wave();
-  printf("PC: 0x%lx\n", top->pc);
   getchar();
+}
+
+void run(int n) {
+  for (int i = 0; i < n; i++) {
+    top->inst = pmem_read(top->pc);
+    single_cycle();
+  }
 }
 
 void sim_init() {
