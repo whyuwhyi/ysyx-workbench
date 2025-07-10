@@ -64,3 +64,14 @@ void sim_exit() {
   delete top;
   delete contextp;
 }
+
+extern "C" uint32_t get_pc(void) {
+  return top->pc;
+}
+
+extern "C" int get_gpr(int idx) {
+  if (idx == 10) {
+    return top->a0;
+  }
+  return 0;  // 其他寄存器暂时返回0
+}

@@ -18,6 +18,18 @@
 #include <cpu/difftest.h>
 #include <locale.h>
 
+#ifdef CONFIG_ITRACE
+#include "../trace/itrace/itrace.h"
+#endif
+
+#ifdef CONFIG_MTRACE  
+#include "../trace/mtrace/mtrace.h"
+#endif
+
+#ifdef CONFIG_FTRACE
+#include "../trace/ftrace/ftrace.h"
+#endif
+
 /* The assembly code of instructions executed is only output to the screen
  * when the number of instructions executed is less than this value.
  * This is useful when you use the `si' command.
@@ -76,21 +88,16 @@ static void exec_once(Decode *s, vaddr_t pc) {
   disassemble(p, s->logbuf + sizeof(s->logbuf) - p,
               MUXDEF(CONFIG_ISA_x86, s->snpc, s->pc), (uint8_t *)&s->isa.inst,
               ilen);
-  void itrace_push(paddr_t pc);
-  itrace_push(s->pc);
+  IFDEF(CONFIG_ITRACE, itrace_push(s->pc));
 #endif
 
-#ifdef CONFIG_FTRACE
-  void ftrace_call(vaddr_t from, vaddr_t to);
-  void ftrace_ret(vaddr_t from, vaddr_t to);
-  bool is_fcall(uint32_t inst);
-  bool is_fret(uint32_t inst);
-  if (is_fcall(s->isa.inst)) {
-    ftrace_call(s->pc, s->dnpc);
-  } else if (is_fret(s->isa.inst)) {
-    ftrace_ret(s->pc, s->dnpc);
-  }
-#endif
+  IFDEF(CONFIG_FTRACE, 
+    if (is_fcall(s->isa.inst)) {
+      ftrace_call(s->pc, s->dnpc);
+    } else if (is_fret(s->isa.inst)) {
+      ftrace_ret(s->pc, s->dnpc);
+    }
+  );
 }
 
 static void execute(uint64_t n) {
@@ -159,11 +166,7 @@ void cpu_exec(uint64_t n) {
                     : ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED))),
         nemu_state.halt_pc);
     // fall through
-#ifdef CONFIG_ITRACE
-    void itrace_display();
-    if (nemu_state.halt_ret != 0)
-      itrace_display();
-#endif
+    IFDEF(CONFIG_ITRACE, if (nemu_state.halt_ret != 0) itrace_display());
   case NEMU_QUIT:
     statistic();
   }

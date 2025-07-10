@@ -5,7 +5,8 @@ module ysyx_25030081_cpu #(RF_ADDR_WIDTH=5,ADDR_WIDTH=32,DATA_WIDTH=32)(
   input rst,
   input [DATA_WIDTH-1:0] inst,
   output [ADDR_WIDTH-1:0] pc,
-  output [DATA_WIDTH-1:0] alu_out
+  output [DATA_WIDTH-1:0] alu_out,
+  output [DATA_WIDTH-1:0] a0
 );
 
 wire [RF_ADDR_WIDTH-1:0] rs1;
@@ -95,7 +96,8 @@ ysyx_25030081_rf regfile_inst(
   .waddr(rd),
   .wdata(wdata),
   .rdata1(rdata1),
-  .rdata2(rdata2)
+  .rdata2(rdata2),
+  .a0(a0)
 );
 
 MuxKey #(2 , 1, 32) alu_a_mux_inst (op1, alu_a_src, {

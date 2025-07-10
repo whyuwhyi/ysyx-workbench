@@ -3,16 +3,20 @@
 
 void mtrace_read(paddr_t addr, int len) {
   if (addr >= PMEM_LEFT && addr <= PMEM_RIGHT) {
-    printf("Read from address " FMT_PADDR " with length %d\n", addr, len);
+    printf("Memory read from " FMT_PADDR " length %d\n", addr, len);
   } else {
-    printf("Invalid read address " FMT_PADDR "\n", addr);
+    printf("Invalid memory read from " FMT_PADDR " length %d\n", addr, len);
   }
 }
 
-void mtrace_write(paddr_t addr, int len) {
+void mtrace_write(paddr_t addr, int len, word_t data) {
   if (addr >= PMEM_LEFT && addr <= PMEM_RIGHT) {
-    printf("Write to address " FMT_PADDR " with length %d\n", addr, len);
+    printf("Memory write to " FMT_PADDR " length %d data 0x%08x\n", addr, len, data);
   } else {
-    printf("Invalid write address " FMT_PADDR "\n", addr);
+    printf("Invalid memory write to " FMT_PADDR " length %d data 0x%08x\n", addr, len, data);
   }
+}
+
+void init_mtrace() {
+  printf("Memory trace initialized\n");
 }

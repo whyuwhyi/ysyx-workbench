@@ -7,8 +7,16 @@ static char *strtab = NULL;
 static int call_depth = 0;
 
 void init_ftrace(const char *elf_path) {
+  if (!elf_path) {
+    printf("Function trace disabled: no ELF file provided\n");
+    return;
+  }
+
   FILE *fp = fopen(elf_path, "rb");
-  assert(fp);
+  if (!fp) {
+    printf("Function trace disabled: cannot open ELF file %s\n", elf_path);
+    return;
+  }
 
   Elf32_Ehdr ehdr;
   fread(&ehdr, 1, sizeof(ehdr), fp);
@@ -52,6 +60,8 @@ void init_ftrace(const char *elf_path) {
   }
   free(syms);
   fclose(fp);
+  
+  printf("Function trace initialized with %d functions\n", func_cnt);
 }
 
 const char *ftrace_func_name(vaddr_t addr) {
@@ -73,9 +83,9 @@ void ftrace_call(uint32_t from, uint32_t to) {
   print_indent();
   const char *name = ftrace_func_name(to);
   if (name) {
-    printf("[0x%08x] call -> 0x%08x <%s>\n", from, to, name);
+    printf("[" FMT_WORD "] call -> " FMT_WORD " <%s>\n", from, to, name);
   } else {
-    printf("[0x%08x] call -> 0x%08x\n", from, to);
+    printf("[" FMT_WORD "] call -> " FMT_WORD "\n", from, to);
   }
   call_depth++;
 }
@@ -85,9 +95,9 @@ void ftrace_ret(uint32_t from, uint32_t to) {
   print_indent();
   const char *name = ftrace_func_name(from);
   if (name) {
-    printf("[0x%08x] ret  <- 0x%08x <%s>\n", from, to, name);
+    printf("[" FMT_WORD "] ret  <- " FMT_WORD " <%s>\n", from, to, name);
   } else {
-    printf("[0x%08x] ret  <- 0x%08x\n", from, to);
+    printf("[" FMT_WORD "] ret  <- " FMT_WORD "\n", from, to);
   }
 }
 
