@@ -19,13 +19,12 @@
 #include <locale.h>
 
 // Trace function declarations
-IFDEF(CONFIG_ITRACE, void itrace_push(paddr_t pc));
 IFDEF(CONFIG_FTRACE, void ftrace_call(uint32_t from, uint32_t to));
 IFDEF(CONFIG_FTRACE, void ftrace_ret(uint32_t from, uint32_t to));
 IFDEF(CONFIG_FTRACE, bool is_fcall(uint32_t inst));
 IFDEF(CONFIG_FTRACE, bool is_fret(uint32_t inst));
+IFDEF(CONFIG_ITRACE, void itrace_push(paddr_t pc));
 IFDEF(CONFIG_ITRACE, void itrace_display());
-
 
 /* The assembly code of instructions executed is only output to the screen
  * when the number of instructions executed is less than this value.
@@ -88,13 +87,11 @@ static void exec_once(Decode *s, vaddr_t pc) {
   IFDEF(CONFIG_ITRACE, itrace_push(s->pc));
 #endif
 
-  IFDEF(CONFIG_FTRACE, 
-    if (is_fcall(s->isa.inst)) {
-      ftrace_call(s->pc, s->dnpc);
-    } else if (is_fret(s->isa.inst)) {
-      ftrace_ret(s->pc, s->dnpc);
-    }
-  );
+  IFDEF(
+      CONFIG_FTRACE,
+      if (is_fcall(s->isa.inst)) {
+        ftrace_call(s->pc, s->dnpc);
+      } else if (is_fret(s->isa.inst)) { ftrace_ret(s->pc, s->dnpc); });
 }
 
 static void execute(uint64_t n) {
