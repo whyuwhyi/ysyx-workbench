@@ -37,7 +37,6 @@ void run(int n) {
     top->inst = pmem_read(top->pc);
     printf("pc: 0x%08x, inst: 0x%08x\n", top->pc, top->inst);
     single_cycle();
-    getchar();
   }
 }
 

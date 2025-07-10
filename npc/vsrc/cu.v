@@ -60,8 +60,10 @@ module ysyx_25030081_cu(
                   (j_type) ? 3'b100 :
                   3'b000;
   assign reg_wr = r_type | i_type | u_type | j_type;
-  assign branch = {b_type, j_type, jalr};
-  assign mem_to_reg = 1'b0;
+  assign branch = (jal) ? 3'b001 :
+                  (jalr) ? 3'b010 :
+                  3'b000;
+  assign mem_to_reg = (jal | jalr) ? 1'b1 : 1'b0;
   assign mem_wr = s_type;
   assign mem_op = {s_type, i_type | u_type, j_type};
   assign alu_a_src = (auipc | jal | jalr) ? 1'b1 : 1'b0;
