@@ -55,14 +55,18 @@ module ysyx_25030081_cu(
   assign u_type = auipc | lui;
   assign j_type = jal;
 
-  assign ext_op = {u_type, j_type, i_type};
+  assign ext_op = (i_type) ? 3'b000 :
+                  (u_type) ? 3'b001 :
+                  (j_type) ? 3'b100 :
+                  3'b000;
   assign reg_wr = r_type | i_type | u_type | j_type;
   assign branch = {b_type, j_type, jalr};
-  assign mem_to_reg = i_type | u_type | j_type;
+  assign mem_to_reg = 1'b0;
   assign mem_wr = s_type;
   assign mem_op = {s_type, i_type | u_type, j_type};
-  assign alu_a_src = auipc ? 1'b1 : 1'b0;
-  assign alu_b_src = (i_type | u_type) ? 2'b01 : 2'b00;
+  assign alu_a_src = (auipc | jal | jalr) ? 1'b1 : 1'b0;
+  assign alu_b_src = (jal | jalr) ? 2'b10 :
+                     (i_type | u_type) ? 2'b01 : 2'b00;
   assign alu_op = (addi) ? 4'b0000 :
                   (auipc) ? 4'b0000 :
                   (lui) ? 4'b0011 :

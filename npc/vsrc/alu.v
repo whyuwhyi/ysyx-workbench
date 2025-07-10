@@ -5,8 +5,9 @@ module ysyx_25030081_alu #(DATA_WIDTH=32)(
   output [DATA_WIDTH-1:0] alu_out
 );
   
-  wire [DATA_WIDTH-1:0] add_result;
-  wire [DATA_WIDTH-1:0] sub_result;
+  wire sub_flag;
+  wire [DATA_WIDTH-1:0] op2_processed;
+  wire [DATA_WIDTH-1:0] addsub_result;
   wire [DATA_WIDTH-1:0] sll_result;
   wire [DATA_WIDTH-1:0] slt_result;
   wire [DATA_WIDTH-1:0] sltu_result;
@@ -16,11 +17,12 @@ module ysyx_25030081_alu #(DATA_WIDTH=32)(
   wire [DATA_WIDTH-1:0] or_result;
   wire [DATA_WIDTH-1:0] and_result;
   
-  assign add_result = op1 + op2;
-  assign sub_result = op1 - op2;
+  assign sub_flag = alu_op[3];
+  assign op2_processed = sub_flag ? (~op2 + 1) : op2;
+  assign addsub_result = op1 + op2_processed;
   assign sll_result = op1 << op2[4:0];
-  assign slt_result = ($signed(op1) < $signed(op2)) ? 32'h1 : 32'h0;
-  assign sltu_result = (op1 < op2) ? 32'h1 : 32'h0;
+  assign slt_result = addsub_result[31] ? 32'h1 : 32'h0;
+  assign sltu_result = (~addsub_result[31] & |addsub_result) ? 32'h0 : 32'h1;
   assign xor_result = op1 ^ op2;
   assign srl_result = op1 >> op2[4:0];
   assign sra_result = $signed(op1) >>> op2[4:0];
@@ -28,8 +30,8 @@ module ysyx_25030081_alu #(DATA_WIDTH=32)(
   assign and_result = op1 & op2;
   
   MuxKey #(11, 4, 32) alu_result_mux_inst (alu_out, alu_op, {
-    4'b0000, add_result,
-    4'b1000, sub_result,
+    4'b0000, addsub_result,
+    4'b1000, addsub_result,
     4'b0001, sll_result,
     4'b0010, slt_result,
     4'b1010, sltu_result,

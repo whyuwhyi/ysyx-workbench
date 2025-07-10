@@ -14,7 +14,7 @@ module ysyx_25030081_rf #(RF_ADDR_WIDTH = 5, DATA_WIDTH = 32) (
   assign rdata2 = (|raddr2) ? rf[raddr2] : 32'b0;
 
   always @(posedge clk) begin
-    if (wen) rf[waddr] <= wdata;
+    if (wen && |waddr) rf[waddr] <= wdata;
   end
 endmodule
 
