@@ -18,9 +18,9 @@
 #include <memory/host.h>
 #include <memory/paddr.h>
 
-#ifdef CONFIG_MTRACE
-#include "../trace/mtrace/mtrace.h"
-#endif
+// Trace function declarations
+IFDEF(CONFIG_MTRACE, void mtrace_read(paddr_t addr, int len));
+IFDEF(CONFIG_MTRACE, void mtrace_write(paddr_t addr, int len, word_t data));
 
 #if defined(CONFIG_PMEM_MALLOC)
 static uint8_t *pmem = NULL;

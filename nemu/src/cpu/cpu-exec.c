@@ -18,17 +18,14 @@
 #include <cpu/difftest.h>
 #include <locale.h>
 
-#ifdef CONFIG_ITRACE
-#include "../trace/itrace/itrace.h"
-#endif
+// Trace function declarations
+IFDEF(CONFIG_ITRACE, void itrace_push(paddr_t pc));
+IFDEF(CONFIG_FTRACE, void ftrace_call(uint32_t from, uint32_t to));
+IFDEF(CONFIG_FTRACE, void ftrace_ret(uint32_t from, uint32_t to));
+IFDEF(CONFIG_FTRACE, bool is_fcall(uint32_t inst));
+IFDEF(CONFIG_FTRACE, bool is_fret(uint32_t inst));
+IFDEF(CONFIG_ITRACE, void itrace_display());
 
-#ifdef CONFIG_MTRACE  
-#include "../trace/mtrace/mtrace.h"
-#endif
-
-#ifdef CONFIG_FTRACE
-#include "../trace/ftrace/ftrace.h"
-#endif
 
 /* The assembly code of instructions executed is only output to the screen
  * when the number of instructions executed is less than this value.
