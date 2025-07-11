@@ -3,7 +3,7 @@
 #include "cpu/simulator.h"
 
 bool is_sim_end = false;
-npc_state npc_state_info = {NPC_RUNNING, 0, 0};
+NPCState npc_state_info = {NPC_RUNNING, 0, 0};
 
 extern "C" void ebreak(void) {
   uint32_t pc = get_pc();
@@ -13,7 +13,7 @@ extern "C" void ebreak(void) {
   is_sim_end = true;
 }
 
-extern "C" void set_npc_state(npc_state_t state, uint32_t pc, int halt_ret) {
+extern "C" void set_npc_state(int state, uint32_t pc, int halt_ret) {
   npc_state_info.state = state;
   npc_state_info.halt_pc = pc;
   npc_state_info.halt_ret = halt_ret;

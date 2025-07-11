@@ -12,7 +12,7 @@ extern "C" {
 
 int pmem_read(int raddr);
 void pmem_write(int waddr, int wdata, char wmask);
-uint8_t* get_pmem();
+uint8_t *get_pmem();
 
 #ifdef __cplusplus
 }

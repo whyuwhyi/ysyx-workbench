@@ -1,4 +1,4 @@
-#include "memory.h"
+#include "memory/pmem.h"
 #include <sys/types.h>
 
 static uint8_t pmem[MEM_SIZE];

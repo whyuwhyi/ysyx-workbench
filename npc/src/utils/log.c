@@ -14,6 +14,7 @@
 ***************************************************************************************/
 
 #include <common.h>
+#include <stdarg.h>
 
 FILE* log_fp = NULL;
 
@@ -44,4 +45,8 @@ void log_write(const char *format, ...) {
   vfprintf(log_fp, format, ap);
   va_end(ap);
   fflush(log_fp);
+}
+
+void assert_fail_msg() {
+  // Implementation for assertion failure message
 }

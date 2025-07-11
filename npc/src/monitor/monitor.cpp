@@ -1,4 +1,4 @@
-#include "memory.h"
+#include "memory/pmem.h"
 #include <assert.h>
 #include <stdio.h>
 

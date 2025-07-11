@@ -1,5 +1,5 @@
 # Sanity check
-ifeq ($(wildcard $(NPC_HOME)/Kconfig),)
+ifeq ($(wildcard $(NPC_HOME)/src/npc-main.cpp),)
   $(error NPC_HOME=$(NPC_HOME) is not a NPC repo)
 endif
 
@@ -9,31 +9,40 @@ endif
 
 remove_quote = $(patsubst "%",%,$(1))
 
+# NPC configuration
 TOPNAME = ysyx_25030081_cpu
-NXDC_FILES = constr/top.nxdc
-INC_PATH = include
+NAME = $(TOPNAME)
 IMG ?= 
 
+# Extract compiler and options from menuconfig
+ifneq ($(CONFIG_CC),)
+CC = $(call remove_quote,$(CONFIG_CC))
+endif
+CFLAGS_BUILD += $(call remove_quote,$(CONFIG_CC_OPT))
+CFLAGS_BUILD += $(if $(CONFIG_CC_DEBUG),-Og -ggdb3,)
+CFLAGS_BUILD += $(if $(CONFIG_CC_ASAN),-fsanitize=address,)
+CFLAGS_TRACE += -DITRACE_COND=$(if $(CONFIG_ITRACE_COND),$(call remove_quote,$(CONFIG_ITRACE_COND)),true)
+
+# Verilator configuration
 VERILATOR = verilator
-VERILATOR_CFLAGS += -MMD --build -cc  \
-				-O3 --x-assign fast --x-initial fast --noassert
-
-GTKWAVE = gtkwave
-WAVE = $(BUILD_DIR)/wave.fst
-
+VERILATOR_CFLAGS += -MMD --build -cc -O3 --x-assign fast --x-initial fast --noassert
 BUILD_DIR = ./build
 OBJ_DIR = $(BUILD_DIR)/obj_dir
 BIN = $(BUILD_DIR)/$(TOPNAME)
 
-default: $(BIN)
+# Include paths
+INC_PATH = include
+INCFLAGS = $(addprefix -I, $(abspath $(INC_PATH))) -I$(abspath ./src)
+CXXFLAGS += $(INCFLAGS) -DTOP_NAME="\"V$(TOPNAME)\""
+CFLAGS  += $(CFLAGS_BUILD) $(CFLAGS_TRACE)
+LDFLAGS += $(CFLAGS_BUILD)
 
-# project source
+# Source files
 VSRCS = $(shell find $(abspath ./vsrc) -name "*.v")
 SRCS = $(shell find $(abspath ./src) -name "*.c" -or -name "*.cc" -or -name "*.cpp")
 
-# rules for verilator
-INCFLAGS = $(addprefix -I, $(abspath $(INC_PATH))) -I$(abspath ./src)
-CXXFLAGS += $(INCFLAGS) -DTOP_NAME="\"V$(TOPNAME)\""
+# Default target
+default: sim
 
 $(BUILD_DIR):
 	@mkdir -p $(BUILD_DIR)
@@ -46,26 +55,7 @@ $(BIN): $(VSRCS) $(SRCS) | $(BUILD_DIR)
 		--trace-fst \
 		--Mdir $(OBJ_DIR) --exe -o $(abspath $(BIN))
 
-# constraint file
-SRC_AUTO_BIND = $(abspath $(BUILD_DIR)/auto_bind.cpp)
-$(SRC_AUTO_BIND): $(NXDC_FILES) | $(BUILD_DIR)
-	python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $^ $@
-
-# nvboard build with specific flags
-NVBOARD_CXXFLAGS = $(CXXFLAGS) -D_NVBOARD_
-NVBOARD_SRCS = $(CSRCS) $(SRC_AUTO_BIND)
-
-nvboard: $(NVBOARD_ARCHIVE) $(SRC_AUTO_BIND) $(VSRCS) $(NVBOARD_SRCS) | $(BUILD_DIR)
-	@rm -rf $(OBJ_DIR)
-	$(VERILATOR) $(VERILATOR_CFLAGS) \
-		--top-module $(TOPNAME) $(VSRCS) \
-		$(addprefix -CFLAGS , $(NVBOARD_CXXFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS)) \
-		--trace-fst \
-		--Mdir $(OBJ_DIR) --exe -o $(abspath $(BIN)) \
-		$(NVBOARD_SRCS)
-	@$(BIN)
-
-# simulation build with specific flags
+# Simulation target
 SIM_CXXFLAGS = $(CXXFLAGS) -D_SIMULATE_
 SIM_BIN = $(BUILD_DIR)/$(TOPNAME)_sim
 
@@ -80,29 +70,42 @@ $(SIM_BIN): $(VSRCS) $(SRCS) | $(BUILD_DIR)
 sim: $(SIM_BIN)
 	@$(call git_commit, "sim RTL")
 	@$(SIM_BIN) $(IMG)
+
+# NVBoard target
+ifneq ($(NVBOARD_HOME),)
+include $(NVBOARD_HOME)/scripts/nvboard.mk
+
+NXDC_FILES = constr/top.nxdc
+SRC_AUTO_BIND = $(abspath $(BUILD_DIR)/auto_bind.cpp)
+
+$(SRC_AUTO_BIND): $(NXDC_FILES) | $(BUILD_DIR)
+	python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $^ $@
+
+NVBOARD_CXXFLAGS = $(CXXFLAGS) -D_NVBOARD_
+NVBOARD_SRCS = $(SRCS) $(SRC_AUTO_BIND)
+
+nvboard: $(NVBOARD_ARCHIVE) $(SRC_AUTO_BIND) $(VSRCS) $(NVBOARD_SRCS) | $(BUILD_DIR)
+	@rm -rf $(OBJ_DIR)
+	$(VERILATOR) $(VERILATOR_CFLAGS) \
+		--top-module $(TOPNAME) $(VSRCS) \
+		$(addprefix -CFLAGS , $(NVBOARD_CXXFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS)) \
+		--trace-fst \
+		--Mdir $(OBJ_DIR) --exe -o $(abspath $(BIN)) \
+		$(NVBOARD_SRCS)
+	@$(BIN)
+endif
+
+# Wave viewer
+GTKWAVE = gtkwave
+WAVE = $(BUILD_DIR)/wave.fst
+
+wave: $(WAVE)
 	@$(GTKWAVE) $(WAVE)
 
 clean:
 	rm -rf $(BUILD_DIR)
 
-.PHONY: default clean sim nvboard
-
-# Extract compiler and options from menuconfig
-ifneq ($(CONFIG_CC),)
-CC = $(call remove_quote,$(CONFIG_CC))
-endif
-CFLAGS_BUILD += $(call remove_quote,$(CONFIG_CC_OPT))
-CFLAGS_BUILD += $(if $(CONFIG_CC_DEBUG),-Og -ggdb3,)
-CFLAGS_BUILD += $(if $(CONFIG_CC_ASAN),-fsanitize=address,)
-CFLAGS_TRACE += -DITRACE_COND=$(if $(CONFIG_ITRACE_COND),$(call remove_quote,$(CONFIG_ITRACE_COND)),true)
-CFLAGS  += $(CFLAGS_BUILD) $(CFLAGS_TRACE)
-LDFLAGS += $(CFLAGS_BUILD)
-
 # Include rules for menuconfig
-include scripts/config.mk
+include $(NPC_HOME)/scripts/config.mk
 
-include ../Makefile
-
-ifneq ($(NVBOARD_HOME),)
-include $(NVBOARD_HOME)/scripts/nvboard.mk
-endif
+.PHONY: default sim nvboard wave clean

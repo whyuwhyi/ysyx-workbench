@@ -1,6 +1,6 @@
 #include "Vysyx_25030081_cpu.h"
-#include "memory.h"
-#include "simulator.h"
+#include "memory/pmem.h"
+#include "cpu/simulator.h"
 #include "verilated.h"
 #include "verilated_fst_c.h"
 #include <nvboard.h>
