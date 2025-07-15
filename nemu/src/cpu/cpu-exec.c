@@ -50,7 +50,14 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
   if (g_print_step) {
     IFDEF(CONFIG_ITRACE, puts(_this->logbuf));
   }
+  IFDEF(CONFIG_ITRACE, itrace_push(_this->pc));
   IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
+
+  IFDEF(
+      CONFIG_FTRACE,
+      if (is_fcall(_this->isa.inst)) {
+        ftrace_call(_this->pc, _this->dnpc);
+      } else if (is_fret(_this->isa.inst)) { ftrace_ret(_this->pc, _this->dnpc); });
 
   watchpoint_check();
 }
@@ -85,14 +92,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
   disassemble(p, s->logbuf + sizeof(s->logbuf) - p,
               MUXDEF(CONFIG_ISA_x86, s->snpc, s->pc), (uint8_t *)&s->isa.inst,
               ilen);
-  IFDEF(CONFIG_ITRACE, itrace_push(s->pc));
 #endif
-
-  IFDEF(
-      CONFIG_FTRACE,
-      if (is_fcall(s->isa.inst)) {
-        ftrace_call(s->pc, s->dnpc);
-      } else if (is_fret(s->isa.inst)) { ftrace_ret(s->pc, s->dnpc); });
 }
 
 static void execute(uint64_t n) {
