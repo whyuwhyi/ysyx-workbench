@@ -25,6 +25,7 @@ bool is_fcall(uint32_t inst);
 bool is_fret(uint32_t inst);
 void itrace_push(paddr_t pc);
 void itrace_display();
+void watchpoint_check();
 
 /* The assembly code of instructions executed is only output to the screen
  * when the number of instructions executed is less than this value.
@@ -51,7 +52,6 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
   }
   IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
 
-  void watchpoint_check();
   watchpoint_check();
 }
 
