@@ -6,7 +6,7 @@ static InstTrace i_trace;
 void init_itrace() {
   i_trace.current = 0;
   memset(i_trace.inst_addr, 0, sizeof(i_trace.inst_addr));
-  Log("Instruction trace initialized\n");
+  Log("Instruction trace initialized");
 }
 
 void itrace_push(paddr_t pc) {
@@ -15,7 +15,7 @@ void itrace_push(paddr_t pc) {
 }
 
 void itrace_display() {
-  Log("Recent instruction trace:\n");
+  Log("Recent instruction trace:");
   char buffer[32];
   int index = 0;
   int ilen = 4;
@@ -32,7 +32,7 @@ void itrace_display() {
     void disassemble(char *str, int size, uint64_t pc, uint8_t *code,
                      int nbyte);
     disassemble(buffer, sizeof(buffer), pc, (uint8_t *)&inst, ilen);
-    Log("" FMT_WORD ":\t%08x:\t%s\n", pc, inst, buffer);
+    Log("" FMT_WORD ":\t%08x:\t%s", pc, inst, buffer);
     pc = i_trace.inst_addr[++index];
   }
 }
