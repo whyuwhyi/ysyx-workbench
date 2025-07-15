@@ -1,17 +1,4 @@
-#***************************************************************************************
-# Copyright (c) 2014-2024 Zihao Yu, Nanjing University
-#
-# NPC is licensed under Mulan PSL v2.
-# You can use this software according to the terms and conditions of the Mulan PSL v2.
-# You may obtain a copy of Mulan PSL v2 at:
-#          http://license.coscl.org.cn/MulanPSL2
-#
-# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-# EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-# MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#
-# See the Mulan PSL v2 for more details.
-#**************************************************************************************/
-
-SRCS-y += src/npc-main.cpp
-DIRS-y += src/cpu src/monitor src/utils src/memory src/trace
+SRCS-y += src/npc-main.cpp src/cpu/cpu.cpp src/cpu/reg_display.cpp src/cpu/verilator_stubs.cpp
+DIRS-y += src/cpu src/monitor src/utils src/memory
+DIRS-$(CONFIG_TRACE) += src/trace
+DIRS-$(CONFIG_DIFFTEST) += src/cpu/difftest

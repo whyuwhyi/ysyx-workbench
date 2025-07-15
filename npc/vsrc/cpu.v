@@ -4,10 +4,10 @@ module ysyx_25030081_cpu #(RF_ADDR_WIDTH=5,ADDR_WIDTH=32,DATA_WIDTH=32)(
   input clk,
   input rst,
   input [DATA_WIDTH-1:0] inst,
-  output [ADDR_WIDTH-1:0] pc,
-  output [DATA_WIDTH-1:0] alu_out,
-  output [DATA_WIDTH-1:0] a0
+  output [DATA_WIDTH-1:0] pc
 );
+
+wire [DATA_WIDTH-1:0] alu_out;
 
 wire [RF_ADDR_WIDTH-1:0] rs1;
 wire [RF_ADDR_WIDTH-1:0] rs2;
@@ -73,13 +73,13 @@ ysyx_25030081_cu cu_inst(
   .opcode(opcode),
   .ext_op(ext_op),
   .reg_wr(reg_wr),
+  .alu_a_src(alu_a_src),
+  .alu_b_src(alu_b_src),
+  .alu_op(alu_op),
   .branch(branch),
   .mem_to_reg(mem_to_reg),
   .mem_wr(mem_wr),
-  .mem_op(mem_op),
-  .alu_a_src(alu_a_src),
-  .alu_b_src(alu_b_src),
-  .alu_op(alu_op)
+  .mem_op(mem_op)
 );
 
 ysyx_25030081_ext ext_inst(
@@ -88,7 +88,7 @@ ysyx_25030081_ext ext_inst(
   .imm(imm)
 );
 
-ysyx_25030081_rf regfile_inst(
+ysyx_25030081_rf rf_inst(
   .clk(clk),
   .wen(reg_wr),
   .raddr1(rs1),
@@ -96,8 +96,7 @@ ysyx_25030081_rf regfile_inst(
   .waddr(rd),
   .wdata(wdata),
   .rdata1(rdata1),
-  .rdata2(rdata2),
-  .a0(a0)
+  .rdata2(rdata2)
 );
 
 MuxKey #(2 , 1, 32) alu_a_mux_inst (op1, alu_a_src, {
@@ -115,7 +114,9 @@ ysyx_25030081_alu alu_inst(
   .alu_op(alu_op),
   .op1(op1),
   .op2(op2),
-  .alu_out(alu_out)
+  .alu_out(alu_out),
+  .zero(zero),
+  .less(less)
 );
 
 MuxKey #(2, 1, 32) rf_wdata_mux_inst (wdata, mem_to_reg, {

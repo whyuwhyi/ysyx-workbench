@@ -202,12 +202,6 @@ config DIFFTEST_REF_NAME
   default "spike" if DIFFTEST_REF_SPIKE
   default "none"
 
-config WATCHPOINT
-  bool "Enable watchpoint"
-  default n
-  help
-    Enable watchpoint support in NEMU.
-
 endmenu
 
 if MODE_SYSTEM

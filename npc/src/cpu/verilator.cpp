@@ -1,9 +1,9 @@
-#include "Vysyx_25030081_cpu.h"
-#include "memory/pmem.h"
-#include "cpu/simulator.h"
-#include "verilated.h"
-#include "verilated_fst_c.h"
+#include <Vysyx_25030081_cpu.h>
+#include <cpu/simulator.h>
+#include <memory/pmem.h>
 #include <nvboard.h>
+#include <verilated.h>
+#include <verilated_fst_c.h>
 
 static VerilatedContext *contextp = NULL;
 static VerilatedFstC *tfp = NULL;
@@ -32,7 +32,7 @@ void single_cycle() {
   step_and_dump_wave();
 }
 
-void run(int n) {
+void cpu_exec(int n) {
   for (int i = 0; i < n; i++) {
     top->inst = pmem_read(top->pc);
     printf("pc: 0x%08x, inst: 0x%08x\n", top->pc, top->inst);
@@ -63,13 +63,4 @@ void sim_exit() {
 
   delete top;
   delete contextp;
-}
-
-extern "C" uint32_t get_pc(void) { return top->pc; }
-
-extern "C" int get_gpr(int idx) {
-  if (idx == 10) {
-    return top->a0;
-  }
-  return 0; // 其他寄存器暂时返回0
 }

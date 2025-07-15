@@ -1,15 +1,13 @@
-#include "common.h"
-#include "cpu/cpu.h"
-#include "cpu/simulator.h"
+#include <common.h>
+#include <cpu/cpu.h>
+#include <cpu/simulator.h>
 
 bool is_sim_end = false;
 NPCState npc_state_info = {NPC_RUNNING, 0, 0};
 
 extern "C" void ebreak(void) {
-  uint32_t pc = get_pc();
-  int halt_ret = get_gpr(10); // a0寄存器，RISC-V中a0是x10
 
-  set_npc_state(NPC_END, pc, halt_ret);
+  // set_npc_state(NPC_END, pc, halt_ret);
   is_sim_end = true;
 }
 

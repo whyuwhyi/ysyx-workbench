@@ -5,12 +5,12 @@ module ysyx_25030081_pc #(ADDR_WIDTH=32,PC_RST=32'h8000_0000)(
     output reg [ADDR_WIDTH-1:0] pc
 );
 
-  always @(posedge clk) begin
-    if (rst) begin
-      pc <= PC_RST;
-    end else begin
-      pc <= next_pc;
-    end
-  end
+  Reg #(32, 32'h8000_0000) pc_reg (
+    .clk(clk),
+    .rst(rst),
+    .din(next_pc),
+    .dout(pc),
+    .wen(1'b1)
+  );
 
 endmodule

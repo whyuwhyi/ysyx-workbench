@@ -1,0 +1,28 @@
+#ifndef __FTRACE_H__
+#define __FTRACE_H__
+
+#include <common.h>
+
+#define MAX_FTRACE_LEN 32
+#define MAX_FUNC_NAME 64
+
+typedef struct {
+  uint32_t caller_pc;
+  uint32_t target_pc;
+  char func_name[MAX_FUNC_NAME];
+  bool is_call;
+  int depth;
+} FuncTrace;
+
+typedef struct {
+  FuncTrace traces[MAX_FTRACE_LEN];
+  size_t current;
+  int call_depth;
+} FTrace;
+
+void init_ftrace();
+void ftrace_call(uint32_t caller_pc, uint32_t target_pc);
+void ftrace_ret(uint32_t ret_pc, uint32_t target_pc);
+void ftrace_display();
+
+#endif

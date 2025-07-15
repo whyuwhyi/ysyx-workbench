@@ -2,7 +2,9 @@ module ysyx_25030081_alu #(DATA_WIDTH=32)(
   input [3:0] alu_op,
   input [DATA_WIDTH-1:0] op1,
   input [DATA_WIDTH-1:0] op2,
-  output [DATA_WIDTH-1:0] alu_out
+  output [DATA_WIDTH-1:0] alu_out,
+  output zero,
+  output less
 );
   
   wire sub_flag;
@@ -21,8 +23,8 @@ module ysyx_25030081_alu #(DATA_WIDTH=32)(
   assign op2_processed = sub_flag ? (~op2 + 1) : op2;
   assign addsub_result = op1 + op2_processed;
   assign sll_result = op1 << op2[4:0];
-  assign slt_result = addsub_result[31] ? 32'h1 : 32'h0;
-  assign sltu_result = (~addsub_result[31] & |addsub_result) ? 32'h0 : 32'h1;
+  assign slt_result = {31'b0, addsub_result[31]};
+  assign sltu_result = {31'b0, ~(~addsub_result[31] & |addsub_result)};
   assign xor_result = op1 ^ op2;
   assign srl_result = op1 >> op2[4:0];
   assign sra_result = $signed(op1) >>> op2[4:0];

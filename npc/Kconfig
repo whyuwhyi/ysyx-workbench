@@ -1,0 +1,119 @@
+mainmenu "NPC Configuration"
+
+menu "Build Options"
+  choice
+    prompt "Compiler"
+    default CC_GCC
+  config CC_GCC
+    bool "gcc"
+  config CC_CLANG
+    bool "clang"
+  endchoice
+  
+  config CC
+    string
+    default "gcc" if CC_GCC
+    default "clang" if CC_CLANG
+    
+  choice
+    prompt "Optimization Level"
+    default CC_O2
+  config CC_O0
+    bool "-O0"
+  config CC_O2
+    bool "-O2"
+  config CC_O3
+    bool "-O3"
+  endchoice
+  
+  config CC_OPT
+    string
+    default "-O0" if CC_O0
+    default "-O2" if CC_O2
+    default "-O3" if CC_O3
+    
+  config CC_DEBUG
+    bool "Enable debug information (-ggdb3)"
+    default y
+    
+  config CC_ASAN
+    bool "Enable address sanitizer"
+    default n
+endmenu
+
+menu "Testing and Debugging"
+  config TRACE
+    bool "Enable tracing"
+    default y
+
+  config ITRACE
+    depends on TRACE
+    bool "Enable instruction tracing"
+    default y
+
+  config FTRACE
+    depends on TRACE  
+    bool "Enable function call tracing"
+    default n
+
+  config MTRACE
+    depends on TRACE
+    bool "Enable memory access tracing"
+    default n
+
+  config DIFFTEST
+    bool "Enable differential testing"
+    default n
+    
+  config DIFFTEST_REF_PATH
+    depends on DIFFTEST
+    string "NEMU reference path"
+    default "../nemu/build/riscv32-nemu-interpreter-so"
+
+endmenu
+
+menu "Memory Configuration"
+  config MSIZE
+    hex "Memory size"
+    default 0x8000000
+
+  config MBASE
+    hex "Memory base address"
+    default 0x80000000
+endmenu
+
+menu "Device Configuration"
+  config DEVICE
+    bool "Enable devices"
+    default n
+
+  config HAS_SERIAL
+    depends on DEVICE
+    bool "Enable serial"
+    default y
+
+  config HAS_TIMER
+    depends on DEVICE
+    bool "Enable timer"
+    default y
+
+  config HAS_KEYBOARD
+    depends on DEVICE
+    bool "Enable keyboard"
+    default y
+
+  config HAS_VGA
+    depends on DEVICE
+    bool "Enable VGA"
+    default y
+
+  config HAS_AUDIO
+    depends on DEVICE
+    bool "Enable audio"
+    default y
+
+  config SERIAL_MMIO
+    depends on HAS_SERIAL
+    hex "Serial MMIO address"
+    default 0xa00003f8
+endmenu
