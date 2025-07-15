@@ -20,11 +20,11 @@
 
 // Trace function declarations
 void ftrace_call(uint32_t from, uint32_t to);
-IFDEF(CONFIG_FTRACE, void ftrace_ret(uint32_t from, uint32_t to));
-IFDEF(CONFIG_FTRACE, bool is_fcall(uint32_t inst));
-IFDEF(CONFIG_FTRACE, bool is_fret(uint32_t inst));
-IFDEF(CONFIG_ITRACE, void itrace_push(paddr_t pc));
-IFDEF(CONFIG_ITRACE, void itrace_display());
+void ftrace_ret(uint32_t from, uint32_t to);
+bool is_fcall(uint32_t inst);
+bool is_fret(uint32_t inst);
+void itrace_push(paddr_t pc);
+void itrace_display();
 
 /* The assembly code of instructions executed is only output to the screen
  * when the number of instructions executed is less than this value.
