@@ -17,19 +17,6 @@
 #include <cpu/cpu.h>
 #include <memory/pmem.h>
 
-// Forward declarations for trace functions
-#ifdef CONFIG_ITRACE
-extern void itrace_push(uint32_t pc, uint32_t inst);
-#endif
-
-#ifdef CONFIG_FTRACE
-extern void ftrace_call(uint32_t pc, uint32_t target, const char *func_name);
-extern void ftrace_return(uint32_t pc, const char *func_name);
-#endif
-
-// Forward declaration for SDB
-extern void sdb_mainloop();
-
 // CPU state management
 bool npc_state_stopped = false;
 static bool npc_state_running = false;
@@ -60,9 +47,8 @@ extern void init_difftest(char *ref_so_file, long img_size, int port);
 extern void difftest_step(uint32_t pc, uint32_t npc);
 #endif
 
-#ifdef CONFIG_WATCHPOINT
+extern void sdb_mainloop();
 extern void watchpoint_check();
-#endif
 
 // Initialize CPU and related systems
 void init_cpu() {
@@ -117,9 +103,7 @@ static void exec_once() {
 #endif
 
   // Check watchpoints
-#ifdef CONFIG_WATCHPOINT
   watchpoint_check();
-#endif
 
   // Check for ebreak
   if (check_ebreak()) {
