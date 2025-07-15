@@ -8,13 +8,13 @@ static int call_depth = 0;
 
 void init_ftrace(const char *elf_path) {
   if (!elf_path) {
-    Log("Function trace disabled: no ELF file provided\n");
+    Log("Function trace disabled: no ELF file provided");
     return;
   }
 
   FILE *fp = fopen(elf_path, "rb");
   if (!fp) {
-    Log("Function trace disabled: cannot open ELF file %s\n", elf_path);
+    Log("Function trace disabled: cannot open ELF file %s", elf_path);
     return;
   }
 
@@ -61,7 +61,7 @@ void init_ftrace(const char *elf_path) {
   free(syms);
   fclose(fp);
 
-  Log("Function trace initialized with %d functions\n", func_cnt);
+  Log("Function trace initialized with %d functions", func_cnt);
 }
 
 const char *ftrace_func_name(vaddr_t addr) {
@@ -83,9 +83,9 @@ void ftrace_call(uint32_t from, uint32_t to) {
   print_indent();
   const char *name = ftrace_func_name(to);
   if (name) {
-    Log("[" FMT_WORD "] call -> " FMT_WORD " <%s>\n", from, to, name);
+    Log("[" FMT_WORD "] call -> " FMT_WORD " <%s>", from, to, name);
   } else {
-    Log("[" FMT_WORD "] call -> " FMT_WORD "\n", from, to);
+    Log("[" FMT_WORD "] call -> " FMT_WORD "", from, to);
   }
   call_depth++;
 }
@@ -95,9 +95,9 @@ void ftrace_ret(uint32_t from, uint32_t to) {
   print_indent();
   const char *name = ftrace_func_name(from);
   if (name) {
-    Log("[" FMT_WORD "] ret  <- " FMT_WORD " <%s>\n", from, to, name);
+    Log("[" FMT_WORD "] ret  <- " FMT_WORD " <%s>", from, to, name);
   } else {
-    Log("[" FMT_WORD "] ret  <- " FMT_WORD "\n", from, to);
+    Log("[" FMT_WORD "] ret  <- " FMT_WORD "", from, to);
   }
 }
 
