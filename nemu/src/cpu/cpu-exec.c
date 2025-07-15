@@ -19,7 +19,7 @@
 #include <locale.h>
 
 // Trace function declarations
-IFDEF(CONFIG_FTRACE, void ftrace_call(uint32_t from, uint32_t to));
+void ftrace_call(uint32_t from, uint32_t to);
 IFDEF(CONFIG_FTRACE, void ftrace_ret(uint32_t from, uint32_t to));
 IFDEF(CONFIG_FTRACE, bool is_fcall(uint32_t inst));
 IFDEF(CONFIG_FTRACE, bool is_fret(uint32_t inst));
