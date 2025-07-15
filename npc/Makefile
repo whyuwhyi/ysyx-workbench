@@ -28,6 +28,8 @@ CFLAGS_BUILD += $(call remove_quote,$(CONFIG_CC_OPT))
 CFLAGS_BUILD += $(if $(CONFIG_CC_DEBUG),-Og -ggdb3,)
 CFLAGS_BUILD += $(if $(CONFIG_CC_ASAN),-fsanitize=address,)
 CFLAGS_TRACE += -DITRACE_COND=$(if $(CONFIG_ITRACE_COND),$(call remove_quote,$(CONFIG_ITRACE_COND)),true)
+CFLAGS_BUILD += $(if $(CONFIG_WAVE_TRACE),-DCONFIG_WAVE_TRACE,)
+CFLAGS_BUILD += $(if $(CONFIG_NVBOARD),-DCONFIG_NVBOARD,)
 
 # Verilator configuration
 VERILATOR = verilator
@@ -44,20 +46,28 @@ CXXFLAGS += $(INCFLAGS) -DTOP_NAME="\"V$(TOPNAME)\""
 CFLAGS  += $(CFLAGS_BUILD) $(CFLAGS_TRACE)
 LDFLAGS += $(CFLAGS_BUILD)
 
+# Filelist discovery and inclusion
+FILELIST_MK = $(shell find -L ./src -name "filelist.mk")
+include $(FILELIST_MK)
+
 # Source files
 VSRCS = $(shell find $(abspath ./vsrc) -name "*.v")
-SRCS = $(shell find $(abspath ./src) -name "*.c" -or -name "*.cc" -or -name "*.cpp")
+DIRS-y += src/monitor
+DIRS-BLACKLIST-y += $(DIRS-BLACKLIST)
+SRCS-BLACKLIST-y += $(SRCS-BLACKLIST) $(shell find -L $(DIRS-BLACKLIST-y) -name "*.c" -o -name "*.cc" -o -name "*.cpp" 2>/dev/null || true)
+SRCS-y += $(shell find -L $(DIRS-y) -name "*.c" -o -name "*.cc" -o -name "*.cpp" 2>/dev/null || true)
+SRCS = $(abspath $(filter-out $(SRCS-BLACKLIST-y),$(SRCS-y)))
 
 # Add necessary libraries based on configuration
 LIBS := 
-LIBS += $(if $(CONFIG_WATCHPOINT),-lreadline)
+LIBS += -lreadline
 LIBS += $(if $(CONFIG_DIFFTEST),-ldl)
 LIBS += $(if $(CONFIG_ITRACE),-ldl)
 
 # Default target
 .DEFAULT_GOAL := $(TARGET)
 
-$(TARGET): $(VSRCS) $(SRCS)
+$(TARGET): $(VSRCS) $(SRCS) $(if $(CONFIG_NVBOARD),$(SRC_AUTO_BIND))
 	@mkdir -p ./build
 	@rm -rf $(OBJ_DIR)
 	$(VERILATOR) $(VERILATOR_CFLAGS) \
@@ -66,24 +76,8 @@ $(TARGET): $(VSRCS) $(SRCS)
 		--trace-fst \
 		--Mdir $(OBJ_DIR) --exe -o $(abspath $(TARGET))
 
-# Simulation target
-SIM_CXXFLAGS = $(CXXFLAGS) -D_SIMULATE_
-SIM_BIN = ./build/$(TOPNAME)_sim
 
-$(SIM_BIN): $(VSRCS) $(SRCS)
-	@mkdir -p ./build
-	@rm -rf $(OBJ_DIR)
-	$(VERILATOR) $(VERILATOR_CFLAGS) \
-		--top-module $(TOPNAME) $^ \
-		$(addprefix -CFLAGS , $(SIM_CXXFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS) $(LIBS)) \
-		--trace-fst \
-		--Mdir $(OBJ_DIR) --exe -o $(abspath $(SIM_BIN))
-
-sim: $(SIM_BIN)
-	@$(call git_commit, "sim RTL")
-	@$(SIM_BIN) $(IMG)
-
-# NVBoard target
+# NVBoard integration
 ifneq ($(NVBOARD_HOME),)
 include $(NVBOARD_HOME)/scripts/nvboard.mk
 
@@ -94,20 +88,17 @@ $(SRC_AUTO_BIND): $(NXDC_FILES)
 	@mkdir -p ./build
 	python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $^ $@
 
-NVBOARD_CXXFLAGS = $(CXXFLAGS) -D_NVBOARD_
-NVBOARD_SRCS = $(SRCS) $(SRC_AUTO_BIND)
-
-nvboard: $(NVBOARD_ARCHIVE) $(SRC_AUTO_BIND) $(VSRCS) $(NVBOARD_SRCS)
-	@mkdir -p ./build
-	@rm -rf $(OBJ_DIR)
-	$(VERILATOR) $(VERILATOR_CFLAGS) \
-		--top-module $(TOPNAME) $(VSRCS) \
-		$(addprefix -CFLAGS , $(NVBOARD_CXXFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS)) \
-		--trace-fst \
-		--Mdir $(OBJ_DIR) --exe -o $(abspath $(TARGET)) \
-		$(NVBOARD_SRCS)
-	@$(TARGET)
+# Add nvboard sources if enabled
+ifeq ($(CONFIG_NVBOARD),y)
+SRCS += $(SRC_AUTO_BIND)
+LIBS += $(NVBOARD_ARCHIVE)
 endif
+endif
+
+# Simulation target for AM integration
+sim: $(TARGET)
+	@$(call git_commit, "sim RTL") 
+	@$(TARGET) $(IMG)
 
 # Wave viewer
 GTKWAVE = gtkwave
@@ -125,4 +116,4 @@ include $(NPC_HOME)/scripts/config.mk
 # Add build target alias
 build: $(TARGET)
 
-.PHONY: build sim nvboard wave clean
+.PHONY: build sim wave clean

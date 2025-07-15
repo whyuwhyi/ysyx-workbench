@@ -1,7 +1,9 @@
 #include <Vysyx_25030081_cpu.h>
 #include <cpu/simulator.h>
 #include <memory/pmem.h>
+#ifdef CONFIG_NVBOARD
 #include <nvboard.h>
+#endif
 #include <verilated.h>
 #include <verilated_fst_c.h>
 
@@ -12,7 +14,7 @@ static TOP_NAME *top = NULL;
 static void step_and_dump_wave() {
   top->eval();
 
-#ifdef _SIMULATE_
+#ifdef CONFIG_WAVE_TRACE
   tfp->dump(contextp->time());
   contextp->timeInc(1);
 #endif
@@ -44,7 +46,7 @@ void sim_init() {
   contextp = new VerilatedContext;
   top = new TOP_NAME{contextp};
 
-#ifdef _SIMULATE_
+#ifdef CONFIG_WAVE_TRACE
   tfp = new VerilatedFstC;
   contextp->traceEverOn(true);
   top->trace(tfp, 0);
@@ -56,7 +58,7 @@ void sim_init() {
 void sim_exit() {
   single_cycle();
 
-#ifdef _SIMULATE_
+#ifdef CONFIG_WAVE_TRACE
   tfp->close();
   delete tfp;
 #endif

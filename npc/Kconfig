@@ -39,6 +39,18 @@ menu "Build Options"
   config CC_ASAN
     bool "Enable address sanitizer"
     default n
+    
+  config WAVE_TRACE
+    bool "Enable wave trace generation"
+    default n
+    help
+      Enable generation of wave trace files for debugging and analysis.
+      
+  config NVBOARD
+    bool "Enable NVBoard support"
+    default n
+    help
+      Enable NVBoard integration for hardware simulation.
 endmenu
 
 menu "Testing and Debugging"
