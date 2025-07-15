@@ -24,6 +24,7 @@ void init_device();
 void init_sdb();
 void init_disasm();
 void init_itrace();
+void init_mtrace();
 void init_ftrace(const char *elf_path);
 
 static void welcome() {
@@ -149,6 +150,7 @@ void init_monitor(int argc, char *argv[]) {
 
   IFDEF(CONFIG_ITRACE, init_disasm());
   IFDEF(CONFIG_ITRACE, init_itrace());
+  IFDEF(CONFIG_MTRACE, init_mtrace());
   IFDEF(CONFIG_FTRACE, init_ftrace(elf_file));
 
   /* Display welcome message. */

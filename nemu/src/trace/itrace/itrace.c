@@ -12,7 +12,6 @@ void init_itrace() {
 void itrace_push(paddr_t pc) {
   i_trace.inst_addr[i_trace.current++] = pc;
   i_trace.current %= MAX_TRACE_LEN;
-  Log("itrace_push: %lu, pc = " FMT_WORD "\n", i_trace.current, pc);
 }
 
 void itrace_display() {
