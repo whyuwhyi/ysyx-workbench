@@ -9,7 +9,7 @@ extern "C" {
 #endif
 
 // Legacy ebreak support
-void ebreak(void);
+void ebreak(uint32_t a0);
 void set_npc_state(int state, uint32_t pc, int halt_ret);
 bool is_exit_status_bad(void);
 

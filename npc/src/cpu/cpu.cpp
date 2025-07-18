@@ -27,26 +27,19 @@ extern void single_cycle();
 extern "C" bool check_ebreak();
 extern "C" int get_pc_value();
 
-// Trace system declarations
-#ifdef CONFIG_ITRACE
 extern void init_itrace();
 extern void itrace_push(uint32_t pc, uint32_t inst);
-#endif
 
-#ifdef CONFIG_MTRACE
 extern void init_mtrace();
-#endif
 
-#ifdef CONFIG_FTRACE
 extern void init_ftrace();
 extern void ftrace_call(uint32_t caller_pc, uint32_t target_pc);
 extern void ftrace_ret(uint32_t ret_pc, uint32_t target_pc);
-#endif
+extern bool is_fcall(uint32_t inst);
+extern bool is_fret(uint32_t inst);
 
-#ifdef CONFIG_DIFFTEST
 extern void init_difftest(char *ref_so_file, long img_size, int port);
 extern void difftest_step(uint32_t pc, uint32_t npc);
-#endif
 
 extern void sdb_mainloop();
 extern void watchpoint_check();
@@ -85,7 +78,7 @@ void init_cpu_difftest(char *ref_so_file, long img_size) {
 static void exec_once() {
   // Ensure DPI-C scope is set before calling DPI functions
   svSetScope(svGetScopeFromName("TOP.ysyx_25030081_cpu.pc_inst"));
-  
+
   uint32_t pc = get_pc_value();
 
   // Execute one cycle in Verilator
@@ -95,19 +88,14 @@ static void exec_once() {
 
   // Get instruction data for trace
   uint32_t inst = pmem_read(pc);
-  
+
 #ifdef CONFIG_ITRACE
-  extern void log_inst(uint32_t pc, uint32_t inst);
-  log_inst(pc, inst);
+  itrace_push(pc, inst);
 #endif
 
   // Check for function calls/returns for ftrace
 #ifdef CONFIG_FTRACE
-  extern void ftrace_call(uint32_t caller_pc, uint32_t target_pc);
-  extern void ftrace_ret(uint32_t ret_pc, uint32_t target_pc);
-  extern bool is_fcall(uint32_t inst);
-  extern bool is_fret(uint32_t inst);
-  
+
   if (is_fcall(inst)) {
     ftrace_call(pc, npc);
   } else if (is_fret(inst)) {
@@ -123,10 +111,11 @@ static void exec_once() {
   // Check watchpoints
   watchpoint_check();
 
-  // Check for ebreak
-  if (check_ebreak()) {
+  // Check NPC state
+  extern NPCState npc_state;
+  if (npc_state.state == NPC_END) {
     npc_state_stopped = true;
-    Log("NPC stopped at ebreak instruction at pc = 0x%08x", npc);
+    npc_state.halt_pc = pc;
   }
 }
 
@@ -136,13 +125,11 @@ void npc_cpu_exec(uint64_t n) {
   npc_state_stopped = false;
 
   if (n == (uint64_t)-1) {
-    // Run until stopped
     Log("NPC started (continuous execution)");
     while (!npc_state_stopped && npc_state_running) {
       exec_once();
     }
   } else {
-    // Run for N instructions
     Log("NPC executing %lu instructions", n);
     for (uint64_t i = 0; i < n && !npc_state_stopped; i++) {
       exec_once();
@@ -152,7 +139,23 @@ void npc_cpu_exec(uint64_t n) {
   npc_state_running = false;
 
   if (npc_state_stopped) {
-    Log("NPC execution stopped");
+    extern NPCState npc_state;
+    if (npc_state.state == NPC_END) {
+      printf("\n");  // 添加换行分隔
+      Log("npc: %s at pc = 0x%08x", 
+          npc_state.halt_ret == 0 ? 
+          ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN) : 
+          ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED), 
+          npc_state.halt_pc);
+      
+      // 自动退出程序
+      npc_state_running = false;
+      npc_state_stopped = true;
+      extern void monitor_exit();
+      monitor_exit();
+    } else {
+      Log("NPC execution stopped");
+    }
   } else {
     Log("NPC execution completed");
   }

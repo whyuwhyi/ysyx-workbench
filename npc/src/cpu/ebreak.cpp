@@ -1,27 +1,24 @@
 #include <common.h>
 #include <cpu/cpu.h>
-#include <cpu/simulator.h>
+#include <utils.h>
+#include <svdpi.h>
 
-bool ebreak_flag = false;
-NPCState npc_state_info = {NPC_RUNNING, 0, 0};
+extern "C" int get_reg_value(int reg_idx);
 
-extern "C" void ebreak(void) {
-  // set_npc_state(NPC_END, pc, halt_ret);
-  ebreak_flag = true;
-  Log("EBREAK instruction executed");
-}
-
-extern "C" void set_npc_state(int state, uint32_t pc, int halt_ret) {
-  npc_state_info.state = state;
-  npc_state_info.halt_pc = pc;
-  npc_state_info.halt_ret = halt_ret;
-}
-
-extern "C" bool is_exit_status_bad(void) {
-  return (npc_state_info.state == NPC_END && npc_state_info.halt_ret != 0) ||
-         (npc_state_info.state == NPC_ABORT);
+extern "C" void ebreak(uint32_t a0) {
+  extern NPCState npc_state;
+  npc_state.state = NPC_END;
+  npc_state.halt_pc = 0;
+  npc_state.halt_ret = a0;
 }
 
 extern "C" bool check_ebreak() {
-  return ebreak_flag;
+  extern NPCState npc_state;
+  return npc_state.state == NPC_END;
+}
+
+extern "C" bool is_exit_status_bad(void) {
+  extern NPCState npc_state;
+  return (npc_state.state == NPC_END && npc_state.halt_ret != 0) ||
+         (npc_state.state == NPC_ABORT);
 }

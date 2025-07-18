@@ -1,6 +1,6 @@
 module ysyx_25030081_ext #(DATA_WIDTH=32) (
   input [31:7] inst,
-  input [2:0] ext_op,
+  input [2:0] op,
   output [DATA_WIDTH-1:0] imm
 );
 
@@ -16,13 +16,12 @@ module ysyx_25030081_ext #(DATA_WIDTH=32) (
   assign immU = {inst[31:12], 12'b0};
   assign immJ = {{12{inst[31]}}, inst[19:12], inst[20], inst[30:21], 1'b0};
 
-  MuxKey #(5, 3, 32) imm_ext_mux_inst (imm, ext_op, {
+  MuxKey #(5, 3, 32) imm_ext_mux_inst (imm, op, {
     3'b000, immI,
     3'b001, immS,
     3'b010, immB,
     3'b011, immU,
     3'b100, immJ
   });
- 
 
 endmodule

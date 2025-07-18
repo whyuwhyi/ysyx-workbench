@@ -14,6 +14,5 @@ typedef struct {
 void init_itrace();
 void itrace_push(uint32_t pc, uint32_t inst);
 void itrace_display();
-void log_inst(uint32_t pc, uint32_t inst);
 
 #endif

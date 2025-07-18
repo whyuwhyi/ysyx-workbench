@@ -96,7 +96,7 @@ endif
 # Simulation target for AM integration
 sim: $(TARGET)
 	@$(call git_commit, "sim RTL") 
-	@$(TARGET) $(IMG)
+	@$(TARGET) $(ARGS) $(IMG)
 
 # Wave viewer
 GTKWAVE = gtkwave

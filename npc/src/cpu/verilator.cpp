@@ -10,9 +10,6 @@
 
 // DPI-C function declaration (implemented in ebreak.cpp)
 extern "C" void ebreak();
-
-// External ebreak functions (defined in ebreak.cpp)
-extern bool ebreak_flag;
 extern "C" bool check_ebreak();
 
 static VerilatedContext *contextp = NULL;
