@@ -54,7 +54,22 @@ void log_inst(uint32_t pc, uint32_t inst) {
 #define ITRACE_COND true
 #endif
   if (ITRACE_COND) {
+    // Store in trace buffer
     itrace_push(pc, inst);
+    
+    // Output instruction decoding in NEMU style
+    printf("0x%08x: ", pc);
+    
+    // Print instruction bytes (little-endian for RISC-V)
+    uint8_t *inst_bytes = (uint8_t *)&inst;
+    for (int i = 0; i < 4; i++) {
+      printf("%02x ", inst_bytes[i]);
+    }
+    
+    // Disassemble and print instruction
+    char disasm_str[128];
+    disassemble(disasm_str, sizeof(disasm_str), pc, (uint8_t *)&inst, 4);
+    printf("%s\n", disasm_str);
   }
 #endif
 }
