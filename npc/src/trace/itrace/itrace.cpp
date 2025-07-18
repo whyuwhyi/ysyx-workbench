@@ -2,7 +2,8 @@
 #include <memory/pmem.h>
 
 #ifdef CONFIG_ITRACE
-extern void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
+extern void disassemble(char *str, int size, uint64_t pc, uint8_t *code,
+                        int nbyte);
 #endif
 
 static InstTrace i_trace;
@@ -11,7 +12,7 @@ void init_itrace() {
   i_trace.current = 0;
   memset(i_trace.inst_addr, 0, sizeof(i_trace.inst_addr));
   memset(i_trace.inst_data, 0, sizeof(i_trace.inst_data));
-  printf("Instruction trace initialized\n");
+  Log("Instruction trace initialized\n");
 }
 
 void itrace_push(uint32_t pc, uint32_t inst) {
@@ -21,27 +22,28 @@ void itrace_push(uint32_t pc, uint32_t inst) {
 }
 
 void itrace_display() {
-  printf("Recent instruction trace:\n");
-  
+  Log("Recent instruction trace:\n");
+
   for (int i = 0; i < MAX_TRACE_LEN; i++) {
     int index = (i_trace.current + i) % MAX_TRACE_LEN;
     uint32_t pc = i_trace.inst_addr[index];
     uint32_t inst = i_trace.inst_data[index];
-    
-    if (pc == 0) continue;
-    
+
+    if (pc == 0)
+      continue;
+
     if (index == (i_trace.current - 1 + MAX_TRACE_LEN) % MAX_TRACE_LEN) {
-      printf("-->");
+      Log("-->");
     } else {
-      printf("   ");
+      Log("   ");
     }
-    
+
 #ifdef CONFIG_ITRACE
     char disasm_str[128];
-    disassemble(disasm_str, sizeof(disasm_str), pc, (uint8_t*)&inst, 4);
-    printf(" 0x%08x: 0x%08x  %s\n", pc, inst, disasm_str);
+    disassemble(disasm_str, sizeof(disasm_str), pc, (uint8_t *)&inst, 4);
+    Log(" 0x%08x: 0x%08x  %s\n", pc, inst, disasm_str);
 #else
-    printf(" 0x%08x: 0x%08x\n", pc, inst);
+    Log(" 0x%08x: 0x%08x\n", pc, inst);
 #endif
   }
 }

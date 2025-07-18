@@ -1,5 +1,6 @@
 #include <common.h>
 #include <cpu/cpu.h>
+#include <svdpi.h>
 
 // RISC-V register names
 static const char *regs[] = {
@@ -9,17 +10,24 @@ static const char *regs[] = {
 
 // Display all registers
 void npc_reg_display() {
-  printf("Register values:\n");
-  printf("PC: 0x%08x\n", get_pc_value());
-  printf("\n");
+  // Set scope for PC access
+  svSetScope(svGetScopeFromName("TOP.ysyx_25030081_cpu.pc_inst"));
+  uint32_t pc_val = get_pc_value();
+  
+  Log("Register values:");
+  Log("PC: 0x%08x", pc_val);
+  Log("");
 
+  // Set scope for register access
+  svSetScope(svGetScopeFromName("TOP.ysyx_25030081_cpu.rf_inst"));
   for (int i = 0; i < 32; i += 4) {
-    printf("x%-2d(%-4s): 0x%08x  ", i, regs[i], get_reg_value(i));
-    printf("x%-2d(%-4s): 0x%08x  ", i + 1, regs[i + 1], get_reg_value(i + 1));
-    printf("x%-2d(%-4s): 0x%08x  ", i + 2, regs[i + 2], get_reg_value(i + 2));
-    printf("x%-2d(%-4s): 0x%08x\n", i + 3, regs[i + 3], get_reg_value(i + 3));
+    Log("x%-2d(%-4s): 0x%08x  x%-2d(%-4s): 0x%08x  x%-2d(%-4s): 0x%08x  x%-2d(%-4s): 0x%08x", 
+        i, regs[i], get_reg_value(i), 
+        i + 1, regs[i + 1], get_reg_value(i + 1), 
+        i + 2, regs[i + 2], get_reg_value(i + 2), 
+        i + 3, regs[i + 3], get_reg_value(i + 3));
   }
-  printf("\n");
+  Log("");
 }
 
 // Get register value by name (for expression evaluator)
@@ -29,6 +37,7 @@ uint32_t npc_reg_str2val(const char *reg_name, bool *success) {
   // Check for register names
   for (int i = 0; i < 32; i++) {
     if (strcmp(reg_name, regs[i]) == 0) {
+      svSetScope(svGetScopeFromName("TOP.ysyx_25030081_cpu.rf_inst"));
       return get_reg_value(i);
     }
   }
@@ -37,16 +46,18 @@ uint32_t npc_reg_str2val(const char *reg_name, bool *success) {
   if (reg_name[0] == 'x' && strlen(reg_name) >= 2) {
     int reg_idx = atoi(reg_name + 1);
     if (reg_idx >= 0 && reg_idx < 32) {
+      svSetScope(svGetScopeFromName("TOP.ysyx_25030081_cpu.rf_inst"));
       return get_reg_value(reg_idx);
     }
   }
 
   // Check for special registers
   if (strcmp(reg_name, "pc") == 0) {
+    svSetScope(svGetScopeFromName("TOP.ysyx_25030081_cpu.pc_inst"));
     return get_pc_value();
   }
 
-  printf("Unknown register: %s\n", reg_name);
+  Log("Unknown register: %s", reg_name);
   *success = false;
   return 0;
 }

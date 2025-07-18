@@ -18,7 +18,7 @@ remove_quote = $(patsubst "%",%,$(1))
 # NPC configuration
 TOPNAME = ysyx_25030081_cpu
 NAME = $(TOPNAME)
-IMG ?= 
+IMG ?=
 
 # Extract compiler and options from menuconfig
 ifneq ($(CONFIG_CC),)
@@ -38,6 +38,7 @@ BUILD_DIR = $(shell pwd)/build
 OBJ_DIR = $(BUILD_DIR)/obj_dir
 TARGET = $(BUILD_DIR)/$(TOPNAME)
 
+$(shell mkdir -p $(BUILD_DIR))
 
 # Include paths
 INC_PATH = include
@@ -68,8 +69,6 @@ LIBS += $(if $(CONFIG_ITRACE),-ldl)
 .DEFAULT_GOAL := $(TARGET)
 
 $(TARGET): $(VSRCS) $(SRCS) $(if $(CONFIG_NVBOARD),$(SRC_AUTO_BIND))
-	@mkdir -p ./build
-	@rm -rf $(OBJ_DIR)
 	$(VERILATOR) $(VERILATOR_CFLAGS) \
 		--top-module $(TOPNAME) $^ \
 		$(addprefix -CFLAGS , $(CXXFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS) $(LIBS)) \
@@ -85,7 +84,6 @@ NXDC_FILES = constr/top.nxdc
 SRC_AUTO_BIND = $(abspath ./build/auto_bind.cpp)
 
 $(SRC_AUTO_BIND): $(NXDC_FILES)
-	@mkdir -p ./build
 	python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $^ $@
 
 # Add nvboard sources if enabled
@@ -108,7 +106,7 @@ wave: $(WAVE)
 	@$(GTKWAVE) $(WAVE)
 
 clean:
-	rm -rf ./build
+	rm -rf $(BUILD_DIR)
 
 # Include rules for menuconfig
 include $(NPC_HOME)/scripts/config.mk

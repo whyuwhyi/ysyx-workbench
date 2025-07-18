@@ -17,7 +17,7 @@
 #include <stdarg.h>
 
 FILE* log_fp = NULL;
-extern NPCState npc_state;
+extern NPCState npc_state_info;
 
 static bool log_enable_flag = true;
 
@@ -49,5 +49,5 @@ void log_write(const char *format, ...) {
 }
 
 void assert_fail_msg() {
-  Log("Assertion failure at pc = 0x%08x", npc_state.halt_pc);
+  Log("Assertion failure at pc = 0x%08x", npc_state_info.halt_pc);
 }

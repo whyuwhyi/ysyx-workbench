@@ -6,6 +6,14 @@
 #endif
 #include <verilated.h>
 #include <verilated_fst_c.h>
+#include <svdpi.h>
+
+// DPI-C function declaration (implemented in ebreak.cpp)
+extern "C" void ebreak();
+
+// External ebreak functions (defined in ebreak.cpp)
+extern bool ebreak_flag;
+extern "C" bool check_ebreak();
 
 static VerilatedContext *contextp = NULL;
 static VerilatedFstC *tfp = NULL;
@@ -34,17 +42,37 @@ void single_cycle() {
   step_and_dump_wave();
 }
 
+// External DPI-C functions to get RTL state
+extern "C" int get_pc_value();
+
 void cpu_exec(int n) {
+  // Ensure DPI-C scope is set before calling DPI functions
+  svSetScope(svGetScopeFromName("TOP.ysyx_25030081_cpu.pc_inst"));
+  
   for (int i = 0; i < n; i++) {
-    top->inst = pmem_read(top->pc);
-    printf("pc: 0x%08x, inst: 0x%08x\n", top->pc, top->inst);
+    // Execute one cycle
     single_cycle();
+    
+    // Get current PC value using DPI-C
+    uint32_t current_pc = get_pc_value();
+    uint32_t current_inst = pmem_read(current_pc);
+    
+    Log("pc: 0x%08x, inst: 0x%08x", current_pc, current_inst);
+    
+    // Check if ebreak was executed
+    if (check_ebreak()) {
+      Log("Simulation stopped due to EBREAK");
+      break;
+    }
   }
 }
 
 void sim_init() {
   contextp = new VerilatedContext;
   top = new TOP_NAME{contextp};
+  
+  // Set DPI-C scope for the PC module where get_pc_value is defined
+  svSetScope(svGetScopeFromName("TOP.ysyx_25030081_cpu.pc_inst"));
 
 #ifdef CONFIG_WAVE_TRACE
   tfp = new VerilatedFstC;

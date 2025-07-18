@@ -244,7 +244,6 @@ static int get_pos_of_main_op(int s, int e) {
 // Forward declaration for register access
 extern uint32_t npc_reg_str2val(const char *reg_name, bool *success);
 
-// Placeholder for memory access - will use pmem
 static word_t npc_vaddr_read(vaddr_t addr, int len) {
   // Simple implementation using pmem
   return pmem_read(addr);

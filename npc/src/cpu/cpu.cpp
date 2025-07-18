@@ -16,6 +16,7 @@
 #include <common.h>
 #include <cpu/cpu.h>
 #include <memory/pmem.h>
+#include <svdpi.h>
 
 // CPU state management
 bool npc_state_stopped = false;
@@ -23,8 +24,8 @@ static bool npc_state_running = false;
 
 // External function declarations for Verilator integration
 extern void single_cycle();
-extern void reset_npc();
-extern bool check_ebreak();
+extern "C" bool check_ebreak();
+extern "C" int get_pc_value();
 
 // Trace system declarations
 #ifdef CONFIG_ITRACE
@@ -82,6 +83,9 @@ void init_cpu_difftest(char *ref_so_file, long img_size) {
 
 // Execute one instruction
 static void exec_once() {
+  // Ensure DPI-C scope is set before calling DPI functions
+  svSetScope(svGetScopeFromName("TOP.ysyx_25030081_cpu.pc_inst"));
+  
   uint32_t pc = get_pc_value();
 
   // Execute one cycle in Verilator
@@ -90,11 +94,25 @@ static void exec_once() {
   uint32_t npc = get_pc_value();
 
   // Get instruction data for trace
+  uint32_t inst = pmem_read(pc);
+  
 #ifdef CONFIG_ITRACE
+  extern void log_inst(uint32_t pc, uint32_t inst);
+  log_inst(pc, inst);
 #endif
 
   // Check for function calls/returns for ftrace
 #ifdef CONFIG_FTRACE
+  extern void ftrace_call(uint32_t caller_pc, uint32_t target_pc);
+  extern void ftrace_ret(uint32_t ret_pc, uint32_t target_pc);
+  extern bool is_fcall(uint32_t inst);
+  extern bool is_fret(uint32_t inst);
+  
+  if (is_fcall(inst)) {
+    ftrace_call(pc, npc);
+  } else if (is_fret(inst)) {
+    ftrace_ret(pc, npc);
+  }
 #endif
 
   // Run difftest check
@@ -144,14 +162,6 @@ void npc_cpu_exec(uint64_t n) {
 void npc_cpu_stop() {
   npc_state_running = false;
   npc_state_stopped = true;
-}
-
-// Reset CPU
-void npc_cpu_reset() {
-  Log("Resetting NPC...");
-  reset_npc();
-  npc_state_stopped = false;
-  npc_state_running = false;
 }
 
 // Get CPU state

@@ -9,7 +9,8 @@ module ysyx_25030081_cu(
   output [3:0] alu_op,
   output [2:0] branch,
   output mem_to_reg,
-  output mem_wr,
+  output mem_wen,
+  output mem_ren,
   output [2:0] mem_op
 );
 
@@ -88,20 +89,30 @@ module ysyx_25030081_cu(
 
   assign ext_op = {j_type, b_type | u_type, s_type | u_type};
   assign reg_wr = r_type | i_type | u_type | j_type;
-  assign branch = (j_jal) ? 3'b001 :
-                  (i_jalr) ? 3'b010 :
-                  3'b000;
-  assign mem_to_reg = (j_jal | i_jalr) ? 1'b1 : 1'b0;
-  assign mem_wr = s_type;
+  MuxKey #(3, 2, 3) branch_mux_inst (branch, {j_jal, i_jalr}, {
+    2'b10, 3'b001,
+    2'b01, 3'b010,
+    2'b00, 3'b000
+  });
+  MuxKey #(2, 1, 1) mem_to_reg_mux_inst (mem_to_reg, j_jal | i_jalr, {
+    1'b1, 1'b1,
+    1'b0, 1'b0
+  });
+  assign mem_wen = s_type;
+  assign mem_ren = i_type;
   assign mem_op = {s_type, i_type | u_type, j_type};
-  assign alu_a_src = (u_auipc | j_jal | i_jalr) ? 1'b1 : 1'b0;
-  assign alu_b_src = (j_jal | i_jalr) ? 2'b10 :
-                     (i_type | u_type) ? 2'b01 : 2'b00;
-  assign alu_op = (i_addi) ? 4'b0000 :
-                  (u_auipc) ? 4'b0000 :
-                  (u_lui) ? 4'b0011 :
-                  (j_jal) ? 4'b0000 :
-                  (i_jalr) ? 4'b0000 :
-                  4'b0000;
+  MuxKey #(2, 1, 1) alu_a_src_mux_inst (alu_a_src, u_auipc | j_jal | i_jalr, {
+    1'b1, 1'b1,
+    1'b0, 1'b0
+  });
+  MuxKey #(3, 2, 2) alu_b_src_mux_inst (alu_b_src, {(j_jal | i_jalr), (i_type | u_type)}, {
+    2'b10, 2'b10,
+    2'b01, 2'b01,
+    2'b00, 2'b00
+  });
+  MuxKey #(2, 1, 4) alu_op_mux_inst (alu_op, u_lui, {
+    1'b1, 4'b0011,
+    1'b0, 4'b0000
+  });
 
 endmodule

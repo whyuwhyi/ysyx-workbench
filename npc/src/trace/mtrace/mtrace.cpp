@@ -5,7 +5,7 @@ static MTrace m_trace;
 void init_mtrace() {
   m_trace.current = 0;
   memset(m_trace.traces, 0, sizeof(m_trace.traces));
-  printf("Memory trace initialized\n");
+  Log("Memory trace initialized\n");
 }
 
 void mtrace_read(uint32_t addr, uint32_t data) {
@@ -25,19 +25,20 @@ void mtrace_write(uint32_t addr, uint32_t data, uint8_t wmask) {
 }
 
 void mtrace_display() {
-  printf("Recent memory trace:\n");
-  
+  Log("Recent memory trace:\n");
+
   for (int i = 0; i < MAX_MTRACE_LEN; i++) {
     int index = (m_trace.current + i) % MAX_MTRACE_LEN;
     MemTrace *trace = &m_trace.traces[index];
-    
-    if (trace->addr == 0) continue;
-    
+
+    if (trace->addr == 0)
+      continue;
+
     if (trace->is_write) {
-      printf("   WRITE 0x%08x: 0x%08x (mask: 0x%02x)\n", 
-             trace->addr, trace->data, trace->wmask);
+      Log("   WRITE 0x%08x: 0x%08x (mask: 0x%02x)\n", trace->addr, trace->data,
+          trace->wmask);
     } else {
-      printf("   READ  0x%08x: 0x%08x\n", trace->addr, trace->data);
+      Log("   READ  0x%08x: 0x%08x\n", trace->addr, trace->data);
     }
   }
 }

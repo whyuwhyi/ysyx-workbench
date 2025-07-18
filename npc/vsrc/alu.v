@@ -20,7 +20,10 @@ module ysyx_25030081_alu #(DATA_WIDTH=32)(
   wire [DATA_WIDTH-1:0] and_result;
   
   assign sub_flag = alu_op[3];
-  assign op2_processed = sub_flag ? (~op2 + 1) : op2;
+  MuxKey #(2, 1, 32) op2_processed_mux_inst (op2_processed, sub_flag, {
+    1'b1, (~op2 + 1),
+    1'b0, op2
+  });
   assign addsub_result = op1 + op2_processed;
   assign sll_result = op1 << op2[4:0];
   assign slt_result = {31'b0, addsub_result[31]};

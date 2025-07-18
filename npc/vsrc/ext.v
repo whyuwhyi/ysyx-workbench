@@ -1,6 +1,6 @@
 module ysyx_25030081_ext #(DATA_WIDTH=32) (
   input [31:7] inst,
-  input [2:0]ext_op,
+  input [2:0] ext_op,
   output [DATA_WIDTH-1:0] imm
 );
 

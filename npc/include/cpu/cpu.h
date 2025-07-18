@@ -13,21 +13,18 @@ void ebreak(void);
 void set_npc_state(int state, uint32_t pc, int halt_ret);
 bool is_exit_status_bad(void);
 
-// DPI-C interface functions (implemented in C++)
+// DPI-C interface functions (implemented in RTL)
 #ifdef __cplusplus
 extern "C" {
 #endif
 int get_pc_value();
 int get_reg_value(int reg_idx);
-void set_pc_value(int pc);
-void set_reg_value(int reg_idx, int value);
 #ifdef __cplusplus
 }
 #endif
 
 // Verilator integration functions
 void single_cycle();
-void reset_npc();
 bool check_ebreak();
 
 #ifdef __cplusplus
@@ -52,7 +49,5 @@ extern bool npc_state_stopped;
 // NPC state access functions for difftest
 uint32_t get_npc_pc();
 uint32_t get_npc_reg(int idx);
-void set_npc_pc(uint32_t pc);
-void set_npc_reg(int idx, uint32_t val);
 
 #endif

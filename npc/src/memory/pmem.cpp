@@ -107,7 +107,7 @@ void init_mem() {
       CONFIG_MSIZE);
 }
 
-// DPI-C functions for Verilator
+// DPI-C functions
 extern "C" int pmem_read(int raddr) { return paddr_read(raddr, 4); }
 
 extern "C" void pmem_write(int waddr, int wdata, char wmask) {
