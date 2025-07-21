@@ -16,13 +16,13 @@ FILE* log_fp = NULL;
 static bool log_enable_flag = true;
 
 void init_log(const char *log_file) {
-  log_fp = stdout;
+  log_fp = NULL;
   if (log_file != NULL) {
     FILE *fp = fopen(log_file, "w");
     Assert(fp, "Can not open '%s'", log_file);
     log_fp = fp;
+    Log("Log is written to %s", log_file);
   }
-  Log("Log is written to %s", log_file ? log_file : "stdout");
 }
 
 bool log_enable() {
@@ -33,14 +33,6 @@ void log_set_enable(bool enable) {
   log_enable_flag = enable;
 }
 
-void log_write(const char *format, ...) {
-  if (!log_enable()) return;
-  va_list ap;
-  va_start(ap, format);
-  vfprintf(log_fp, format, ap);
-  va_end(ap);
-  fflush(log_fp);
-}
 
 static int parse_args(int argc, char *argv[]) {
   static struct option long_options[] = {
@@ -142,7 +134,7 @@ static void print_trap_info() {
   switch (npc_state.state) {
     case NPC_END:
     case NPC_ABORT:
-      printf("npc: %s at pc = 0x%08x\n",
+      Log("npc: %s at pc = 0x%08x",
           (npc_state.state == NPC_ABORT
                ? ANSI_FMT("ABORT", ANSI_FG_RED)
                : (npc_state.halt_ret == 0

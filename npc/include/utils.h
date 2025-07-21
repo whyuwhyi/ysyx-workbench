@@ -39,6 +39,23 @@ uint64_t get_time();
 bool log_enable();
 void init_log(const char *log_file);
 void log_set_enable(bool enable);
-void log_write(const char *format, ...);
+
+extern FILE* log_fp;
+
+#define log_write(...) \
+  do { \
+    extern bool log_enable(); \
+    extern FILE* log_fp; \
+    if (log_enable() && log_fp != NULL) { \
+      fprintf(log_fp, __VA_ARGS__); \
+      fflush(log_fp); \
+    } \
+  } while (0)
+
+#define _Log(...) \
+  do { \
+    printf(__VA_ARGS__); \
+    log_write(__VA_ARGS__); \
+  } while (0)
 
 #endif

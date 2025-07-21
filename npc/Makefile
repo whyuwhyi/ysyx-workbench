@@ -43,7 +43,7 @@ $(shell mkdir -p $(BUILD_DIR))
 # Include paths
 INC_PATH = include
 INCFLAGS = $(addprefix -I, $(abspath $(INC_PATH))) -I$(abspath ./src)
-CXXFLAGS += $(INCFLAGS) -DTOP_NAME="\"V$(TOPNAME)\""
+CXXFLAGS += $(INCFLAGS) -DTOP_NAME="\"V$(TOPNAME)\"" -ffile-prefix-map=$(abspath .)/=
 CFLAGS  += $(CFLAGS_BUILD) $(CFLAGS_TRACE)
 LDFLAGS += $(CFLAGS_BUILD)
 

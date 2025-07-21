@@ -17,28 +17,18 @@
 #define __DEBUG_H__
 
 #include <stdio.h>
-#include <assert.h>
-#include <macro.h>
-
-extern FILE* log_fp;
-void init_log(const char *log_file);
+#include <utils.h>
 
 #define Log(format, ...) \
-    do { \
-      extern bool log_enable(); \
-      if (log_enable()) { \
-        fprintf(log_fp, "[%s:%d %s] " format "\n", \
-          __FILE__, __LINE__, __func__, ## __VA_ARGS__); \
-        fflush(log_fp); \
-      } \
-    } while (0)
+    _Log(ANSI_FMT("[%s:%d %s] " format, ANSI_FG_BLUE) "\n", \
+        __FILE__, __LINE__, __func__, ## __VA_ARGS__)
 
 #define Assert(cond, format, ...) \
   do { \
     if (!(cond)) { \
       fflush(stdout); \
       fprintf(stderr, ANSI_FMT(format, ANSI_FG_RED) "\n", ##  __VA_ARGS__); \
-      fflush(log_fp); \
+      extern FILE* log_fp; fflush(log_fp); \
       extern void assert_fail_msg(); \
       assert_fail_msg(); \
       assert(cond); \

@@ -78,8 +78,8 @@
 
 // functional macro helpers
 
-#define __ANSI(str, fmt) "\033[" str "m" fmt "\033[0m"
-#define ANSI_FMT(str, fmt) __ANSI(str, fmt)
+#define __ANSI(fmt, str) "\033[" str "m" fmt "\033[0m"
+#define ANSI_FMT(fmt, str) __ANSI(fmt, str)
 
 #define ANSI_FG_BLACK "30"
 #define ANSI_FG_RED "31"

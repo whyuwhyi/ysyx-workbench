@@ -38,7 +38,8 @@ static int cmd_c(char *args) {
 }
 
 static int cmd_q(char *args) {
-  exit(0);
+  extern NPCState npc_state;
+  npc_state.state = NPC_QUIT;
   return -1;
 }
 
