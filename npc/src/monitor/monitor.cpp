@@ -109,6 +109,8 @@ void init_monitor(int argc, char *argv[]) {
   init_cpu();
 
 #ifdef CONFIG_ITRACE
+  void init_disasm();
+  init_disasm();
   init_itrace();
 #endif
 
