@@ -117,4 +117,6 @@ include $(NPC_HOME)/scripts/config.mk
 # Add build target alias
 build: $(TARGET)
 
+include ../Makefile
+
 .PHONY: build sim wave clean
