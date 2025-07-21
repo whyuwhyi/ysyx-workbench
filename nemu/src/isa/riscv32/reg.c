@@ -22,11 +22,11 @@ const char *regs[] = {"$0", "ra", "sp",  "gp",  "tp", "t0", "t1", "t2",
                       "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"};
 
 void isa_reg_display() {
-  printf("name\t hex\t\t dec\n");
+  printf("Name Dec         Hex        \n");
   for (int i = 0; i < 32; ++i) {
-    printf("%s\t " FMT_WORD "\t %d\n", regs[i], gpr(i), gpr(i));
+    printf("%-4s %-11d " FMT_WORD "\n", regs[i], (int32_t)gpr(i), gpr(i));
   }
-  printf("pc\t " FMT_WORD "\t %d\n", cpu.pc, cpu.pc);
+  printf("%-4s %-11d " FMT_WORD "\n", "pc", (int32_t)cpu.pc, cpu.pc);
 }
 
 word_t isa_reg_str2val(const char *s, bool *success) {
