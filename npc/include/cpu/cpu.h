@@ -4,32 +4,15 @@
 #include "common.h"
 #include "utils.h"
 
-#ifdef __cplusplus
+// DPI-C interface functions
 extern "C" {
-#endif
-
-// Legacy ebreak support
+uint32_t get_pc_value();
+uint32_t get_reg_value(int reg_idx);
 void ebreak(uint32_t a0);
-void set_npc_state(int state, uint32_t pc, int halt_ret);
-bool is_exit_status_bad(void);
-
-// DPI-C interface functions (implemented in RTL)
-#ifdef __cplusplus
-extern "C" {
-#endif
-int get_pc_value();
-int get_reg_value(int reg_idx);
-#ifdef __cplusplus
-}
-#endif
-
-// Verilator integration functions
-void single_cycle();
 bool check_ebreak();
-
-#ifdef __cplusplus
+uint32_t pmem_read(uint32_t raddr);
+void pmem_write(uint32_t waddr, uint32_t wdata, char wmask);
 }
-#endif
 
 // C++ CPU interface functions
 void init_cpu();
@@ -38,10 +21,17 @@ void npc_cpu_exec(uint64_t n);
 void npc_cpu_stop();
 void npc_cpu_reset();
 bool npc_is_stopped();
-bool npc_is_running();
-
-// Register display function
 void npc_reg_display();
+
+// Simulator functions
+void sim_init(void);
+void sim_exit(void);
+void single_cycle();
+
+// State management functions
+void set_npc_state(int state, uint32_t pc, int halt_ret);
+bool is_exit_status_bad(void);
+bool npc_is_running();
 
 // CPU state globals
 extern bool npc_state_stopped;
@@ -49,5 +39,32 @@ extern bool npc_state_stopped;
 // NPC state access functions for difftest
 uint32_t get_npc_pc();
 uint32_t get_npc_reg(int idx);
+
+// Monitor and system functions
+void init_monitor(int argc, char *argv[]);
+void monitor_exit(void);
+void engine_start();
+long load_image(char *img_file);
+
+// Trace functions
+void init_itrace();
+void init_mtrace();
+void init_ftrace(const char *elf_path);
+void itrace_push(uint32_t pc);
+void itrace_display();
+void ftrace_call(uint32_t caller_pc, uint32_t target_pc);
+void ftrace_ret(uint32_t ret_pc, uint32_t target_pc);
+bool is_fcall(uint32_t inst);
+bool is_fret(uint32_t inst);
+
+// Debugger functions
+void init_sdb();
+void sdb_mainloop();
+void sdb_set_batch_mode();
+void watchpoint_check();
+
+// Difftest functions
+void init_difftest(char *ref_so_file, long img_size, int port);
+void difftest_step(uint32_t pc, uint32_t npc);
 
 #endif

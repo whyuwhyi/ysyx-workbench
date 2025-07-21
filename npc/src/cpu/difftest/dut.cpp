@@ -14,14 +14,12 @@
 ***************************************************************************************/
 
 #include <common.h>
+#include <cpu/cpu.h>
 #include <svdpi.h>
 
 // These functions interface with the RTL via DPI-C
 // They will be properly implemented when integrating with Verilator
 
-// DPI-C functions for register access (read-only)
-extern "C" uint32_t get_reg_value(int reg_idx);
-extern "C" uint32_t get_pc_value();
 
 // NPC interface functions used by difftest
 uint32_t get_npc_pc() {
@@ -37,6 +35,3 @@ uint32_t get_npc_reg(int idx) {
 
 
 // DPI-C functions are now implemented in RTL (rf.v and pc.v)
-// External declarations for the actual DPI-C functions
-extern "C" uint32_t get_reg_value(int reg_idx);
-extern "C" uint32_t get_pc_value();

@@ -1,5 +1,13 @@
-#include "ftrace.h"
+#include <common.h>
 #include <elf.h>
+
+#define MAX_FUNC 1024
+
+typedef struct {
+  paddr_t addr;
+  word_t size;
+  const char *name;
+} FuncInfo;
 
 static FuncInfo funcs[MAX_FUNC];
 static int func_cnt = 0;

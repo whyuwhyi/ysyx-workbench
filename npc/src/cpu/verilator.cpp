@@ -1,5 +1,5 @@
 #include <Vysyx_25030081_cpu.h>
-#include <cpu/simulator.h>
+#include <cpu/cpu.h>
 #include <memory/pmem.h>
 #ifdef CONFIG_NVBOARD
 #include <nvboard.h>
@@ -8,9 +8,6 @@
 #include <verilated_fst_c.h>
 #include <svdpi.h>
 
-// DPI-C function declaration (implemented in ebreak.cpp)
-extern "C" void ebreak();
-extern "C" bool check_ebreak();
 
 static VerilatedContext *contextp = NULL;
 static VerilatedFstC *tfp = NULL;
@@ -39,8 +36,6 @@ void single_cycle() {
   step_and_dump_wave();
 }
 
-// External DPI-C functions to get RTL state
-extern "C" int get_pc_value();
 
 void cpu_exec(int n) {
   // Ensure DPI-C scope is set before calling DPI functions

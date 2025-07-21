@@ -44,5 +44,8 @@ module ysyx_25030081_alu #(DATA_WIDTH=32)(
     4'b0001, op2
   });
 
+  assign zero = (out == 32'b0);
+  assign less = (op == 4'b1010) ? sltu_result[0] : slt_result[0];
+
 endmodule
 

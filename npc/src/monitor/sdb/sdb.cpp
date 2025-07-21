@@ -254,12 +254,36 @@ void sdb_mainloop() {
     return;
   }
 
+  static char *last_cmd = NULL;
+
   for (char *str; (str = rl_gets()) != NULL;) {
     char *str_end = str + strlen(str);
 
-    /* extract the first token as the command */
     char *cmd = strtok(str, " ");
     if (cmd == NULL) {
+      if (last_cmd != NULL) {
+        char *last_str = strdup(last_cmd);
+        char *last_cmd_token = strtok(last_str, " ");
+        char *last_args = last_cmd_token + strlen(last_cmd_token) + 1;
+        char *last_str_end = last_str + strlen(last_cmd);
+        if (last_args >= last_str_end) {
+          last_args = NULL;
+        }
+
+        printf("Repeating: %s\n", last_cmd);
+
+        int i;
+        for (i = 0; i < NR_CMD; i++) {
+          if (strcmp(last_cmd_token, cmd_table[i].name) == 0) {
+            if (cmd_table[i].handler(last_args) < 0) {
+              free(last_str);
+              return;
+            }
+            break;
+          }
+        }
+        free(last_str);
+      }
       continue;
     }
 
@@ -271,10 +295,18 @@ void sdb_mainloop() {
       args = NULL;
     }
 
+    if (last_cmd)
+      free(last_cmd);
+    last_cmd = strdup(str);
+
+    char *restored_str = strdup(str);
+    char *restored_cmd = strtok(restored_str, " ");
+
     int i;
     for (i = 0; i < NR_CMD; i++) {
       if (strcmp(cmd, cmd_table[i].name) == 0) {
         if (cmd_table[i].handler(args) < 0) {
+          free(restored_str);
           return;
         }
         break;
@@ -284,6 +316,8 @@ void sdb_mainloop() {
     if (i == NR_CMD) {
       printf("Unknown command '%s'\n", cmd);
     }
+
+    free(restored_str);
   }
 }
 
@@ -293,6 +327,4 @@ void init_sdb() {
 
   /* Initialize the watchpoint pool. */
   init_wp_pool();
-
-  // test_expr();
 }

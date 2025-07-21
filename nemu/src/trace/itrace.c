@@ -1,5 +1,12 @@
-#include "itrace.h"
+#include <common.h>
 #include <memory/vaddr.h>
+
+#define MAX_TRACE_LEN 24
+
+typedef struct {
+  vaddr_t inst_addr[MAX_TRACE_LEN];
+  size_t current;
+} InstTrace;
 
 static InstTrace i_trace;
 

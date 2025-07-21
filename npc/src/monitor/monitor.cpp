@@ -1,22 +1,18 @@
 #include <assert.h>
 #include <common.h>
 #include <cpu/cpu.h>
-#include <cpu/simulator.h>
 #include <memory/pmem.h>
 #include <stdio.h>
 #include <getopt.h>
+#include <stdarg.h>
 
-extern void init_sdb();
-extern void sdb_mainloop();
-extern void sdb_set_batch_mode();
-extern "C" bool is_exit_status_bad();
+NPCState npc_state = { .state = NPC_STOP };
 
-// Forward declaration
+FILE* log_fp = NULL;
+static bool log_enable_flag = true;
+
+
 long load_image(char *img_file);
-
-#ifdef CONFIG_ITRACE
-extern void init_disasm();
-#endif
 
 static bool is_batch_mode = false;
 static char *log_file = NULL;
@@ -65,16 +61,22 @@ static int parse_args(int argc, char *argv[]) {
 void monitor_init(void) {
   Log("Monitor initializing...");
 
-  // Initialize CPU and subsystems
   init_cpu();
 
-  // Initialize SDB
-  init_sdb();
-
-  // Initialize disassembly if itrace is enabled
 #ifdef CONFIG_ITRACE
-  init_disasm();
+  init_itrace();
 #endif
+
+#ifdef CONFIG_MTRACE
+  init_mtrace();
+#endif
+
+#ifdef CONFIG_FTRACE
+  extern char *img_file;
+  init_ftrace(img_file);
+#endif
+
+  init_sdb();
 
   Log("Monitor initialized");
 }
@@ -106,26 +108,25 @@ void monitor_exit(void) {
 }
 
 static void print_trap_info() {
-  uint32_t pc = get_pc_value();
-
-  if (npc_is_stopped()) {
-    printf(ANSI_FMT("npc: HIT TRAP at pc = 0x%08x", ANSI_FG_GREEN) "\n", pc);
-
-    // Display trace information if enabled
+  extern NPCState npc_state;
+  switch (npc_state.state) {
+    case NPC_END:
+    case NPC_ABORT:
+      printf("npc: %s at pc = 0x%08x\n",
+          (npc_state.state == NPC_ABORT
+               ? ANSI_FMT("ABORT", ANSI_FG_RED)
+               : (npc_state.halt_ret == 0
+                      ? ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN)
+                      : ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED))),
+          npc_state.halt_pc);
 #ifdef CONFIG_ITRACE
-    extern void itrace_display();
-    itrace_display();
+      if (npc_state.halt_ret != 0) {
+        itrace_display();
+      }
 #endif
-
-#ifdef CONFIG_MTRACE
-    extern void mtrace_display();
-    mtrace_display();
-#endif
-
-#ifdef CONFIG_FTRACE
-    extern void ftrace_display();
-    ftrace_display();
-#endif
+      break;
+    case NPC_QUIT:
+      break;
   }
 }
 
@@ -167,4 +168,47 @@ long load_image(char *img_file) {
 #endif
 
   return size;
+}
+
+bool is_exit_status_bad() {
+  bool good = (npc_state.state == NPC_END && npc_state.halt_ret == 0) ||
+    (npc_state.state == NPC_QUIT);
+  return !good;
+}
+
+void set_npc_state(int state, vaddr_t pc, int halt_ret) {
+  npc_state.state = state;
+  npc_state.halt_pc = pc;
+  npc_state.halt_ret = halt_ret;
+}
+
+void init_log(const char *log_file) {
+  log_fp = stdout;
+  if (log_file != NULL) {
+    FILE *fp = fopen(log_file, "w");
+    Assert(fp, "Can not open '%s'", log_file);
+    log_fp = fp;
+  }
+  Log("Log is written to %s", log_file ? log_file : "stdout");
+}
+
+bool log_enable() {
+  return log_enable_flag;
+}
+
+void log_set_enable(bool enable) {
+  log_enable_flag = enable;
+}
+
+void log_write(const char *format, ...) {
+  if (!log_enable()) return;
+  va_list ap;
+  va_start(ap, format);
+  vfprintf(log_fp, format, ap);
+  va_end(ap);
+  fflush(log_fp);
+}
+
+void assert_fail_msg() {
+  Log("Assertion failure at pc = 0x%08x", npc_state.halt_pc);
 }

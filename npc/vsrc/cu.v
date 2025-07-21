@@ -100,10 +100,10 @@ module ysyx_25030081_cu(
   assign alu_b_src[1] = i_jalr | j_jal;
   assign alu_b_src[0] = i_type | s_type | u_type;
   
-  assign alu_op[3] = r_sub;
-  assign alu_op[2] = r_xor | i_xori | r_slt | i_slti | r_sltu | i_sltiu;
-  assign alu_op[1] = r_or | i_ori | r_and | i_andi;
-  assign alu_op[0] = r_add | i_addi | r_sll | i_slli | r_srl | i_srli | r_sra | i_srai;
+  assign alu_op[3] = r_sub | r_sra | i_srai | r_sltu | i_sltiu;
+  assign alu_op[2] = r_slt | i_slti | r_sltu | i_sltiu | r_xor | i_xori | r_or | i_ori | r_and | i_andi;
+  assign alu_op[1] = r_sll | i_slli | r_slt | i_slti | r_sltu | i_sltiu | r_srl | i_srli | r_sra | i_srai | r_or | i_ori | r_and | i_andi;
+  assign alu_op[0] = r_sll | i_slli | r_srl | i_srli | r_sra | i_srai | r_and | i_andi;
 
   assign mem_to_reg = i_lw | i_lh | i_lhu | i_lb | i_lbu;
   

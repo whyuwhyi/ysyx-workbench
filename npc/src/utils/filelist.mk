@@ -13,7 +13,7 @@
 # See the Mulan PSL v2 for more details.
 #**************************************************************************************/
 
-SRCS-y += src/utils/log.c src/utils/state.c src/utils/timer.c
+SRCS-y += src/utils/timer.c
 
 # Disassembly support for instruction trace
 ifeq ($(CONFIG_ITRACE),y)

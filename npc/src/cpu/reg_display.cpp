@@ -8,20 +8,17 @@ static const char *regs[] = {
     "s6",   "s7", "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"};
 
 void npc_reg_display() {
+  printf("name\t hex\t\t dec\n");
+  
+  svSetScope(svGetScopeFromName("TOP.ysyx_25030081_cpu.rf_inst"));
+  for (int i = 0; i < 32; i++) {
+    uint32_t reg_val = get_reg_value(i);
+    printf("%s\t 0x%08x\t %d\n", regs[i], reg_val, reg_val);
+  }
+  
   svSetScope(svGetScopeFromName("TOP.ysyx_25030081_cpu.pc_inst"));
   uint32_t pc_val = get_pc_value();
-
-  printf("Register values:\n");
-  printf("PC: 0x%08x\n", pc_val);
-
-  svSetScope(svGetScopeFromName("TOP.ysyx_25030081_cpu.rf_inst"));
-  for (int i = 0; i < 32; i += 4) {
-    printf("x%-2d(%-4s): 0x%08x  x%-2d(%-4s): 0x%08x  x%-2d(%-4s): 0x%08x  "
-           "x%-2d(%-4s): 0x%08x",
-           i, regs[i], get_reg_value(i), i + 1, regs[i + 1],
-           get_reg_value(i + 1), i + 2, regs[i + 2], get_reg_value(i + 2),
-           i + 3, regs[i + 3], get_reg_value(i + 3));
-  }
+  printf("pc\t 0x%08x\t %d\n", pc_val, pc_val);
 }
 
 // Get register value by name (for expression evaluator)

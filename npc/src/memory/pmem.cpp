@@ -1,11 +1,7 @@
 #include <assert.h>
 #include <memory/pmem.h>
+#include <cpu/cpu.h>
 #include <sys/types.h>
-
-#ifdef CONFIG_MTRACE
-extern void mtrace_read(uint32_t addr, uint32_t data);
-extern void mtrace_write(uint32_t addr, uint32_t data, uint8_t wmask);
-#endif
 
 static uint8_t pmem[CONFIG_MSIZE];
 
@@ -36,7 +32,7 @@ uint32_t paddr_read(uint32_t addr, int len) {
   }
 
 #ifdef CONFIG_MTRACE
-  mtrace_read(addr, data);
+  mtrace_read(addr, len);
 #endif
 
   return data;
@@ -48,7 +44,7 @@ void paddr_write(uint32_t addr, int len, uint32_t data) {
   }
 
 #ifdef CONFIG_MTRACE
-  mtrace_write(addr, data, (1 << len) - 1);
+  mtrace_write(addr, len, data);
 #endif
 
   uint32_t offset = addr - CONFIG_MBASE;
@@ -108,9 +104,9 @@ void init_mem() {
 }
 
 // DPI-C functions
-extern "C" int pmem_read(int raddr) { return paddr_read(raddr, 4); }
+extern "C" uint32_t pmem_read(uint32_t raddr) { return paddr_read(raddr, 4); }
 
-extern "C" void pmem_write(int waddr, int wdata, char wmask) {
+extern "C" void pmem_write(uint32_t waddr, uint32_t wdata, char wmask) {
   switch (wmask) {
   case 0x1:
     paddr_write(waddr, 1, wdata);
