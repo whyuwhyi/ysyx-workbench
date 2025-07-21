@@ -16,13 +16,15 @@ FILE* log_fp = NULL;
 static bool log_enable_flag = true;
 
 void init_log(const char *log_file) {
-  log_fp = stdout;
+  log_fp = NULL;  // Default: no log file, only console output
   if (log_file != NULL) {
     FILE *fp = fopen(log_file, "w");
     Assert(fp, "Can not open '%s'", log_file);
     log_fp = fp;
+    Log("Log is written to %s", log_file);
+  } else {
+    Log("Log is written to stdout");
   }
-  Log("Log is written to %s", log_file ? log_file : "stdout");
 }
 
 bool log_enable() {
