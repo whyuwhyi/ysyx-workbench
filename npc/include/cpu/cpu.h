@@ -52,6 +52,8 @@ long load_image(char *img_file);
 // Trace functions
 void init_itrace();
 void init_mtrace();
+void mtrace_read(uint32_t addr, int len);
+void mtrace_write(uint32_t addr, int len, uint32_t data);
 void init_ftrace(const char *elf_path);
 void itrace_push(uint32_t pc);
 void itrace_display();

@@ -8,15 +8,39 @@
 
 NPCState npc_state = { .state = NPC_STOP };
 
-FILE* log_fp = NULL;
-static bool log_enable_flag = true;
-
-
-long load_image(char *img_file);
-
 static bool is_batch_mode = false;
 static char *log_file = NULL;
 static char *img_file = NULL;
+
+FILE* log_fp = NULL;
+static bool log_enable_flag = true;
+
+void init_log(const char *log_file) {
+  log_fp = stdout;
+  if (log_file != NULL) {
+    FILE *fp = fopen(log_file, "w");
+    Assert(fp, "Can not open '%s'", log_file);
+    log_fp = fp;
+  }
+  Log("Log is written to %s", log_file ? log_file : "stdout");
+}
+
+bool log_enable() {
+  return log_enable_flag;
+}
+
+void log_set_enable(bool enable) {
+  log_enable_flag = enable;
+}
+
+void log_write(const char *format, ...) {
+  if (!log_enable()) return;
+  va_list ap;
+  va_start(ap, format);
+  vfprintf(log_fp, format, ap);
+  va_end(ap);
+  fflush(log_fp);
+}
 
 static int parse_args(int argc, char *argv[]) {
   static struct option long_options[] = {
@@ -58,7 +82,34 @@ static int parse_args(int argc, char *argv[]) {
   return 0;
 }
 
-void monitor_init(void) {
+long load_image(char *img_file) {
+  Assert(img_file != NULL, "Image file path must not be NULL");
+
+  FILE *fp = fopen(img_file, "rb");
+  Assert(fp, "Can not open '%s'", img_file);
+
+  fseek(fp, 0, SEEK_END);
+  long size = ftell(fp);
+
+  fseek(fp, 0, SEEK_SET);
+  uint8_t *pmem = get_pmem();
+  int ret = fread(pmem, size, 1, fp);
+  assert(ret == 1);
+
+  fclose(fp);
+  Log("Image loaded: %s, size = %ld bytes", img_file, size);
+
+#ifdef CONFIG_DIFFTEST
+  init_cpu_difftest(const_cast<char *>(CONFIG_DIFFTEST_REF_PATH), size);
+#endif
+
+  return size;
+}
+
+void init_monitor(int argc, char *argv[]) {
+  parse_args(argc, argv);
+  init_log(log_file);
+  
   Log("Monitor initializing...");
 
   init_cpu();
@@ -72,26 +123,10 @@ void monitor_init(void) {
 #endif
 
 #ifdef CONFIG_FTRACE
-  extern char *img_file;
   init_ftrace(img_file);
 #endif
 
   init_sdb();
-
-  Log("Monitor initialized");
-}
-
-void init_monitor(int argc, char *argv[]) {
-  /* Parse arguments. */
-  parse_args(argc, argv);
-
-  /* Open the log file. */
-  init_log(log_file);
-
-  /* Initialize monitor. */
-  monitor_init();
-  
-  /* Initialize simulator. */
   sim_init();
 
   if (is_batch_mode) {
@@ -99,16 +134,11 @@ void init_monitor(int argc, char *argv[]) {
     Log("Running in batch mode");
   }
 
-  /* Load the program image. */
   long img_size = load_image(img_file);
-}
-
-void monitor_exit(void) { 
-  Log("Monitor exited"); 
+  Log("Monitor initialized");
 }
 
 static void print_trap_info() {
-  extern NPCState npc_state;
   switch (npc_state.state) {
     case NPC_END:
     case NPC_ABORT:
@@ -139,35 +169,7 @@ void engine_start() {
   }
 
   print_trap_info();
-  
   sim_exit();
-  monitor_exit();
-}
-
-
-long load_image(char *img_file) {
-  Assert(img_file != NULL, "Image file path must not be NULL");
-
-  FILE *fp = fopen(img_file, "rb");
-  Assert(fp, "Can not open '%s'", img_file);
-
-  fseek(fp, 0, SEEK_END);
-  long size = ftell(fp);
-
-  fseek(fp, 0, SEEK_SET);
-  uint8_t *pmem = get_pmem();
-  int ret = fread(pmem, size, 1, fp);
-  assert(ret == 1);
-
-  fclose(fp);
-  Log("Image loaded: %s, size = %ld bytes", img_file, size);
-
-  // Initialize difftest after loading image
-#ifdef CONFIG_DIFFTEST
-  init_cpu_difftest(const_cast<char *>(CONFIG_DIFFTEST_REF_PATH), size);
-#endif
-
-  return size;
 }
 
 bool is_exit_status_bad() {
@@ -180,33 +182,6 @@ void set_npc_state(int state, vaddr_t pc, int halt_ret) {
   npc_state.state = state;
   npc_state.halt_pc = pc;
   npc_state.halt_ret = halt_ret;
-}
-
-void init_log(const char *log_file) {
-  log_fp = stdout;
-  if (log_file != NULL) {
-    FILE *fp = fopen(log_file, "w");
-    Assert(fp, "Can not open '%s'", log_file);
-    log_fp = fp;
-  }
-  Log("Log is written to %s", log_file ? log_file : "stdout");
-}
-
-bool log_enable() {
-  return log_enable_flag;
-}
-
-void log_set_enable(bool enable) {
-  log_enable_flag = enable;
-}
-
-void log_write(const char *format, ...) {
-  if (!log_enable()) return;
-  va_list ap;
-  va_start(ap, format);
-  vfprintf(log_fp, format, ap);
-  va_end(ap);
-  fflush(log_fp);
 }
 
 void assert_fail_msg() {
