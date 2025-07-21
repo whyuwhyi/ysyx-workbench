@@ -33,7 +33,7 @@ CFLAGS_BUILD += $(if $(CONFIG_NVBOARD),-DCONFIG_NVBOARD,)
 
 # Verilator configuration
 VERILATOR = verilator
-VERILATOR_CFLAGS += -MMD --build -cc -O3 --x-assign fast --x-initial fast --noassert
+VERILATOR_CFLAGS += -MMD --build -cc -O3 --x-assign fast --x-initial fast --noassert --quiet-exit --quiet
 BUILD_DIR = $(shell pwd)/build
 OBJ_DIR = $(BUILD_DIR)/obj_dir
 TARGET = $(BUILD_DIR)/$(TOPNAME)
@@ -69,7 +69,8 @@ LIBS += $(if $(CONFIG_ITRACE),-ldl)
 .DEFAULT_GOAL := $(TARGET)
 
 $(TARGET): $(VSRCS) $(SRCS) $(if $(CONFIG_NVBOARD),$(SRC_AUTO_BIND))
-	$(VERILATOR) $(VERILATOR_CFLAGS) \
+	@echo "Building NPC target..."
+	@$(VERILATOR) $(VERILATOR_CFLAGS) \
 		--top-module $(TOPNAME) $^ \
 		$(addprefix -CFLAGS , $(CXXFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS) $(LIBS)) \
 		--trace-fst \
