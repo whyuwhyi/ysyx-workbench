@@ -3,7 +3,13 @@
 #define MAX_IRINGBUF 24
 
 typedef struct {
-  uint32_t inst_addr[MAX_IRINGBUF];
+  uint32_t pc;
+  uint32_t inst;
+  char disasm[64];
+} TraceEntry;
+
+typedef struct {
+  TraceEntry entries[MAX_IRINGBUF];
   size_t current;
 } InstTrace;
 

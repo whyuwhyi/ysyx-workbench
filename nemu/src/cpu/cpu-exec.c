@@ -23,7 +23,7 @@ void ftrace_call(uint32_t from, uint32_t to);
 void ftrace_ret(uint32_t from, uint32_t to);
 bool is_fcall(uint32_t inst);
 bool is_fret(uint32_t inst);
-void itrace_push(paddr_t pc);
+void itrace_push(paddr_t pc, uint32_t inst, const char *disasm);
 void itrace_display();
 void watchpoint_check();
 
@@ -50,7 +50,7 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
   if (g_print_step) {
     IFDEF(CONFIG_ITRACE, puts(_this->logbuf));
   }
-  IFDEF(CONFIG_ITRACE, itrace_push(_this->pc));
+  IFDEF(CONFIG_ITRACE, itrace_push(_this->pc, _this->isa.inst, _this->logbuf));
   IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
 
   IFDEF(
