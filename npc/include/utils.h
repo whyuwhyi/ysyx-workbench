@@ -52,9 +52,10 @@ extern FILE* log_fp;
     } \
   } while (0)
 
-#define _Log(format, ...) \
+#define _Log(...) \
   do { \
-    printf(format, ##__VA_ARGS__); \
+    printf(__VA_ARGS__); \
+    log_write(__VA_ARGS__); \
   } while (0)
 
 #endif

@@ -20,11 +20,8 @@
 #include <utils.h>
 
 #define Log(format, ...) \
-  do { \
     _Log(ANSI_FMT("[%s:%d %s] " format, ANSI_FG_BLUE) "\n", \
-        __FILE__, __LINE__, __func__, ## __VA_ARGS__); \
-    log_write("[%s:%d %s] " format "\n", __FILE__, __LINE__, __func__, ## __VA_ARGS__); \
-  } while (0)
+        __FILE__, __LINE__, __func__, ## __VA_ARGS__)
 
 #define Assert(cond, format, ...) \
   do { \
