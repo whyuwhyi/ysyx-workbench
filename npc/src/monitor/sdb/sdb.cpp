@@ -280,8 +280,6 @@ void sdb_mainloop() {
           last_args = NULL;
         }
 
-        printf("Repeating: %s\n", last_cmd);
-
         int i;
         for (i = 0; i < NR_CMD; i++) {
           if (strcmp(last_cmd_token, cmd_table[i].name) == 0) {

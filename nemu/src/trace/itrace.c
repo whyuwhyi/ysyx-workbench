@@ -40,13 +40,11 @@ void itrace_display() {
     
     if (entry->pc == 0) continue;  // Skip empty entries
     
-    // Mark the most recently executed instruction
+    // Mark the most recently executed instruction and show instruction info
     if (index == ((i_trace.current - 1 + MAX_TRACE_LEN) % MAX_TRACE_LEN)) {
-      Log("-->");
+      Log("-->" FMT_WORD ":\t%08x:\t%s", entry->pc, entry->inst, entry->disasm);
     } else {
-      Log("   ");
+      Log("   " FMT_WORD ":\t%08x:\t%s", entry->pc, entry->inst, entry->disasm);
     }
-    
-    Log("" FMT_WORD ":\t%08x:\t%s", entry->pc, entry->inst, entry->disasm);
   }
 }
