@@ -21,7 +21,7 @@ wire [6:0] funct7;
 wire [2:0] funct3;
 wire [6:0] opcode;
 
-wire reg_wen, mem_to_reg, mem_wen, mem_ren, alu_a_src;
+wire reg_wen, mem_to_reg, mem_wen, mem_ren, alu_a_src, alu_unsigned_cmp;
 wire [1:0] alu_b_src;
 wire [3:0] alu_op;
 wire [2:0] ext_op;
@@ -81,6 +81,7 @@ ysyx_25030081_cu cu_inst(
   .alu_a_src(alu_a_src),
   .alu_b_src(alu_b_src),
   .alu_op(alu_op),
+  .alu_unsigned_cmp(alu_unsigned_cmp),
   .branch(branch),
   .mem_to_reg(mem_to_reg),
   .mem_wen(mem_wen),
@@ -110,6 +111,7 @@ ysyx_25030081_alu alu_inst(
   .op(alu_op),
   .op1(alu_op1),
   .op2(alu_op2),
+  .unsigned_cmp(alu_unsigned_cmp),
   .out(alu_out),
   .zero(zero),
   .less(less)

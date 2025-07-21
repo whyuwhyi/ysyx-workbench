@@ -7,6 +7,7 @@ module ysyx_25030081_cu(
   output alu_a_src,
   output [1:0] alu_b_src,
   output [3:0] alu_op,
+  output alu_unsigned_cmp,
   output [2:0] branch,
   output mem_to_reg,
   output mem_wen,
@@ -107,6 +108,8 @@ module ysyx_25030081_cu(
                      i_slti | i_sltiu;
   assign alu_op[0] = r_and  | r_sll  | r_srl  | r_sra   | i_andi | i_slli |
                     i_srli | i_srai;
+
+  assign alu_unsigned_cmp = r_sltu | i_sltiu | b_bltu | b_bgeu;
 
   assign mem_to_reg = i_lw | i_lh | i_lhu | i_lb | i_lbu;
   

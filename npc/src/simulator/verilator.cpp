@@ -1,3 +1,4 @@
+#include "Vysyx_25030081_cpu.h"
 #include <Vysyx_25030081_cpu.h>
 #include <cpu/cpu.h>
 #include <memory/pmem.h>
@@ -10,7 +11,7 @@
 
 static VerilatedContext *contextp = NULL;
 static VerilatedFstC *tfp = NULL;
-static TOP_NAME *top = NULL;
+static Vysyx_25030081_cpu *top = NULL;
 
 static void step_and_dump_wave() {
   top->eval();
@@ -55,7 +56,7 @@ void cpu_exec(int n) {
 
 void sim_init() {
   contextp = new VerilatedContext;
-  top = new TOP_NAME{contextp};
+  top = new Vysyx_25030081_cpu{contextp};
 
   // svSetScope(svGetScopeFromName("TOP.ysyx_25030081_cpu.pc_inst"));
 

@@ -25,24 +25,24 @@ INCLUDES = $(addprefix -I, $(INC_PATH))
 CFLAGS  := -O2 -MMD -Wall -Werror $(INCLUDES) $(CFLAGS)
 LDFLAGS := -O2 $(LDFLAGS)
 
-OBJS = $(SRCS:%.c=$(OBJ_DIR)/%.o) $(CXXSRC:%.cc=$(OBJ_DIR)/%.o) $(CPPFILES:%.cpp=$(OBJ_DIR)/%.o)
+# OBJS will be defined in the main Makefile for NPC
 
-# Compilation patterns
-$(OBJ_DIR)/%.o: %.c
-	@echo + CC $<
-	@mkdir -p $(dir $@)
-	@$(CC) $(CFLAGS) -c -o $@ $<
-	$(call call_fixdep, $(@:.o=.d), $@)
-
-$(OBJ_DIR)/%.o: %.cc
-	@echo + CXX $<
+# Compilation patterns for user source files
+$(OBJ_DIR)/src/%.o: src/%.cpp
+	@echo + CXX $(notdir $<)
 	@mkdir -p $(dir $@)
 	@$(CXX) $(CFLAGS) $(CXXFLAGS) -c -o $@ $<
 	$(call call_fixdep, $(@:.o=.d), $@)
 
-$(OBJ_DIR)/%.o: %.cpp
-	@echo + CXX $<
+$(OBJ_DIR)/src/%.o: src/%.c
+	@echo + CC $(notdir $<)
 	@mkdir -p $(dir $@)
+	@$(CC) $(CFLAGS) -c -o $@ $<
+	$(call call_fixdep, $(@:.o=.d), $@)
+
+# Compilation patterns for Verilator generated files (in OBJ_DIR)
+$(OBJ_DIR)/%.o: $(OBJ_DIR)/%.cpp
+	@echo + CXX $(notdir $<)
 	@$(CXX) $(CFLAGS) $(CXXFLAGS) -c -o $@ $<
 	$(call call_fixdep, $(@:.o=.d), $@)
 
@@ -55,9 +55,10 @@ $(OBJ_DIR)/%.o: %.cpp
 
 app: $(BINARY)
 
-$(BINARY):: $(OBJS) $(ARCHIVES)
-	@echo + LD $@
-	@$(LD) -o $@ $(OBJS) $(LDFLAGS) $(ARCHIVES) $(LIBS)
+# Target rule will be defined in main Makefile for NPC
+# $(BINARY):: $(OBJS) $(ARCHIVES)
+#	@echo + LD $@
+#	@$(LD) -o $@ $(OBJS) $(LDFLAGS) $(ARCHIVES) $(LIBS)
 
 clean:
 	-rm -rf $(BUILD_DIR)

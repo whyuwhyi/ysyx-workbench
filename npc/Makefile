@@ -73,10 +73,7 @@ $(TARGET): $(VSRCS) $(SRCS) $(if $(CONFIG_NVBOARD),$(SRC_AUTO_BIND))
 		--top-module $(TOPNAME) $^ \
 		$(addprefix -CFLAGS , $(CXXFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS) $(LIBS)) \
 		--trace-fst \
-		--Mdir $(OBJ_DIR) --exe -o $(abspath $(TARGET)) 2>&1 | \
-		sed -E 's|^g\+\+.*-o ([a-zA-Z_]+\.o) (.*/([^/]+\.cp*[p])).*|+ CXX \3|' | \
-		sed -E 's|^g\+\+.*-o (.*/[^/]+).*|+ LD \1|' | \
-		grep -E '^\+ (CXX|LD|CC)|Building|Error|Warning' || true
+		--Mdir $(OBJ_DIR) --exe -o $(abspath $(TARGET))
 
 
 # NVBoard integration
