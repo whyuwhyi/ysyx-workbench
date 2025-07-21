@@ -93,6 +93,9 @@ LIBS += $(NVBOARD_ARCHIVE)
 endif
 endif
 
+# Default arguments for simulation
+override ARGS ?= --log=$(BUILD_DIR)/npc-log.txt
+
 # Simulation target for AM integration
 sim: $(TARGET)
 	@$(call git_commit, "sim RTL") 
