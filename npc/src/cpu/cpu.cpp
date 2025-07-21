@@ -88,21 +88,29 @@ void npc_cpu_exec(uint64_t n) {
 
   npc_state_running = false;
 
-  if (npc_state_stopped) {
-    extern NPCState npc_state;
-    if (npc_state.state == NPC_END) {
-      Log("npc: %s at pc = 0x%08x",
-          (npc_state.halt_ret == 0
-               ? ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN)
-               : ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED)),
-          npc_state.halt_pc);
-      npc_state_running = false;
-      npc_state_stopped = true;
-    } else {
-      Log("NPC execution stopped");
+  extern NPCState npc_state;
+  switch (npc_state.state) {
+  case NPC_RUNNING:
+    npc_state.state = NPC_STOP;
+    break;
+
+  case NPC_END:
+  case NPC_ABORT:
+    Log("npc: %s at pc = 0x%08x",
+        (npc_state.state == NPC_ABORT
+             ? ANSI_FMT("ABORT", ANSI_FG_RED)
+             : (npc_state.halt_ret == 0
+                    ? ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN)
+                    : ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED))),
+        npc_state.halt_pc);
+#ifdef CONFIG_ITRACE
+    if (npc_state.halt_ret != 0) {
+      itrace_display();
     }
-  } else {
-    Log("NPC execution completed");
+#endif
+    break;
+  case NPC_QUIT:
+    break;
   }
 }
 

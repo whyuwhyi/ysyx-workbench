@@ -18,7 +18,7 @@ remove_quote = $(patsubst "%",%,$(1))
 # NPC configuration
 TOPNAME = ysyx_25030081_cpu
 NAME = $(TOPNAME)
-IMG ?=
+IMG ?= ../am-kernels/tests/cpu-tests/build/dummy-riscv32e-npc.bin
 
 # Extract compiler and options from menuconfig
 ifneq ($(CONFIG_CC),)

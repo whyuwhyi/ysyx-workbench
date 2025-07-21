@@ -33,15 +33,15 @@ module ysyx_25030081_alu #(DATA_WIDTH=32)(
   MuxKey #(11, 4, 32) alu_result_mux_inst (out, op, {
     4'b0000, add_result,
     4'b1000, add_result,
-    4'b0010, xor_result,
-    4'b0011, sll_result,
-    4'b0100, slt_result,
-    4'b0101, or_result,
-    4'b0111, and_result,
-    4'b1010, srl_result,
-    4'b1100, sltu_result,
-    4'b1110, sra_result,
-    4'b0001, op2
+    4'b0001, sll_result,
+    4'b0010, slt_result,
+    4'b1010, sltu_result,
+    4'b0011, op2,
+    4'b0100, xor_result,
+    4'b0101, srl_result,
+    4'b1101, sra_result,
+    4'b0110, or_result,
+    4'b0111, and_result
   });
 
   assign zero = (out == 32'b0);

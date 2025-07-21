@@ -93,17 +93,20 @@ module ysyx_25030081_cu(
   
   assign branch[2] = b_type;
   assign branch[1] = i_jalr | b_blt | b_bltu | b_bge | b_bgeu;
-  assign branch[0] = b_bne | b_bge | b_bgeu | j_jal;
+  assign branch[0] = b_bne  | b_bge | b_bgeu | j_jal;
 
   assign alu_a_src = u_auipc | j_jal | i_jalr;
 
   assign alu_b_src[1] = i_jalr | j_jal;
   assign alu_b_src[0] = i_type | s_type | u_type;
   
-  assign alu_op[3] = r_sub | r_sra | i_srai | r_sltu | i_sltiu;
-  assign alu_op[2] = r_slt | i_slti | r_sltu | i_sltiu | r_xor | i_xori | r_or | i_ori | r_and | i_andi;
-  assign alu_op[1] = r_sll | i_slli | r_slt | i_slti | r_sltu | i_sltiu | r_srl | i_srli | r_sra | i_srai | r_or | i_ori | r_and | i_andi;
-  assign alu_op[0] = r_sll | i_slli | r_srl | i_srli | r_sra | i_srai | r_and | i_andi;
+  assign alu_op[3] = r_sub  | r_sra  | r_sltu | i_sltiu | i_srai | b_type;
+  assign alu_op[2] = r_and  | r_or   | r_xor  | r_srl   | r_sra  | i_andi |
+                     i_ori  | i_xori | i_srli | i_srai;
+  assign alu_op[1] = r_and  | r_or   | r_slt  | r_sltu  | i_andi | i_ori  |
+                     i_slti | i_sltiu;
+  assign alu_op[0] = r_and  | r_sll  | r_srl  | r_sra   | i_andi | i_slli |
+                    i_srli | i_srai;
 
   assign mem_to_reg = i_lw | i_lh | i_lhu | i_lb | i_lbu;
   

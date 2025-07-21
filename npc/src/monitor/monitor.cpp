@@ -130,27 +130,6 @@ void init_monitor(int argc, char *argv[]) {
   Log("Monitor initialized");
 }
 
-static void print_trap_info() {
-  switch (npc_state.state) {
-    case NPC_END:
-    case NPC_ABORT:
-      Log("npc: %s at pc = 0x%08x",
-          (npc_state.state == NPC_ABORT
-               ? ANSI_FMT("ABORT", ANSI_FG_RED)
-               : (npc_state.halt_ret == 0
-                      ? ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN)
-                      : ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED))),
-          npc_state.halt_pc);
-#ifdef CONFIG_ITRACE
-      if (npc_state.halt_ret != 0) {
-        itrace_display();
-      }
-#endif
-      break;
-    case NPC_QUIT:
-      break;
-  }
-}
 
 void engine_start() {
   if (is_batch_mode) {
@@ -160,7 +139,6 @@ void engine_start() {
     sdb_mainloop();
   }
 
-  print_trap_info();
   sim_exit();
 }
 
