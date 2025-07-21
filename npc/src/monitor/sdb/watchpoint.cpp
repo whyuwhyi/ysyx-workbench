@@ -73,9 +73,9 @@ void display_wp() {
     printf("No watchpoints.\n");
     return;
   }
-  printf("Num\t Value\t What\n");
+  printf("Num Dec         Hex        Expr\n");
   while (p != NULL) {
-    printf("%d\t %u\t %s\n", p->NO, p->value, p->exp);
+    printf("%-3d %-11d 0x%08x %s\n", p->NO, (int32_t)p->value, p->value, p->exp);
     p = p->next;
   }
 }

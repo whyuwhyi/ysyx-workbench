@@ -8,17 +8,17 @@ static const char *regs[] = {
     "s6",   "s7", "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"};
 
 void npc_reg_display() {
-  printf("name\t hex\t\t dec\n");
+  printf("Name Dec         Hex        \n");
   
   svSetScope(svGetScopeFromName("TOP.ysyx_25030081_cpu.rf_inst"));
   for (int i = 0; i < 32; i++) {
     uint32_t reg_val = get_reg_value(i);
-    printf("%s\t 0x%08x\t %d\n", regs[i], reg_val, reg_val);
+    printf("%-4s %-11d 0x%08x\n", regs[i], (int32_t)reg_val, reg_val);
   }
   
   svSetScope(svGetScopeFromName("TOP.ysyx_25030081_cpu.pc_inst"));
   uint32_t pc_val = get_pc_value();
-  printf("pc\t 0x%08x\t %d\n", pc_val, pc_val);
+  printf("%-4s %-11d 0x%08x\n", "pc", (int32_t)pc_val, pc_val);
 }
 
 // Get register value by name (for expression evaluator)

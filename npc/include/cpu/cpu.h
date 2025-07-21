@@ -40,6 +40,9 @@ extern bool npc_state_stopped;
 uint32_t get_npc_pc();
 uint32_t get_npc_reg(int idx);
 
+// Register access functions
+uint32_t npc_reg_str2val(const char *reg_name, bool *success);
+
 // Monitor and system functions
 void init_monitor(int argc, char *argv[]);
 void monitor_exit(void);

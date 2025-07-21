@@ -1,5 +1,5 @@
 #include <common.h>
-#include <memory/pmem.h>
+#include <cpu/cpu.h>
 #include <regex.h>
 
 #define MAX_TOKEN_LEN 32
@@ -240,17 +240,6 @@ static int get_pos_of_main_op(int s, int e) {
 
   return pos;
 }
-
-// Forward declaration for register access
-extern uint32_t npc_reg_str2val(const char *reg_name, bool *success);
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-extern uint32_t pmem_read(uint32_t raddr);
-#ifdef __cplusplus
-}
-#endif
 
 static word_t npc_vaddr_read(vaddr_t addr, int len) {
   // Simple implementation using pmem

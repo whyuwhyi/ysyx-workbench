@@ -38,7 +38,6 @@ static int cmd_c(char *args) {
 }
 
 static int cmd_q(char *args) {
-  printf("Bye!\n");
   exit(0);
   return -1;
 }
@@ -92,7 +91,7 @@ static int cmd_help(char *args) {
 }
 
 static int cmd_si(char *args) {
-  char *arg = strtok(NULL, " ");
+  char *arg = args ? strtok(args, " ") : NULL;
   char *remaining = strtok(NULL, " ");
   uint64_t n = 1;
 
@@ -111,7 +110,12 @@ static int cmd_si(char *args) {
 }
 
 static int cmd_info(char *args) {
-  char *arg = strtok(NULL, " ");
+  if (args == NULL) {
+    printf("Too few argument\nUsage: info SUBCMD\n");
+    return 0;
+  }
+
+  char *arg = strtok(args, " ");
   char *remaining = strtok(NULL, " ");
 
   if (arg == NULL) {
@@ -136,10 +140,15 @@ static int cmd_info(char *args) {
 }
 
 static int cmd_x(char *args) {
+  if (args == NULL) {
+    printf("Usage: x N EXPR\n");
+    return 0;
+  }
+
   char *arg_end = args + strlen(args);
-  char *arg1 = strtok(NULL, " ");
-  char *temptr = arg1 + strlen(arg1) + 1;
-  char *exp = (temptr < arg_end) ? temptr : NULL;
+  char *arg1 = strtok(args, " ");
+  char *temptr = arg1 ? arg1 + strlen(arg1) + 1 : NULL;
+  char *exp = (temptr && temptr < arg_end) ? temptr : NULL;
   int n = -1;
 
   while (exp != NULL && *exp == ' ') {
@@ -223,7 +232,7 @@ static int cmd_w(char *args) {
 }
 
 static int cmd_d(char *args) {
-  char *arg = strtok(NULL, " ");
+  char *arg = args ? strtok(args, " ") : NULL;
   char *remaining = strtok(NULL, " ");
 
   if (arg == NULL) {
