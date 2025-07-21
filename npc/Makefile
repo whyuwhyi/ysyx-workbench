@@ -33,7 +33,7 @@ CFLAGS_BUILD += $(if $(CONFIG_NVBOARD),-DCONFIG_NVBOARD,)
 
 # Verilator configuration
 VERILATOR = verilator
-VERILATOR_CFLAGS += -MMD --build -cc -O3 --x-assign fast --x-initial fast --noassert --quiet-exit --quiet
+VERILATOR_CFLAGS += -MMD --build -cc -O3 --x-assign fast --x-initial fast --noassert --quiet-exit
 BUILD_DIR = $(shell pwd)/build
 OBJ_DIR = $(BUILD_DIR)/obj_dir
 TARGET = $(BUILD_DIR)/$(TOPNAME)
@@ -69,12 +69,14 @@ LIBS += $(if $(CONFIG_ITRACE),-ldl)
 .DEFAULT_GOAL := $(TARGET)
 
 $(TARGET): $(VSRCS) $(SRCS) $(if $(CONFIG_NVBOARD),$(SRC_AUTO_BIND))
-	@echo "Building NPC target..."
 	@$(VERILATOR) $(VERILATOR_CFLAGS) \
 		--top-module $(TOPNAME) $^ \
 		$(addprefix -CFLAGS , $(CXXFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS) $(LIBS)) \
 		--trace-fst \
-		--Mdir $(OBJ_DIR) --exe -o $(abspath $(TARGET))
+		--Mdir $(OBJ_DIR) --exe -o $(abspath $(TARGET)) 2>&1 | \
+		sed -E 's|^g\+\+.*-o ([a-zA-Z_]+\.o) (.*/([^/]+\.cp*[p])).*|+ CXX \3|' | \
+		sed -E 's|^g\+\+.*-o (.*/[^/]+).*|+ LD \1|' | \
+		grep -E '^\+ (CXX|LD|CC)|Building|Error|Warning' || true
 
 
 # NVBoard integration
