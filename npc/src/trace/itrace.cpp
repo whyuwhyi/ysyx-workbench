@@ -42,13 +42,11 @@ void itrace_display() {
     
     if (entry->pc == 0) continue;  // Skip empty entries
     
-    // Mark the most recently executed instruction
+    // Mark the most recently executed instruction and show instruction info
     if (index == ((itrace.current - 1 + MAX_IRINGBUF) % MAX_IRINGBUF)) {
-      Log("-->");
+      Log("-->0x%08x:\t%08x:\t%s", entry->pc, entry->inst, entry->disasm);
     } else {
-      Log("   ");
+      Log("   0x%08x:\t%08x:\t%s", entry->pc, entry->inst, entry->disasm);
     }
-    
-    Log("0x%08x:\t%08x:\t%s", entry->pc, entry->inst, entry->disasm);
   }
 }
