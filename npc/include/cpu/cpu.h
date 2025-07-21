@@ -55,7 +55,7 @@ void init_mtrace();
 void mtrace_read(uint32_t addr, int len);
 void mtrace_write(uint32_t addr, int len, uint32_t data);
 void init_ftrace(const char *elf_path);
-void itrace_push(uint32_t pc);
+void itrace_push(uint32_t pc, uint32_t inst);
 void itrace_display();
 void ftrace_call(uint32_t caller_pc, uint32_t target_pc);
 void ftrace_ret(uint32_t ret_pc, uint32_t target_pc);

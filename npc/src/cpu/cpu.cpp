@@ -21,6 +21,10 @@
 bool npc_state_stopped = false;
 static bool npc_state_running = false;
 
+// Control real-time instruction output
+static bool g_print_step = false;
+static uint64_t g_nr_guest_inst = 0;
+
 void init_cpu() {
   npc_state_stopped = false;
   npc_state_running = false;
@@ -43,9 +47,20 @@ static void exec_once() {
   uint32_t npc = get_pc_value();
 
   uint32_t inst = pmem_read(pc);
+  g_nr_guest_inst++;
 
 #ifdef CONFIG_ITRACE
-  itrace_push(pc);
+  // Generate logbuf for real-time output
+  char logbuf[128];
+  void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
+  disassemble(logbuf, sizeof(logbuf), pc, (uint8_t *)&inst, 4);
+  
+  // Real-time output when executing few instructions
+  if (g_print_step) {
+    printf("0x%08x:\t%08x:\t%s\n", pc, inst, logbuf);
+  }
+  
+  itrace_push(pc, inst);
 #endif
 
 #ifdef CONFIG_FTRACE
@@ -74,8 +89,12 @@ void npc_cpu_exec(uint64_t n) {
   npc_state_running = true;
   npc_state_stopped = false;
 
+  // Enable real-time output for small step execution (like NEMU)
+  g_print_step = (n < 10);
+
   if (n == (uint64_t)-1) {
     Log("NPC started (continuous execution)");
+    g_print_step = false;  // Disable for continuous execution
     while (!npc_state_stopped && npc_state_running) {
       exec_once();
     }
