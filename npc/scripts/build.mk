@@ -56,9 +56,9 @@ $(OBJ_DIR)/%.o: $(OBJ_DIR)/%.cpp
 app: $(BINARY)
 
 # Target rule will be defined in main Makefile for NPC
-# $(BINARY):: $(OBJS) $(ARCHIVES)
-#	@echo + LD $@
-#	@$(LD) -o $@ $(OBJS) $(LDFLAGS) $(ARCHIVES) $(LIBS)
+$(BINARY):: $(OBJS) $(ARCHIVES)
+	@echo + LD $@
+	@$(LD) -o $@ $(OBJS) $(LDFLAGS) $(ARCHIVES) $(LIBS)
 
 clean:
 	-rm -rf $(BUILD_DIR)
