@@ -81,8 +81,9 @@ const char *ftrace_func_name(vaddr_t addr) {
   return NULL;
 }
 
+static char buf[256];
+
 void ftrace_call(uint32_t from, uint32_t to) {
-  char buf[1024];
   for (int i = 0; i < call_depth; i++) {
     buf[i] = ' ';
   }
@@ -101,11 +102,17 @@ void ftrace_call(uint32_t from, uint32_t to) {
 
 void ftrace_ret(uint32_t from, uint32_t to) {
   call_depth--;
+  for (int i = 0; i < call_depth; i++) {
+    buf[i] = ' ';
+  }
+
   const char *name = ftrace_func_name(from);
   if (name) {
-    Log("[" FMT_WORD "] ret  <- " FMT_WORD " <%s>", from, to, name);
+    snprintf(buf + call_depth, sizeof(buf) - call_depth,
+             "[" FMT_WORD "] ret -> " FMT_WORD " <%s>", from, to, name);
   } else {
-    Log("[" FMT_WORD "] ret  <- " FMT_WORD "", from, to);
+    snprintf(buf + call_depth, sizeof(buf) - call_depth,
+             "[" FMT_WORD "] ret -> " FMT_WORD, from, to);
   }
 }
 
