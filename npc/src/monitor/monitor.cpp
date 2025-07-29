@@ -1,22 +1,23 @@
 #include <assert.h>
 #include <common.h>
 #include <cpu/cpu.h>
-#include <memory/pmem.h>
-#include <stdio.h>
 #include <getopt.h>
+#include <memory/pmem.h>
 #include <stdarg.h>
+#include <stdio.h>
 
-NPCState npc_state = { .state = NPC_STOP };
+NPCState npc_state = {.state = NPC_STOP};
 
 static bool is_batch_mode = false;
 static char *log_file = NULL;
 static char *img_file = NULL;
+static char *elf_file = NULL;
 
-FILE* log_fp = NULL;
+FILE *log_fp = NULL;
 static bool log_enable_flag = true;
 
 void init_log(const char *log_file) {
-  log_fp = NULL;  // Default: no log file, only console output
+  log_fp = NULL; // Default: no log file, only console output
   if (log_file != NULL) {
     FILE *fp = fopen(log_file, "w");
     Assert(fp, "Can not open '%s'", log_file);
@@ -27,42 +28,39 @@ void init_log(const char *log_file) {
   }
 }
 
-bool log_enable() {
-  return log_enable_flag;
-}
+bool log_enable() { return log_enable_flag; }
 
-void log_set_enable(bool enable) {
-  log_enable_flag = enable;
-}
-
+void log_set_enable(bool enable) { log_enable_flag = enable; }
 
 static int parse_args(int argc, char *argv[]) {
-  static struct option long_options[] = {
-    {"batch", no_argument, 0, 'b'},
-    {"help", no_argument, 0, 'h'},
-    {"log", required_argument, 0, 'l'},
-    {0, 0, 0, 0}
-  };
+  static struct option long_options[] = {{"batch", no_argument, 0, 'b'},
+                                         {"help", no_argument, 0, 'h'},
+                                         {"log", required_argument, 0, 'l'},
+                                         {"elf", required_argument, 0, 'e'},
+                                         {0, 0, 0, 0}};
 
   int c;
-  while ((c = getopt_long(argc, argv, "bhl:", long_options, NULL)) != -1) {
+  while ((c = getopt_long(argc, argv, "bhl:e:", long_options, NULL)) != -1) {
     switch (c) {
-      case 'b':
-        is_batch_mode = true;
-        break;
-      case 'h':
-        printf("Usage: %s [OPTION]... IMAGE\n", argv[0]);
-        printf("Options:\n");
-        printf("  -b, --batch         run in batch mode (non-interactive)\n");
-        printf("  -l, --log=FILE      output log to FILE\n");
-        printf("  -h, --help          display this help and exit\n");
-        exit(0);
-      case 'l':
-        log_file = optarg;
-        break;
-      case '?':
-        printf("Usage: %s [OPTION]... IMAGE\n", argv[0]);
-        exit(1);
+    case 'b':
+      is_batch_mode = true;
+      break;
+    case 'h':
+      printf("Usage: %s [OPTION]... IMAGE\n", argv[0]);
+      printf("Options:\n");
+      printf("  -b, --batch         run in batch mode (non-interactive)\n");
+      printf("  -l, --log=FILE      output log to FILE\n");
+      printf("  -e, --elf=FILE      specify ELF file for debugging\n");
+      printf("  -h, --help          display this help and exit\n");
+      exit(0);
+    case 'l':
+      log_file = optarg;
+      break;
+    case 'e':
+      elf_file = optarg;
+    case '?':
+      printf("Usage: %s [OPTION]... IMAGE\n", argv[0]);
+      exit(1);
     }
   }
 
@@ -103,7 +101,7 @@ long load_image(char *img_file) {
 void init_monitor(int argc, char *argv[]) {
   parse_args(argc, argv);
   init_log(log_file);
-  
+
   Log("Monitor initializing...");
 
   init_cpu();
@@ -119,7 +117,7 @@ void init_monitor(int argc, char *argv[]) {
 #endif
 
 #ifdef CONFIG_FTRACE
-  init_ftrace(img_file);
+  init_ftrace(elf_file);
 #endif
 
   init_sdb();
@@ -134,7 +132,6 @@ void init_monitor(int argc, char *argv[]) {
   Log("Monitor initialized");
 }
 
-
 void engine_start() {
   if (is_batch_mode) {
     npc_cpu_exec(-1);
@@ -148,7 +145,7 @@ void engine_start() {
 
 bool is_exit_status_bad() {
   bool good = (npc_state.state == NPC_END && npc_state.halt_ret == 0) ||
-    (npc_state.state == NPC_QUIT);
+              (npc_state.state == NPC_QUIT);
   return !good;
 }
 
