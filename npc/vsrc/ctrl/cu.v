@@ -1,3 +1,5 @@
+`include "marco.v"
+
 module ysyx_25030081_cu(
   input [6:0] funct7,
   input [2:0] funct3,

@@ -33,7 +33,7 @@ CFLAGS_BUILD += $(if $(CONFIG_NVBOARD),-DCONFIG_NVBOARD,)
 
 # Verilator configuration
 VERILATOR = verilator
-VERILATOR_CFLAGS += -MMD --build -cc -O3 --x-assign fast --x-initial fast --noassert --quiet-exit
+VERILATOR_CFLAGS += -MMD --build -cc -O3 --x-assign fast --x-initial fast --noassert --quiet-exit -Ivsrc/include
 BUILD_DIR = $(shell pwd)/build
 OBJ_DIR = $(BUILD_DIR)/obj_dir
 TARGET = $(BUILD_DIR)/$(TOPNAME)
@@ -42,8 +42,9 @@ $(shell mkdir -p $(BUILD_DIR))
 
 # Include paths
 INC_PATH = include
-INCFLAGS = $(addprefix -I, $(abspath $(INC_PATH))) -I$(abspath ./src)
-CXXFLAGS += $(INCFLAGS) -DTOP_NAME="\"V$(TOPNAME)\"" -ffile-prefix-map=$(abspath .)/=
+INCFLAGS = $(addprefix -I, $(abspath $(INC_PATH)))
+VINCFLAGS = $(addprefix -I, $(abspath ./vsrc/include))
+CXXFLAGS += $(INCFLAGS) $(VINCFLAGS) -DTOP_NAME="\"V$(TOPNAME)\"" -ffile-prefix-map=$(abspath .)/=
 CFLAGS  += $(CFLAGS_BUILD) $(CFLAGS_TRACE)
 LDFLAGS += $(CFLAGS_BUILD)
 
