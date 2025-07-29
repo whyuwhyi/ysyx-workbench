@@ -101,13 +101,13 @@ module ysyx_25030081_cu(
   assign alu_b_src[1] = i_jalr | j_jal;
   assign alu_b_src[0] = i_type | s_type | u_type;
   
-  assign alu_op[3] = r_sub  | r_sra  | r_sltu | i_sltiu | i_srai | b_type;
-  assign alu_op[2] = r_and  | r_or   | r_xor  | r_srl   | r_sra  | i_andi |
-                     i_ori  | i_xori | i_srli | i_srai;
-  assign alu_op[1] = r_and  | r_or   | r_slt  | r_sltu  | i_andi | i_ori  |
-                     i_slti | i_sltiu;
-  assign alu_op[0] = r_and  | r_sll  | r_srl  | r_sra   | i_andi | i_slli |
-                    i_srli | i_srai;
+  assign alu_op[3] = r_sub  | r_sra   | r_sltu | i_sltiu | i_srai | b_type;
+  assign alu_op[2] = r_and  | r_or    | r_xor  | r_srl   | r_sra  | i_andi |
+                     i_ori  | i_xori  | i_srli | i_srai;
+  assign alu_op[1] = r_and  | r_or    | r_slt  | r_sltu  | i_andi | i_ori  |
+                     i_slti | i_sltiu | u_lui;
+  assign alu_op[0] = r_and  | r_sll   | r_srl  | r_sra   | i_andi | i_slli |
+                    i_srli | i_srai   | u_lui;
 
   assign alu_unsigned_cmp = r_sltu | i_sltiu | b_bltu | b_bgeu;
 
