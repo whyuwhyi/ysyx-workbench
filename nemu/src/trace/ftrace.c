@@ -83,7 +83,7 @@ const char *ftrace_func_name(vaddr_t addr) {
 
 static void print_indent() {
   for (int i = 0; i < call_depth; i++) {
-    Log("  ");
+    Log_n("  ");
   }
 }
 
