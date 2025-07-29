@@ -91,10 +91,10 @@ void ftrace_call(uint32_t from, uint32_t to) {
   const char *name = ftrace_func_name(to);
   if (name) {
     snprintf(buf + call_depth, sizeof(buf) - call_depth,
-             "[" FMT_WORD "] call -> " FMT_WORD " <%s>", from, to, name);
+             "" FMT_WORD " call -> " FMT_WORD " <%s>", from, to, name);
   } else {
     snprintf(buf + call_depth, sizeof(buf) - call_depth,
-             "[" FMT_WORD "] call -> " FMT_WORD, from, to);
+             "" FMT_WORD " call -> " FMT_WORD, from, to);
   }
   Log("%s", buf);
   call_depth++;
