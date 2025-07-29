@@ -16,11 +16,13 @@ void init_ftrace(const char *elf_path) {
   Log("Function trace initialized");
 
   if (!elf_path) {
+    Log("No ELF file specified for function tracing");
     return;
   }
 
   FILE *fp = fopen(elf_path, "rb");
   if (!fp) {
+    Log("Failed to open ELF file: %s", elf_path);
     return;
   }
 
