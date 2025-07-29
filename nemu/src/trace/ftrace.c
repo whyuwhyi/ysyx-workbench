@@ -84,7 +84,7 @@ const char *ftrace_func_name(vaddr_t addr) {
 
 static char buf[256];
 
-void ftrace_call(uint32_t from, uint32_t to) {
+void ftrace_call(vaddr_t from, vaddr_t to) {
   for (int i = 0; i < call_depth; i++) {
     buf[i] = ' ';
   }
@@ -101,7 +101,7 @@ void ftrace_call(uint32_t from, uint32_t to) {
   call_depth++;
 }
 
-void ftrace_ret(uint32_t from, uint32_t to) {
+void ftrace_ret(vaddr_t from, vaddr_t to) {
   call_depth--;
   for (int i = 0; i < call_depth; i++) {
     buf[i] = ' ';
@@ -118,16 +118,16 @@ void ftrace_ret(uint32_t from, uint32_t to) {
   Log("%s", buf);
 }
 
-bool is_fcall(uint32_t inst) {
-  uint32_t opcode = inst & 0x7f;
-  uint32_t rd = (inst >> 7) & 0x1f;
+bool is_fcall(word_t inst) {
+  word_t opcode = inst & 0x7f;
+  word_t rd = (inst >> 7) & 0x1f;
   return (opcode == 0x6f && rd == 1) || (opcode == 0x67 && rd == 1);
 }
 
-bool is_fret(uint32_t inst) {
-  uint32_t opcode = inst & 0x7f;
-  uint32_t rd = (inst >> 7) & 0x1f;
-  uint32_t rs1 = (inst >> 15) & 0x1f;
-  uint32_t imm = (inst >> 20) & 0xfff;
+bool is_fret(word_t inst) {
+  word_t opcode = inst & 0x7f;
+  word_t rd = (inst >> 7) & 0x1f;
+  word_t rs1 = (inst >> 15) & 0x1f;
+  word_t imm = (inst >> 20) & 0xfff;
   return (opcode == 0x67 && rd == 0 && rs1 == 1 && imm == 0);
 }
