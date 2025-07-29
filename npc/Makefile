@@ -100,7 +100,6 @@ override ARGS ?= --log=$(BUILD_DIR)/npc-log.txt
 sim: $(TARGET)
 	@$(call git_commit, "sim RTL") 
 	@$(TARGET) $(ARGS) $(IMG)
-	@echo $(ARGS)
 
 # Wave viewer
 GTKWAVE = gtkwave
