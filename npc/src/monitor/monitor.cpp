@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <bits/getopt_core.h>
 #include <common.h>
 #include <cpu/cpu.h>
 #include <getopt.h>
@@ -33,45 +34,37 @@ bool log_enable() { return log_enable_flag; }
 void log_set_enable(bool enable) { log_enable_flag = enable; }
 
 static int parse_args(int argc, char *argv[]) {
-  const struct option long_options[] = {{"batch", no_argument, NULL, 'b'},
-                                        {"help", no_argument, NULL, 'h'},
-                                        {"log", required_argument, NULL, 'l'},
-                                        {"elf", required_argument, NULL, 'e'},
-                                        {0, 0, NULL, 0}};
+  const struct option table[] = {{"batch", no_argument, NULL, 'b'},
+                                 {"help", no_argument, NULL, 'h'},
+                                 {"log", required_argument, NULL, 'l'},
+                                 {"elf", required_argument, NULL, 'e'},
+                                 {0, 0, NULL, 0}};
 
   int c;
-  while ((c = getopt_long(argc, argv, "-bhl:e:", long_options, NULL)) != -1) {
+  while ((c = getopt_long(argc, argv, "-bhl:e:", table, NULL)) != -1) {
     switch (c) {
     case 'b':
       is_batch_mode = true;
       break;
-    case 'h':
-      printf("Usage: %s [OPTION]... IMAGE\n", argv[0]);
-      printf("Options:\n");
-      printf("  -b, --batch         run in batch mode (non-interactive)\n");
-      printf("  -l, --log=FILE      output log to FILE\n");
-      printf("  -e, --elf=FILE      specify ELF file for debugging\n");
-      printf("  -h, --help          display this help and exit\n");
-      exit(0);
     case 'l':
       log_file = optarg;
       break;
     case 'e':
       elf_file = optarg;
       break;
-    case '?':
-      printf("Usage: %s [OPTION]... IMAGE\n", argv[0]);
-      exit(1);
+    case 1:
+      img_file = optarg;
+      return 0;
+    default:
+      printf("Usage: %s [OPTION]... IMAGE [args]\n\n", argv[0]);
+      printf("\t-b,--batch         run in batch mode (non-interactive)\n");
+      printf("\t-l,--log=FILE      output log to FILE\n");
+      printf("\t-e,--elf=FILE      specify ELF file for debugging\n");
+      printf("\t-h,--help          display this help and exit\n");
+      printf("\n");
+      exit(0);
     }
   }
-
-  if (optind >= argc) {
-    fprintf(stderr, "Error: No image file specified\n");
-    printf("Usage: %s [OPTION]... IMAGE\n", argv[0]);
-    exit(1);
-  }
-
-  img_file = argv[optind];
   return 0;
 }
 
