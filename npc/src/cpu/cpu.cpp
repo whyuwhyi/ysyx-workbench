@@ -23,14 +23,12 @@ void init_cpu_difftest(char *ref_so_file, long img_size) {
 }
 
 static void exec_once() {
-  svSetScope(svGetScopeFromName("TOP.ysyx_25030081_cpu.pc_inst"));
-
-  uint32_t pc = get_pc_value();
+  uint32_t pc = get_npc_pc();
   uint32_t inst = pmem_read(pc);
 
   single_cycle();
 
-  uint32_t npc = get_pc_value();
+  uint32_t npc = get_npc_pc();
 
   g_nr_guest_inst++;
 

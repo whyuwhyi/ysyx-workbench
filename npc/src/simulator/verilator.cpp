@@ -37,15 +37,8 @@ void single_cycle() {
 }
 
 void cpu_exec(int n) {
-  svSetScope(svGetScopeFromName("TOP.ysyx_25030081_cpu.pc_inst"));
-
   for (int i = 0; i < n; i++) {
     single_cycle();
-
-    uint32_t current_pc = get_pc_value();
-    uint32_t current_inst = pmem_read(current_pc);
-
-    Log("pc: 0x%08x, inst: 0x%08x", current_pc, current_inst);
 
     if (check_ebreak()) {
       Log("Simulation stopped due to EBREAK");

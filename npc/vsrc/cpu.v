@@ -129,6 +129,6 @@ ysyx_25030081_mem mem_inst(
 
 always @(inst)
   if (inst == 32'h00100073)
-    ebreak(rf_inst.rf[10]);
+    ebreak();
 
 endmodule

@@ -1,13 +1,19 @@
+#include "Vysyx_25030081_cpu__Dpi.h"
 #include <common.h>
 #include <cpu/cpu.h>
 #include <dlfcn.h>
 #include <memory/pmem.h>
 
-// RISC-V register state for difftest
+// Direction constants for difftest
+#define DIFFTEST_TO_DUT true
+#define DIFFTEST_TO_REF false
+
 typedef struct {
   uint32_t gpr[32];
   uint32_t pc;
 } riscv32_CPU_state;
+
+static riscv32_CPU_state dut_riscv32_cpu_state;
 
 // Function pointers to reference implementation
 void (*ref_difftest_memcpy)(uint32_t addr, void *buf, size_t n,
@@ -15,36 +21,6 @@ void (*ref_difftest_memcpy)(uint32_t addr, void *buf, size_t n,
 void (*ref_difftest_regcpy)(void *dut, bool direction) = NULL;
 void (*ref_difftest_exec)(uint64_t n) = NULL;
 void (*ref_difftest_raise_intr)(uint64_t NO) = NULL;
-
-#ifdef CONFIG_DIFFTEST
-
-static bool is_skip_ref = false;
-static int skip_dut_nr_inst = 0;
-
-// Direction constants for difftest
-#define DIFFTEST_TO_DUT true
-#define DIFFTEST_TO_REF false
-
-// this is used to let ref skip instructions which
-// can not produce consistent behavior with NPC
-void difftest_skip_ref() {
-  is_skip_ref = true;
-  skip_dut_nr_inst = 0;
-}
-
-// this is used to deal with instruction packing in reference.
-void difftest_skip_dut(int nr_ref, int nr_dut) {
-  skip_dut_nr_inst += nr_dut;
-
-  while (nr_ref-- > 0) {
-    ref_difftest_exec(1);
-  }
-}
-
-// External functions to get NPC state - will be implemented via DPI-C
-extern uint32_t get_npc_pc();
-extern uint32_t get_npc_reg(int idx);
-extern void set_npc_reg(int idx, uint32_t value);
 
 void init_difftest(char *ref_so_file, long img_size, int port) {
   assert(ref_so_file != NULL);
@@ -85,19 +61,16 @@ void init_difftest(char *ref_so_file, long img_size, int port) {
   uint8_t *pmem = get_pmem();
   ref_difftest_memcpy(CONFIG_MBASE, pmem, img_size, DIFFTEST_TO_REF);
 
-  // Copy initial register state to reference
-  riscv32_CPU_state cpu_state;
   for (int i = 0; i < 32; i++) {
-    cpu_state.gpr[i] = get_npc_reg(i);
+    dut_riscv32_cpu_state.gpr[i] = get_npc_reg(i);
   }
-  cpu_state.pc = get_npc_pc();
-  ref_difftest_regcpy(&cpu_state, DIFFTEST_TO_REF);
+  dut_riscv32_cpu_state.pc = get_npc_pc();
+  ref_difftest_regcpy(&dut_riscv32_cpu_state, DIFFTEST_TO_REF);
 }
 
 static void checkregs(riscv32_CPU_state *ref, uint32_t pc) {
   bool diff_found = false;
 
-  // Check PC
   uint32_t dut_pc = get_npc_pc();
   if (ref->pc != dut_pc) {
     Log("PC differs: REF=0x%08x, DUT=0x%08x at pc=0x%08x", ref->pc, dut_pc, pc);
@@ -139,44 +112,8 @@ static void checkregs(riscv32_CPU_state *ref, uint32_t pc) {
 void difftest_step(uint32_t pc, uint32_t npc) {
   riscv32_CPU_state ref_r;
 
-  if (skip_dut_nr_inst > 0) {
-    ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);
-    if (ref_r.pc == npc) {
-      skip_dut_nr_inst = 0;
-      checkregs(&ref_r, npc);
-      return;
-    }
-    skip_dut_nr_inst--;
-    if (skip_dut_nr_inst == 0)
-      panic("can not catch up with ref.pc = 0x%08x at pc = 0x%08x", ref_r.pc,
-            pc);
-    return;
-  }
-
-  if (is_skip_ref) {
-    // to skip the checking of an instruction, just copy the reg state to
-    // reference design
-    riscv32_CPU_state cpu_state;
-    for (int i = 0; i < 32; i++) {
-      cpu_state.gpr[i] = get_npc_reg(i);
-    }
-    cpu_state.pc = get_npc_pc();
-    ref_difftest_regcpy(&cpu_state, DIFFTEST_TO_REF);
-    is_skip_ref = false;
-    return;
-  }
-
   ref_difftest_exec(1);
   ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);
 
   checkregs(&ref_r, pc);
 }
-
-#else
-
-void init_difftest(char *ref_so_file, long img_size, int port) {}
-void difftest_step(uint32_t pc, uint32_t npc) {}
-void difftest_skip_ref() {}
-void difftest_skip_dut(int nr_ref, int nr_dut) {}
-
-#endif

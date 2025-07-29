@@ -9,40 +9,34 @@ static const char *regs[] = {
 
 void npc_reg_display() {
   printf("Name Dec         Hex        \n");
-  
-  svSetScope(svGetScopeFromName("TOP.ysyx_25030081_cpu.rf_inst"));
+
   for (int i = 0; i < 32; i++) {
-    uint32_t reg_val = get_reg_value(i);
+    uint32_t reg_val = get_npc_reg(i);
     printf("%-4s %-11d 0x%08x\n", regs[i], (int32_t)reg_val, reg_val);
   }
-  
-  svSetScope(svGetScopeFromName("TOP.ysyx_25030081_cpu.pc_inst"));
-  uint32_t pc_val = get_pc_value();
+
+  uint32_t pc_val = get_npc_pc();
   printf("%-4s %-11d 0x%08x\n", "pc", (int32_t)pc_val, pc_val);
 }
 
-// Get register value by name (for expression evaluator)
 uint32_t npc_reg_str2val(const char *reg_name, bool *success) {
   *success = true;
 
   for (int i = 0; i < 32; i++) {
     if (strcmp(reg_name, regs[i]) == 0) {
-      svSetScope(svGetScopeFromName("TOP.ysyx_25030081_cpu.rf_inst"));
-      return get_reg_value(i);
+      return get_npc_reg(i);
     }
   }
 
   if (reg_name[0] == 'x' && strlen(reg_name) >= 2) {
     int reg_idx = atoi(reg_name + 1);
     if (reg_idx >= 0 && reg_idx < 32) {
-      svSetScope(svGetScopeFromName("TOP.ysyx_25030081_cpu.rf_inst"));
-      return get_reg_value(reg_idx);
+      return get_npc_reg(reg_idx);
     }
   }
 
   if (strcmp(reg_name, "pc") == 0) {
-    svSetScope(svGetScopeFromName("TOP.ysyx_25030081_cpu.pc_inst"));
-    return get_pc_value();
+    return get_npc_pc();
   }
 
   Log("Unknown register: %s", reg_name);

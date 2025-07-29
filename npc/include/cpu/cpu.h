@@ -4,15 +4,30 @@
 #include "common.h"
 #include "utils.h"
 
+enum { NPC_RUNNING, NPC_STOP, NPC_END, NPC_ABORT, NPC_QUIT };
+
+typedef struct {
+  int state;
+  vaddr_t halt_pc;
+  uint32_t halt_ret;
+} NPCState;
+
+extern NPCState npc_state;
+
+uint64_t get_time();
+
 // DPI-C interface functions
 extern "C" {
 uint32_t get_pc_value();
 uint32_t get_reg_value(int reg_idx);
-void ebreak(uint32_t a0);
+void ebreak();
 bool check_ebreak();
 uint32_t pmem_read(uint32_t raddr);
 void pmem_write(uint32_t waddr, uint32_t wdata, char wmask);
 }
+
+uint32_t get_npc_pc();
+uint32_t get_npc_reg(int reg_idx);
 
 // C++ CPU interface functions
 void init_cpu();
@@ -35,10 +50,6 @@ bool npc_is_running();
 
 // CPU state globals
 extern bool npc_state_stopped;
-
-// NPC state access functions for difftest
-uint32_t get_npc_pc();
-uint32_t get_npc_reg(int idx);
 
 // Register access functions
 uint32_t npc_reg_str2val(const char *reg_name, bool *success);

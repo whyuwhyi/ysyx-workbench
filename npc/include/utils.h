@@ -18,44 +18,28 @@
 
 #include <common.h>
 
-// ----------- state -----------
-
-enum { NPC_RUNNING, NPC_STOP, NPC_END, NPC_ABORT, NPC_QUIT };
-
-typedef struct {
-  int state;
-  vaddr_t halt_pc;
-  uint32_t halt_ret;
-} NPCState;
-
-extern NPCState npc_state;
-
-// ----------- timer -----------
-
-uint64_t get_time();
-
 // ----------- log -----------
 
 bool log_enable();
 void init_log(const char *log_file);
 void log_set_enable(bool enable);
 
-extern FILE* log_fp;
+extern FILE *log_fp;
 
-#define log_write(...) \
-  do { \
-    extern bool log_enable(); \
-    extern FILE* log_fp; \
-    if (log_enable() && log_fp != NULL) { \
-      fprintf(log_fp, __VA_ARGS__); \
-      fflush(log_fp); \
-    } \
+#define log_write(...)                                                         \
+  do {                                                                         \
+    extern bool log_enable();                                                  \
+    extern FILE *log_fp;                                                       \
+    if (log_enable() && log_fp != NULL) {                                      \
+      fprintf(log_fp, __VA_ARGS__);                                            \
+      fflush(log_fp);                                                          \
+    }                                                                          \
   } while (0)
 
-#define _Log(...) \
-  do { \
-    printf(__VA_ARGS__); \
-    log_write(__VA_ARGS__); \
+#define _Log(...)                                                              \
+  do {                                                                         \
+    printf(__VA_ARGS__);                                                       \
+    log_write(__VA_ARGS__);                                                    \
   } while (0)
 
 #endif
