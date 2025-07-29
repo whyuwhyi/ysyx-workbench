@@ -98,11 +98,11 @@ void ftrace_call(vaddr_t from, vaddr_t to) {
              "[" FMT_WORD "] call -> [" FMT_WORD "]", from, to);
   }
   Log("%s", buf);
-  call_depth++;
+  call_depth = call_depth > 10 ? 10 : call_depth + 1;
 }
 
 void ftrace_ret(vaddr_t from, vaddr_t to) {
-  call_depth--;
+  call_depth = call_depth > 0 ? call_depth - 1 : 0;
   for (int i = 0; i < call_depth; i++) {
     buf[i] = ' ';
   }

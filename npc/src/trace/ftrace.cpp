@@ -111,11 +111,11 @@ void ftrace_call(uint32_t from, uint32_t to) {
              "[" FMT_WORD "] call -> [" FMT_WORD "]", from, to);
   }
   Log("%s", buf);
-  call_depth++;
+  call_depth = call_depth > 10 ? call_depth : call_depth + 1;
 }
 
 void ftrace_ret(uint32_t from, uint32_t to) {
-  call_depth--;
+  call_depth = call_depth > 0 ? call_depth - 1 : 0;
   for (int i = 0; i < call_depth; i++) {
     buf[i] = ' ';
   }
