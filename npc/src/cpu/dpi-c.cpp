@@ -9,7 +9,7 @@ uint32_t get_npc_pc() {
 
 uint32_t get_npc_reg(int idx) {
   if (idx == 0)
-    return 0; // x0 is always 0 in RISC-V
+    return 0;
   svSetScope(svGetScopeFromName("TOP.ysyx_25030081_cpu.rf_inst"));
   return get_reg_value(idx);
 }

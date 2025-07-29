@@ -8,7 +8,5 @@ extern NPCState npc_state;
 extern "C" void ebreak(uint32_t a0) {
   npc_state.state = NPC_END;
   npc_state.halt_pc = get_pc_value();
-  npc_state.halt_ret = a0;
+  npc_state.halt_ret = get_npc_reg(10);
 }
-
-extern "C" bool check_ebreak() { return npc_state.state == NPC_END; }

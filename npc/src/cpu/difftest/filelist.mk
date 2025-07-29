@@ -13,4 +13,4 @@
 # See the Mulan PSL v2 for more details.
 #**************************************************************************************/
 
-SRCS-y += src/cpu/difftest/difftest.cpp src/cpu/difftest/dut.cpp
+SRCS-y += src/cpu/difftest/difftest.cpp
