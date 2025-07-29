@@ -16,13 +16,14 @@ static int call_depth = 0;
 
 void init_ftrace(const char *elf_path) {
   if (!elf_path) {
-    Log("Function trace disabled: no ELF file provided");
+    Log("Function trace may can not work well: no ELF file provided");
     return;
   }
 
   FILE *fp = fopen(elf_path, "rb");
   if (!fp) {
-    Log("Function trace disabled: cannot open ELF file %s", elf_path);
+    Log("Function trace may can not work well: cannot open ELF file %s",
+        elf_path);
     return;
   }
 
