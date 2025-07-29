@@ -14,7 +14,7 @@ static int call_depth = 0;
 
 void init_ftrace(const char *elf_path) {
   Log("Function trace initialized");
-  
+
   if (!elf_path) {
     return;
   }
@@ -93,18 +93,22 @@ static const char *ftrace_func_name(uint32_t addr) {
   return NULL;
 }
 
-void ftrace_call(uint32_t from, uint32_t to) {
+static void print_indent() {
   for (int i = 0; i < call_depth; i++) {
-    printf("  ");
+    Log("  ");
   }
-  
+}
+
+void ftrace_call(uint32_t from, uint32_t to) {
+  print_indent();
+
   const char *name = ftrace_func_name(to);
   if (name) {
     Log("[0x%08x] call -> 0x%08x <%s>", from, to, name);
   } else {
     Log("[0x%08x] call -> 0x%08x", from, to);
   }
-  
+
   call_depth++;
 }
 
@@ -112,11 +116,11 @@ void ftrace_ret(uint32_t from, uint32_t to) {
   if (call_depth > 0) {
     call_depth--;
   }
-  
+
   for (int i = 0; i < call_depth; i++) {
     printf("  ");
   }
-  
+
   const char *name = ftrace_func_name(from);
   if (name) {
     Log("[0x%08x] ret  <- 0x%08x <%s>", from, to, name);
