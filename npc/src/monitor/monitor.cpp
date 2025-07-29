@@ -33,11 +33,11 @@ bool log_enable() { return log_enable_flag; }
 void log_set_enable(bool enable) { log_enable_flag = enable; }
 
 static int parse_args(int argc, char *argv[]) {
-  static struct option long_options[] = {{"batch", no_argument, NULL, 'b'},
-                                         {"help", no_argument, NULL, 'h'},
-                                         {"log", required_argument, NULL, 'l'},
-                                         {"elf", required_argument, NULL, 'e'},
-                                         {0, 0, NULL, 0}};
+  const struct option long_options[] = {{"batch", no_argument, NULL, 'b'},
+                                        {"help", no_argument, NULL, 'h'},
+                                        {"log", required_argument, NULL, 'l'},
+                                        {"elf", required_argument, NULL, 'e'},
+                                        {0, 0, NULL, 0}};
 
   int c;
   while ((c = getopt_long(argc, argv, "-bhl:e:", long_options, NULL)) != -1) {
@@ -58,6 +58,7 @@ static int parse_args(int argc, char *argv[]) {
       break;
     case 'e':
       elf_file = optarg;
+      break;
     case '?':
       printf("Usage: %s [OPTION]... IMAGE\n", argv[0]);
       exit(1);
