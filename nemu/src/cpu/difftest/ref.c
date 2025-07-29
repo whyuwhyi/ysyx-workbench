@@ -28,11 +28,13 @@ __EXPORT void difftest_memcpy(paddr_t addr, void *buf, size_t n,
 }
 
 __EXPORT void difftest_regcpy(void *dut, bool direction) {
+  isa_reg_display();
   if (direction == DIFFTEST_TO_REF) {
     memcpy(&cpu, dut, sizeof(cpu));
   } else {
     memcpy(dut, &cpu, sizeof(cpu));
   }
+  isa_reg_display();
 }
 
 __EXPORT void difftest_exec(uint64_t n) { cpu_exec(n); }
