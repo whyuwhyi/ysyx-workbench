@@ -63,8 +63,10 @@ void init_difftest(char *ref_so_file, long img_size, int port) {
 
   for (int i = 0; i < 32; i++) {
     dut_riscv32_cpu_state.gpr[i] = get_npc_reg(i);
+    Log("Initial register x%d: 0x%08x", i, dut_riscv32_cpu_state.gpr[i]);
   }
   dut_riscv32_cpu_state.pc = get_npc_pc();
+  Log("Initial PC: 0x%08x", dut_riscv32_cpu_state.pc);
   ref_difftest_regcpy(&dut_riscv32_cpu_state, DIFFTEST_TO_REF);
 }
 
