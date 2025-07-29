@@ -99,7 +99,8 @@ override ARGS ?= --log=$(BUILD_DIR)/npc-log.txt
 # Simulation target for AM integration
 sim: $(TARGET)
 	@$(call git_commit, "sim RTL") 
-	$(TARGET) $(ARGS) $(IMG)
+	@$(TARGET) $(ARGS) $(IMG)
+	@echo $(ARGS)
 
 # Wave viewer
 GTKWAVE = gtkwave
