@@ -36,17 +36,6 @@ void single_cycle() {
   step_and_dump_wave();
 }
 
-void cpu_exec(int n) {
-  for (int i = 0; i < n; i++) {
-    single_cycle();
-
-    if (check_ebreak()) {
-      Log("Simulation stopped due to EBREAK");
-      break;
-    }
-  }
-}
-
 void sim_init() {
   contextp = new VerilatedContext;
   top = new Vysyx_25030081_cpu{contextp};
@@ -59,7 +48,7 @@ void sim_init() {
   top->trace(tfp, 0);
   tfp->open("build/wave.fst");
 #endif
-  reset(10);
+  reset(100);
 }
 
 void sim_exit() {

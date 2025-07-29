@@ -1,6 +1,6 @@
 #include <assert.h>
-#include <memory/pmem.h>
 #include <cpu/cpu.h>
+#include <memory/pmem.h>
 #include <sys/types.h>
 
 static uint8_t pmem[CONFIG_MSIZE];
@@ -104,9 +104,9 @@ void init_mem() {
 }
 
 // DPI-C functions
-extern "C" uint32_t pmem_read(uint32_t raddr) { return paddr_read(raddr, 4); }
+extern "C" int pmem_read(int raddr) { return paddr_read(raddr, 4); }
 
-extern "C" void pmem_write(uint32_t waddr, uint32_t wdata, char wmask) {
+extern "C" void pmem_write(int waddr, int wdata, char wmask) {
   switch (wmask) {
   case 0x1:
     paddr_write(waddr, 1, wdata);

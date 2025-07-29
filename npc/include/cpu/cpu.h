@@ -18,12 +18,12 @@ uint64_t get_time();
 
 // DPI-C interface functions
 extern "C" {
-uint32_t get_pc_value();
-uint32_t get_reg_value(int reg_idx);
+int get_pc_value();
+int get_reg_value(int reg_idx);
 void ebreak();
 bool check_ebreak();
-uint32_t pmem_read(uint32_t raddr);
-void pmem_write(uint32_t waddr, uint32_t wdata, char wmask);
+int pmem_read(int raddr);
+void pmem_write(int waddr, int wdata, char wmask);
 }
 
 uint32_t get_npc_pc();
