@@ -95,6 +95,7 @@ endif
 
 # Default arguments for simulation
 override ARGS ?= --log=$(BUILD_DIR)/npc-log.txt
+ARGS += $(NPCFLAGS)
 
 # Simulation target for AM integration
 sim: $(TARGET)
