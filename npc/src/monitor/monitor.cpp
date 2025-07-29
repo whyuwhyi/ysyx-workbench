@@ -33,14 +33,14 @@ bool log_enable() { return log_enable_flag; }
 void log_set_enable(bool enable) { log_enable_flag = enable; }
 
 static int parse_args(int argc, char *argv[]) {
-  static struct option long_options[] = {{"batch", no_argument, 0, 'b'},
-                                         {"help", no_argument, 0, 'h'},
-                                         {"log", required_argument, 0, 'l'},
-                                         {"elf", required_argument, 0, 'e'},
-                                         {0, 0, 0, 0}};
+  static struct option long_options[] = {{"batch", no_argument, NULL, 'b'},
+                                         {"help", no_argument, NULL, 'h'},
+                                         {"log", required_argument, NULL, 'l'},
+                                         {"elf", required_argument, NULL, 'e'},
+                                         {0, 0, NULL, 0}};
 
   int c;
-  while ((c = getopt_long(argc, argv, "bhl:e:", long_options, NULL)) != -1) {
+  while ((c = getopt_long(argc, argv, "-bhl:e:", long_options, NULL)) != -1) {
     switch (c) {
     case 'b':
       is_batch_mode = true;
