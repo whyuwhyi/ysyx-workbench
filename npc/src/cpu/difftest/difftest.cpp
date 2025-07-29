@@ -9,7 +9,7 @@
 #define DIFFTEST_TO_REF false
 
 typedef struct {
-  uint32_t gpr[32];
+  uint32_t gpr[16];
   uint32_t pc;
 } riscv32_CPU_state;
 
