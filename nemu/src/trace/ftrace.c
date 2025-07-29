@@ -82,9 +82,12 @@ const char *ftrace_func_name(vaddr_t addr) {
 }
 
 static void print_indent() {
+  char buf[1024];
   for (int i = 0; i < call_depth; i++) {
-    Log_n("  ");
-  }
+    buf[i * 2] = ' ';
+    buf[i * 2 + 1] = ' ';
+  };
+  Log_n("%s", buf);
 }
 
 void ftrace_call(uint32_t from, uint32_t to) {
