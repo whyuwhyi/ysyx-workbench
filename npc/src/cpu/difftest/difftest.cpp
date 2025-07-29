@@ -5,8 +5,8 @@
 #include <memory/pmem.h>
 
 // Direction constants for difftest
-#define DIFFTEST_TO_DUT true
-#define DIFFTEST_TO_REF false
+
+enum { DIFFTEST_TO_DUT, DIFFTEST_TO_REF };
 
 typedef struct {
   uint32_t gpr[32];
