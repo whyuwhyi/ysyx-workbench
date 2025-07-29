@@ -1,18 +1,3 @@
-/***************************************************************************************
- * Copyright (c) 2014-2024 Zihao Yu, Nanjing University
- *
- * NPC is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan
- *PSL v2. You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- *
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY
- *KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
- *NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- *
- * See the Mulan PSL v2 for more details.
- ***************************************************************************************/
-
 #include <common.h>
 #include <cpu/cpu.h>
 #include <memory/pmem.h>
@@ -54,12 +39,12 @@ static void exec_once() {
   char logbuf[128];
   void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
   disassemble(logbuf, sizeof(logbuf), pc, (uint8_t *)&inst, 4);
-  
+
   // Real-time output when executing few instructions
   if (g_print_step) {
     printf("0x%08x:\t%08x:\t%s\n", pc, inst, logbuf);
   }
-  
+
   itrace_push(pc, inst);
 #endif
 
@@ -89,12 +74,12 @@ void npc_cpu_exec(uint64_t n) {
   npc_state_running = true;
   npc_state_stopped = false;
 
-  // Enable real-time output for small step execution (like NEMU)
+  // Enable real-time output for small step execution
   g_print_step = (n < 10);
 
   if (n == (uint64_t)-1) {
     Log("NPC started (continuous execution)");
-    g_print_step = false;  // Disable for continuous execution
+    g_print_step = false; // Disable for continuous execution
     while (!npc_state_stopped && npc_state_running) {
       exec_once();
     }
