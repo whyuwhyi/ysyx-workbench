@@ -33,7 +33,6 @@ static void exec_once() {
   g_nr_guest_inst++;
 
 #ifdef CONFIG_ITRACE
-  // Generate logbuf for real-time output
   char logbuf[128];
   void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
   disassemble(logbuf, sizeof(logbuf), pc, (uint8_t *)&inst, 4);
