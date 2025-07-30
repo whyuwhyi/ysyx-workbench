@@ -40,10 +40,7 @@ int vprintf(const char *fmt, va_list ap) {
     return -1;
   char buf[1024];
   int ret = vsnprintf(buf, sizeof(buf), fmt, ap);
-
-  for (int i = 0; buf[i] != '\0'; i++) {
-    putch(buf[i]);
-  }
+  putstr(buf);
 
   return ret;
 }
