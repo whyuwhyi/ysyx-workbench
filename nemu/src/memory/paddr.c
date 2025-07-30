@@ -57,7 +57,7 @@ void init_mem() {
 }
 
 word_t paddr_read(paddr_t addr, int len) {
-  word_t ret = 0;
+  word_t ret;
   if (likely(in_pmem(addr)))
     ret = pmem_read(addr, len);
   else {
