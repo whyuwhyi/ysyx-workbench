@@ -1,7 +1,7 @@
 #include <common.h>
 #include <elf.h>
 
-#define MAX_FUNC 1024
+#define MAX_FUNC 65536
 
 typedef struct {
   paddr_t addr;
