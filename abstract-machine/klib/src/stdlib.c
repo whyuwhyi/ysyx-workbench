@@ -28,16 +28,26 @@ int atoi(const char *nptr) {
   return x;
 }
 
-static uintptr_t addr = 0;
-void *malloc(size_t size) {
-  if (addr == 0) {
-    addr = (uintptr_t)heap.start;
-  }
-  uintptr_t start = addr;
-  addr = ROUNDUP(addr, size);
+#define MALLOC_ALIGN 4
 
-  return (void *)start;
-  return NULL;
+static uintptr_t brk_addr = 0;
+
+void *malloc(size_t size) {
+  if (brk_addr == 0) {
+    brk_addr = (uintptr_t)ROUNDUP(heap.start, MALLOC_ALIGN);
+  }
+
+  size = (size_t)ROUNDUP(size, MALLOC_ALIGN);
+
+  if (brk_addr + size > (uintptr_t)heap.end) {
+    return NULL;
+  }
+
+  uintptr_t old_brk = brk_addr;
+
+  brk_addr += size;
+
+  return (void *)old_brk;
 }
 
 void free(void *ptr) {}
