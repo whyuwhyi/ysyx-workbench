@@ -9,8 +9,11 @@ void __am_input_keybrd(AM_INPUT_KEYBRD_T *kbd) {
   if (KEY_CODE == 0) {
     kbd->keydown = false;
     kbd->keycode = AM_KEY_NONE;
-  } else {
+  } else if (KEY_CODE & KEYDOWN_MASK) {
     kbd->keydown = true;
+    kbd->keycode = KEY_CODE & 0x7fff;
+  } else {
+    kbd->keydown = false;
     kbd->keycode = KEY_CODE;
   }
 }
