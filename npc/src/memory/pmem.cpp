@@ -104,7 +104,6 @@ void init_mem() {
       CONFIG_MSIZE);
 }
 
-// DPI-C functions
 extern "C" int pmem_read(int raddr) {
   if (raddr == TIMER_ADDR) {
     return timer_get_timer();
@@ -113,7 +112,7 @@ extern "C" int pmem_read(int raddr) {
 }
 
 extern "C" void pmem_write(int waddr, int wdata, char wmask) {
-  if (waddr == SERIAL_ADDR) {
+  if (waddr == (int)SERIAL_ADDR) {
     serial_putchar(wdata & 0xff);
     return;
   }
