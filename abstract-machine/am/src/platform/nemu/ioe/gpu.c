@@ -1,5 +1,6 @@
 #include <am.h>
 #include <nemu.h>
+#include <stdint.h>
 
 #define WIDTH_ADDR VGACTL_ADDR
 #define HEIGHT_ADDR (VGACTL_ADDR + 2)
@@ -30,7 +31,7 @@ void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
   int h = ctl->h;
   int width = inw(WIDTH_ADDR);
   int height = inw(HEIGHT_ADDR);
-  uint32_t *pixels = ctl->pixels;
+  uint32_t *pixels = (uint32_t *)ctl->pixels;
   uint32_t *fb = (uint32_t *)(uintptr_t)FB_ADDR;
 
   for (int j = 0; j < h; j++) {
