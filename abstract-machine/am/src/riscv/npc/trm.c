@@ -15,6 +15,7 @@ static const char mainargs[MAINARGS_MAX_LEN] =
 void putch(char ch) {
   // volatile char *uart_tx = (volatile char *)0xa00003f8;
   // *uart_tx = ch;
+  asm volatile("sb %1, 0(%0)" : : "r"((char *)0xa00003f8), "r"(ch) : "memory");
 }
 
 void halt(int code) {
