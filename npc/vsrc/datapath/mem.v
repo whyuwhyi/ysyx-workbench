@@ -30,7 +30,7 @@ module ysyx_25030081_mem #(ADDR_WIDTH=32, DATA_WIDTH=32)
   });
 
   always @(*) begin
-    if (wen)
+    // if (wen)
       pmem_write(waddr, wdata, wmask);
   end
 
