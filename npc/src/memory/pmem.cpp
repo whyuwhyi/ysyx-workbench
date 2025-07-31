@@ -12,7 +12,8 @@ static inline bool in_pmem(uint32_t addr) {
 
 uint32_t paddr_read(uint32_t addr, int len) {
   if (!in_pmem(addr)) {
-    // return 0;
+    Log("Read from invalid address: 0x%08x", addr);
+    return 0;
   }
 
   uint32_t offset = addr - CONFIG_MBASE;
@@ -41,7 +42,8 @@ uint32_t paddr_read(uint32_t addr, int len) {
 
 void paddr_write(uint32_t addr, int len, uint32_t data) {
   if (!in_pmem(addr)) {
-    // return;
+    Log("Write to invalid address: 0x%08x", addr);
+    return;
   }
 
 #ifdef CONFIG_MTRACE
