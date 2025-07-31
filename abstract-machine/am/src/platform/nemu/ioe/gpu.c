@@ -30,15 +30,15 @@ void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
   int w = ctl->w;
   int h = ctl->h;
   int width = (int)inw(WIDTH_ADDR);
-  int height = (int)inw(HEIGHT_ADDR);
+  // int height = (int)inw(HEIGHT_ADDR);
   uint32_t *pixels = (uint32_t *)ctl->pixels;
   uint32_t *fb = (uint32_t *)(uintptr_t)FB_ADDR;
 
   for (int j = 0; j < h; j++) {
     for (int i = 0; i < w; i++) {
-      if (x + i >= 0 && x + i < width && y + j >= 0 && y + j < height) {
-        fb[(y + j) * width + (x + i)] = pixels[j * w + i];
-      }
+      // if (x + i >= 0 && x + i < width && y + j >= 0 && y + j < height) {
+      fb[(y + j) * width + (x + i)] = pixels[j * w + i];
+      // }
     }
   }
 
