@@ -93,39 +93,3 @@ menu "Memory Configuration"
     hex "Memory base address"
     default 0x80000000
 endmenu
-
-menu "Device Configuration"
-  config DEVICE
-    bool "Enable devices"
-    default n
-
-  config HAS_SERIAL
-    depends on DEVICE
-    bool "Enable serial"
-    default y
-
-  config HAS_TIMER
-    depends on DEVICE
-    bool "Enable timer"
-    default y
-
-  config HAS_KEYBOARD
-    depends on DEVICE
-    bool "Enable keyboard"
-    default y
-
-  config HAS_VGA
-    depends on DEVICE
-    bool "Enable VGA"
-    default y
-
-  config HAS_AUDIO
-    depends on DEVICE
-    bool "Enable audio"
-    default y
-
-  config SERIAL_MMIO
-    depends on HAS_SERIAL
-    hex "Serial MMIO address"
-    default 0xa00003f8
-endmenu
