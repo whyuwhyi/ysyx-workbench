@@ -112,9 +112,7 @@ extern "C" int pmem_read(int raddr) {
 }
 
 extern "C" void pmem_write(int waddr, int wdata, char wmask) {
-  if (waddr == (uint32_t)SERIAL_ADDR) {
-    Log("Serial write: 0x%08x, data: 0x%08x, mask: 0x%02x", waddr, wdata,
-        wmask);
+  if (waddr == SERIAL_ADDR) {
     serial_putchar(wdata & 0xff);
     return;
   }
