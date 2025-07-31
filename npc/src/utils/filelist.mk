@@ -1,5 +1,3 @@
-SRCS-y += src/utils/timer.cpp
-
 # Disassembly support for instruction trace
 ifeq ($(CONFIG_ITRACE),y)
 LIBCAPSTONE = tools/capstone/repo/libcapstone.so.5

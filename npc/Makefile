@@ -55,6 +55,7 @@ include $(FILELIST_MK)
 # Source files
 VSRCS = $(shell find $(abspath ./vsrc) -name "*.v")
 DIRS-y += src/monitor
+DIRS-y += src/device
 DIRS-BLACKLIST-y += $(DIRS-BLACKLIST)
 SRCS-BLACKLIST-y += $(SRCS-BLACKLIST) $(shell find -L $(DIRS-BLACKLIST-y) -name "*.c" -o -name "*.cc" -o -name "*.cpp" 2>/dev/null || true)
 SRCS-y += $(shell find -L $(DIRS-y) -name "*.c" -o -name "*.cc" -o -name "*.cpp" 2>/dev/null || true)

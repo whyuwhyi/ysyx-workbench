@@ -2,6 +2,7 @@
 #include <bits/getopt_core.h>
 #include <common.h>
 #include <cpu/cpu.h>
+#include <device/device.h>
 #include <getopt.h>
 #include <memory/pmem.h>
 #include <stdarg.h>
@@ -115,6 +116,9 @@ void init_monitor(int argc, char *argv[]) {
 #endif
 
   init_sdb();
+
+  init_device();
+
   sim_init();
 
   if (is_batch_mode) {

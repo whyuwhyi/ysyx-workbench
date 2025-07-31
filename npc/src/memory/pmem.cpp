@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <cpu/cpu.h>
+#include <device/device.h>
 #include <memory/pmem.h>
 #include <sys/types.h>
 
@@ -104,9 +105,19 @@ void init_mem() {
 }
 
 // DPI-C functions
-extern "C" int pmem_read(int raddr) { return paddr_read(raddr, 4); }
+extern "C" int pmem_read(int raddr) {
+  if (raddr == TIMER_ADDR) {
+    return timer_get_timer();
+  }
+  return paddr_read(raddr, 4);
+}
 
 extern "C" void pmem_write(int waddr, int wdata, char wmask) {
+  if (waddr == SERIAL_ADDR) {
+    serial_putchar(wdata & 0xff);
+    return;
+  }
+
   switch (wmask) {
   case 0x1:
     paddr_write(waddr, 1, wdata);
