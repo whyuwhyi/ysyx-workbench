@@ -21,14 +21,12 @@ module ysyx_25030081_alu #(DATA_WIDTH=32)(
   wire [DATA_WIDTH-1:0] and_result;
   
   assign op2_processed = (op == 4'b0000) ? op2 : ~op2+1; 
-  assign add_result = op1 + op2_processed;
+  assign add_result = op1 >> op2_processed;
   assign sll_result = op1 << op2[4:0];
   
-  // 有符号比较：考虑溢出情况
   wire signed_less = (op1[31] == op2[31]) ? add_result[31] : op1[31];
   assign slt_result = {31'b0, signed_less};
   
-  // 无符号比较：直接比较
   assign sltu_result = {31'b0, (op1 < op2)};
   
   assign xor_result = op1 ^ op2;
