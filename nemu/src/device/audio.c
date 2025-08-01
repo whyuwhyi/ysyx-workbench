@@ -52,10 +52,6 @@ static void audio_fill_cb(void *userdata, uint8_t *stream, int len) {
 }
 
 static void audio_io_handler(uint32_t offset, int len, bool is_write) {
-  if (!is_write) {
-    panic("audio_io_handler: read operation not supported");
-  }
-
   if (offset == sizeof(uint32_t) * reg_init) {
     if (audio_base[reg_init]) {
       SDL_AudioSpec spec = {.freq = audio_base[reg_freq],
