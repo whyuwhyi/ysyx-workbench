@@ -52,7 +52,7 @@ static void audio_fill_cb(void *userdata, uint8_t *stream, int len) {
 }
 
 static void audio_io_handler(uint32_t offset, int len, bool is_write) {
-  if (offset == sizeof(uint32_t) * reg_init) {
+  if (is_write && offset == sizeof(uint32_t) * reg_init) {
     if (audio_base[reg_init]) {
       SDL_AudioSpec spec = {.freq = audio_base[reg_freq],
                             .format = AUDIO_S16SYS,
@@ -64,6 +64,7 @@ static void audio_io_handler(uint32_t offset, int len, bool is_write) {
       int ret = SDL_OpenAudio(&spec, NULL);
       Assert(ret == 0, "SDL_OpenAudio failed");
       SDL_PauseAudio(0);
+      audio_base[reg_init] = 0;
     }
   }
 }
