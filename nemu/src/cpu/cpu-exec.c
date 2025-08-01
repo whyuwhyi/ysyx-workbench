@@ -40,6 +40,7 @@ static uint64_t g_timer = 0; // unit: us
 static bool g_print_step = false;
 
 void device_update();
+extern void watchpoint_check();
 
 static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 #ifdef CONFIG_ITRACE_COND
@@ -52,12 +53,13 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
   }
   IFDEF(CONFIG_ITRACE, itrace_push(_this->pc, _this->isa.inst, _this->logbuf));
   IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
-
   IFDEF(
       CONFIG_FTRACE,
       if (is_fcall(_this->isa.inst)) {
         ftrace_call(_this->pc, _this->dnpc);
-      } else if (is_fret(_this->isa.inst)) { ftrace_ret(_this->pc, _this->dnpc); });
+      } else if (is_fret(_this->isa.inst)) {
+        ftrace_ret(_this->pc, _this->dnpc);
+      });
 
   watchpoint_check();
 }

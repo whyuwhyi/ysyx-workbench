@@ -88,7 +88,8 @@ void display_wp() {
   }
   printf("Num Dec         Hex        Expr\n");
   while (p != NULL) {
-    printf("%-3d %-11d " FMT_WORD " %s\n", p->NO, (int32_t)p->value, p->value, p->exp);
+    printf("%-3d %-11d " FMT_WORD " %s\n", p->NO, (int32_t)p->value, p->value,
+           p->exp);
     p = p->next;
   }
 }
