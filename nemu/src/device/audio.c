@@ -62,7 +62,7 @@ static void audio_io_handler(uint32_t offset, int len, bool is_write) {
                             .userdata = NULL};
       SDL_InitSubSystem(SDL_INIT_AUDIO);
       int ret = SDL_OpenAudio(&spec, NULL);
-      Assert(ret == 1, "SDL_OpenAudio failed");
+      Assert(ret == 0, "SDL_OpenAudio failed");
       SDL_PauseAudio(0);
     }
   }
