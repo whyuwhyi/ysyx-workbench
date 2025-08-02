@@ -114,7 +114,7 @@ extern "C" int pmem_read(int raddr) {
 }
 
 extern "C" void pmem_write(int waddr, int wdata, char wmask) {
-  if (waddr == SERIAL_ADDR) {
+  if (waddr == 0xa00003f8) {
     serial_putchar(wdata & 0xff);
     return;
   }
