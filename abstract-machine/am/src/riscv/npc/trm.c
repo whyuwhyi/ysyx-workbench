@@ -1,5 +1,7 @@
+#include "riscv/riscv.h"
 #include <am.h>
 #include <klib-macros.h>
+#include <stdint.h>
 
 extern char _heap_start;
 int main(const char *args);
@@ -12,9 +14,11 @@ Area heap = RANGE(&_heap_start, PMEM_END);
 static const char mainargs[MAINARGS_MAX_LEN] =
     MAINARGS_PLACEHOLDER; // defined in CFLAGS
 
+#define SERIAL_ADDR 0xa00003f8
 void putch(char ch) {
-  volatile char *uart_tx = (volatile char *)0xa00003f8;
-  *uart_tx = ch;
+  // aolatile char *uart_tx = (volatile char *)0xa00003f8;
+  // *uart_tx = ch;
+  outb((uintptr_t)SERIAL_ADDR, ch);
 }
 
 void halt(int code) {
