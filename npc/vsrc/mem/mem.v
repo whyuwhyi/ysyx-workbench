@@ -18,8 +18,14 @@ module ysyx_25030081_mem #(ADDR_WIDTH=32, DATA_WIDTH=32)
     2'b11, 8'b00000000
   });
 
-  wire [DATA_WIDTH-1:0] raw_rdata;
-  assign raw_rdata = ren ? pmem_read(raddr) : 32'b0;
+  reg [DATA_WIDTH-1:0] raw_rdata;
+  // assign raw_rdata = ren ? pmem_read(raddr) : 32'b0;
+  always @(*) begin
+    if (ren)
+      raw_rdata = pmem_read(raddr);
+    else 
+      raw_rdata = 32'b0;
+  end
   
   MuxKey #(5, 3, 32) rdata_mux_inst (rdata, op, {
     3'b000, {{24{raw_rdata[7]}}, raw_rdata[7:0]},

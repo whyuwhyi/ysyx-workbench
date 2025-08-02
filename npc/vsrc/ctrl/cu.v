@@ -109,7 +109,7 @@ module ysyx_25030081_cu(
   assign alu_op[1] = r_and  | r_or    | r_slt  | r_sltu  | i_andi | i_ori  |
                      i_slti | i_sltiu | u_lui;
   assign alu_op[0] = r_and  | r_sll   | r_srl  | r_sra   | i_andi | i_slli |
-                    i_srli | i_srai   | u_lui;
+                    i_srli  | i_srai  | u_lui;
 
   assign alu_unsigned_cmp = r_sltu | i_sltiu | b_bltu | b_bgeu;
 
