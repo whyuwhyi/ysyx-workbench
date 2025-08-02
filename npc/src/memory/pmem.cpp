@@ -114,23 +114,24 @@ extern "C" int pmem_read(int raddr) {
 }
 
 extern "C" void pmem_write(int waddr, int wdata, char wmask) {
-  if (waddr == 0xa00003f8) {
+  if (waddr == SERIAL_ADDR) {
     serial_putchar(wdata & 0xff);
     return;
-  }
+  } else {
 
-  switch (wmask) {
-  case 0x1:
-    paddr_write(waddr, 1, wdata);
-    break;
-  case 0x3:
-    paddr_write(waddr, 2, wdata);
-    break;
-  case 0xf:
-    paddr_write(waddr, 4, wdata);
-    break;
-  default:
-    break;
+    switch (wmask) {
+    case 0x1:
+      paddr_write(waddr, 1, wdata);
+      break;
+    case 0x3:
+      paddr_write(waddr, 2, wdata);
+      break;
+    case 0xf:
+      paddr_write(waddr, 4, wdata);
+      break;
+    default:
+      break;
+    }
   }
 }
 
