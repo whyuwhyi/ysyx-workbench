@@ -1,5 +1,4 @@
 #include <common.h>
-#include <memory/paddr.h>
 
 void init_dtrace() { Log("Device trace initialized"); }
 

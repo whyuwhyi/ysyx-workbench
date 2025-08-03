@@ -1,5 +1,4 @@
 #include <common.h>
-#include <memory/vaddr.h>
 
 #define MAX_TRACE_LEN 24
 
@@ -38,10 +37,6 @@ void itrace_display() {
     int index = (i_trace.current + i) % MAX_TRACE_LEN;
     TraceEntry *entry = &i_trace.entries[index];
 
-    if (entry->pc == 0)
-      continue; // Skip empty entries
-
-    // Mark the most recently executed instruction and show instruction info
     if (index == ((i_trace.current - 1 + MAX_TRACE_LEN) % MAX_TRACE_LEN)) {
       Log("-->" FMT_WORD ":\t%08x:\t%s", entry->pc, entry->inst, entry->disasm);
     } else {

@@ -11,7 +11,6 @@ typedef struct {
 
 static FuncInfo funcs[MAX_FUNC];
 static int func_cnt = 0;
-static char *strtab = NULL;
 static int call_depth = 0;
 
 void init_ftrace(const char *elf_path) {
@@ -56,6 +55,7 @@ void init_ftrace(const char *elf_path) {
   fread(syms, 1, symtab_hdr->sh_size, fp);
   int sym_count = symtab_hdr->sh_size / sizeof(Elf32_Sym);
 
+  char *strtab = NULL;
   strtab = malloc(strtab_hdr->sh_size);
   fseek(fp, strtab_hdr->sh_offset, SEEK_SET);
   fread(strtab, 1, strtab_hdr->sh_size, fp);
