@@ -2,11 +2,12 @@
 #include <elf.h>
 
 #define MAX_FUNC 65536
+#define MAX_FUNC_NAME_LEN 256
 
 typedef struct {
   paddr_t addr;
   word_t size;
-  const char *name;
+  char name[MAX_FUNC_NAME_LEN];
 } FuncInfo;
 
 static FuncInfo funcs[MAX_FUNC];
@@ -55,8 +56,7 @@ void init_ftrace(const char *elf_path) {
   fread(syms, 1, symtab_hdr->sh_size, fp);
   int sym_count = symtab_hdr->sh_size / sizeof(Elf32_Sym);
 
-  char *strtab = NULL;
-  strtab = malloc(strtab_hdr->sh_size);
+  char *strtab = malloc(strtab_hdr->sh_size);
   fseek(fp, strtab_hdr->sh_offset, SEEK_SET);
   fread(strtab, 1, strtab_hdr->sh_size, fp);
 
@@ -64,11 +64,13 @@ void init_ftrace(const char *elf_path) {
     if (ELF32_ST_TYPE(syms[i].st_info) == STT_FUNC && syms[i].st_size > 0) {
       funcs[func_cnt].addr = syms[i].st_value;
       funcs[func_cnt].size = syms[i].st_size;
-      funcs[func_cnt].name = strtab + syms[i].st_name;
+      snprintf(funcs[func_cnt].name, MAX_FUNC_NAME_LEN, "%s",
+               strtab + syms[i].st_name);
       func_cnt++;
     }
   }
   free(syms);
+  free(strtab);
   fclose(fp);
 
   Log("Function trace initialized with %d functions", func_cnt);
