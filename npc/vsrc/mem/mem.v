@@ -23,7 +23,7 @@ module ysyx_25030081_mem #(ADDR_WIDTH=32, DATA_WIDTH=32)
   always @(*) begin
     if (ren)
       raw_rdata = pmem_read(raddr);
-    else 
+    else
       raw_rdata = 32'b0;
   end
   
