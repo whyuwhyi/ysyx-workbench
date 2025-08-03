@@ -35,34 +35,26 @@ void init_ftrace(const char *elf_path) {
   fseek(fp, ehdr.e_shoff, SEEK_SET);
   fread(shdr, sizeof(Elf32_Shdr), ehdr.e_shnum, fp);
 
-  // Elf32_Shdr shstr = shdr[ehdr.e_shstrndx];
-  // char shstrtab[shstr.sh_size];
-  // fseek(fp, shstr.sh_offset, SEEK_SET);
-  // fread(shstrtab, 1, shstr.sh_size, fp);
-  //
-  // Elf32_Shdr *symtab = NULL, *strtab_hdr = NULL;
-  // for (int i = 0; i < ehdr.e_shnum; i++) {
-  //   const char *name = shstrtab + shdr[i].sh_name;
-  //   if (strcmp(name, ".symtab") == 0)
-  //     symtab = &shdr[i];
-  //   if (strcmp(name, ".strtab") == 0)
-  //     strtab_hdr = &shdr[i];
-  // }
+  Elf32_Shdr shstr_hdr = shdr[ehdr.e_shstrndx];
+  char shstrtab[shstr_hdr.sh_size];
+  fseek(fp, shstr_hdr.sh_offset, SEEK_SET);
+  fread(shstrtab, 1, shstr_hdr.sh_size, fp);
 
-  Elf32_Shdr *symtab = NULL, *strtab_hdr = NULL;
+  Elf32_Shdr *symtab_hdr = NULL, *strtab_hdr = NULL;
   for (int i = 0; i < ehdr.e_shnum; i++) {
-    if (shdr[i].sh_type == SHT_SYMTAB)
-      symtab = &shdr[i];
-    if (shdr[i].sh_type == SHT_STRTAB)
+    const char *name = shstrtab + shdr[i].sh_name;
+    if (strcmp(name, ".symtab") == 0)
+      symtab_hdr = &shdr[i];
+    if (strcmp(name, ".strtab") == 0)
       strtab_hdr = &shdr[i];
   }
 
-  assert(symtab && strtab_hdr);
+  assert(symtab_hdr && strtab_hdr);
 
-  Elf32_Sym *syms = malloc(symtab->sh_size);
-  fseek(fp, symtab->sh_offset, SEEK_SET);
-  fread(syms, 1, symtab->sh_size, fp);
-  int sym_count = symtab->sh_size / sizeof(Elf32_Sym);
+  Elf32_Sym *syms = malloc(symtab_hdr->sh_size);
+  fseek(fp, symtab_hdr->sh_offset, SEEK_SET);
+  fread(syms, 1, symtab_hdr->sh_size, fp);
+  int sym_count = symtab_hdr->sh_size / sizeof(Elf32_Sym);
 
   strtab = malloc(strtab_hdr->sh_size);
   fseek(fp, strtab_hdr->sh_offset, SEEK_SET);
