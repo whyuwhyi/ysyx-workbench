@@ -48,6 +48,10 @@ static void audio_fill_cb(void *userdata, uint8_t *stream, int len) {
     stream[i] = sbuf[(head + i) % sbuf_size];
   }
 
+  for (int i = real_len; i < len; i++) {
+    stream[i] = 0;
+  }
+
   audio_base[reg_sbuf_head] = (head + real_len) % sbuf_size;
 }
 
