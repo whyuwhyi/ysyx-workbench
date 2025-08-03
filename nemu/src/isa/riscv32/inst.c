@@ -13,6 +13,7 @@
  * See the Mulan PSL v2 for more details.
  ***************************************************************************************/
 
+#include "common.h"
 #include "local-include/reg.h"
 #include "macro.h"
 #include <cpu/cpu.h>
@@ -67,7 +68,7 @@ enum {
 
 #define shamt(x) (x & 0x1f)
 
-static void decode_operand(Decode *s, int *rd, word_t *src1, word_t *src2,
+static void decode_operand(Decode *s, word_t *rd, word_t *src1, word_t *src2,
                            word_t *imm, int type) {
   uint32_t i = s->isa.inst;
   int rs1 = BITS(i, 19, 15);
@@ -111,7 +112,7 @@ static int decode_exec(Decode *s) {
 #define INSTPAT_INST(s) ((s)->isa.inst)
 #define INSTPAT_MATCH(s, name, type, ... /* execute body */)                   \
   {                                                                            \
-    int rd = 0;                                                                \
+    word_t rd = 0;                                                             \
     word_t src1 = 0, src2 = 0, imm = 0;                                        \
     decode_operand(s, &rd, &src1, &src2, &imm, concat(TYPE_, type));           \
     __VA_ARGS__;                                                               \
@@ -212,7 +213,8 @@ static int decode_exec(Decode *s) {
           s->dnpc = s->pc + imm);
 
   INSTPAT("0000000 00001 00000 000 00000 11100 11", ebreak, N,
-          NEMUTRAP(s->pc, R(10))); // R(10) is $a0
+          NEMUTRAP(s->pc, R(10)));
+
   INSTPAT("??????? ????? ????? ??? ????? ????? ??", inv, N, INV(s->pc));
   INSTPAT_END();
 
