@@ -239,7 +239,7 @@ static int decode_exec(Decode *s) {
   INSTPAT("??????? ????? ????? ??? ????? 11011 11", jal, J, R(rd) = s->pc + 4;
           s->dnpc = s->pc + imm);
 
-  INSTPAT("0000000 00000 00000 000 00000 11101 11", ecall, N,
+  INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall, N,
           isa_raise_intr(0, s->pc));
   INSTPAT("0000000 00001 00000 000 00000 11100 11", ebreak, N,
           NEMUTRAP(s->pc, R(10)));
