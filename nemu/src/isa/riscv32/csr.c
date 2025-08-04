@@ -1,7 +1,7 @@
 #include "local-include/csr.h"
 #include <common.h>
 
-word_t csr[nr_csr];
+word_t riscv_csr[nr_csr];
 
 const char *csr_names[] = {
     [mepc] = "mepc",

@@ -19,9 +19,7 @@
 word_t isa_raise_intr(word_t NO, vaddr_t epc) {
   CSR(mepc) = epc;
   CSR(macause) = NO;
-  cpu.pc = CSR(mtvec);
-
-  return 0;
+  return CSR(mtvec);
 }
 
 word_t isa_query_intr() { return INTR_EMPTY; }
