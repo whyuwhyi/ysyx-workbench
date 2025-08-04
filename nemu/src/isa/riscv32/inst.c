@@ -14,6 +14,7 @@
  ***************************************************************************************/
 
 #include "common.h"
+#include "local-include/csr.h"
 #include "local-include/reg.h"
 #include "macro.h"
 #include <cpu/cpu.h>
@@ -65,11 +66,16 @@ enum {
     *imm = (SEXT(BITS(i, 31, 31), 1) << 20) | (BITS(i, 19, 12) << 12) |        \
            (BITS(i, 20, 20) << 11) | (BITS(i, 30, 21) << 1);                   \
   } while (0)
+#define zimmI()                                                                \
+  do {                                                                         \
+    *zimm = BITS(i, 19, 15);                                                   \
+  } while (0)
 
-#define shamt(x) (x & 0x1f)
+#define shamtI(x) (x & 0x1f)
+#define csrI(x) (x & 0xfff)
 
 static void decode_operand(Decode *s, word_t *rd, word_t *src1, word_t *src2,
-                           word_t *imm, int type) {
+                           word_t *imm, word_t *zimm, int type) {
   uint32_t i = s->isa.inst;
   int rs1 = BITS(i, 19, 15);
   int rs2 = BITS(i, 24, 20);
@@ -82,6 +88,7 @@ static void decode_operand(Decode *s, word_t *rd, word_t *src1, word_t *src2,
   case TYPE_I:
     src1R();
     immI();
+    zimmI();
     break;
   case TYPE_S:
     src1R();
@@ -114,7 +121,8 @@ static int decode_exec(Decode *s) {
   {                                                                            \
     word_t rd = 0;                                                             \
     word_t src1 = 0, src2 = 0, imm = 0;                                        \
-    decode_operand(s, &rd, &src1, &src2, &imm, concat(TYPE_, type));           \
+    word_t zimm = 0;                                                           \
+    decode_operand(s, &rd, &src1, &src2, &imm, &zimm, concat(TYPE_, type));    \
     __VA_ARGS__;                                                               \
   }
 
@@ -141,15 +149,15 @@ static int decode_exec(Decode *s) {
   INSTPAT("0000001 ????? ????? 111 ????? 01100 11", remu, R,
           R(rd) = src1 % src2);
   INSTPAT("0000000 ????? ????? 001 ????? 01100 11", sll, R,
-          R(rd) = src1 << shamt(src2));
+          R(rd) = src1 << shamtI(src2));
   INSTPAT("0000000 ????? ????? 010 ????? 01100 11", slt, R,
           R(rd) = (int32_t)src1 < (int32_t)src2);
   INSTPAT("0000000 ????? ????? 011 ????? 01100 11", sltu, R,
           R(rd) = src1 < src2);
   INSTPAT("0100000 ????? ????? 101 ????? 01100 11", sra, R,
-          R(rd) = (int32_t)src1 >> shamt(src2));
+          R(rd) = (int32_t)src1 >> shamtI(src2));
   INSTPAT("0000000 ????? ????? 101 ????? 01100 11", srl, R,
-          R(rd) = src1 >> shamt(src2));
+          R(rd) = src1 >> shamtI(src2));
   INSTPAT("0100000 ????? ????? 000 ????? 01100 11", sub, R,
           R(rd) = src1 - src2);
   INSTPAT("0000000 ????? ????? 100 ????? 01100 11", xor, R,
@@ -173,17 +181,36 @@ static int decode_exec(Decode *s) {
           R(rd) = Mr(src1 + imm, 2));
   INSTPAT("??????? ????? ????? 110 ????? 00100 11", ori, I, R(rd) = src1 | imm);
   INSTPAT("0000000 ????? ????? 001 ????? 00100 11", slli, I,
-          R(rd) = src1 << shamt(imm));
+          R(rd) = src1 << shamtI(imm));
   INSTPAT("??????? ????? ????? 010 ????? 00100 11", slti, I,
           R(rd) = (int32_t)src1 < (int32_t)imm);
   INSTPAT("??????? ????? ????? 011 ????? 00100 11", sltiu, I,
           R(rd) = src1 < imm);
   INSTPAT("0100000 ????? ????? 101 ????? 00100 11", srai, I,
-          R(rd) = (int32_t)src1 >> shamt(imm));
+          R(rd) = (int32_t)src1 >> shamtI(imm));
   INSTPAT("0000000 ????? ????? 101 ????? 00100 11", srli, I,
-          R(rd) = src1 >> shamt(imm));
+          R(rd) = src1 >> shamtI(imm));
   INSTPAT("??????? ????? ????? 100 ????? 00100 11", xori, I,
           R(rd) = src1 ^ imm);
+
+  INSTPAT("??????? ????? ????? 011 ????? 11100 11", csrrc, I,
+          word_t t = CSR(csrI(imm));
+          CSR(csrI(imm)) = t & ~src1; R(rd) = t);
+  INSTPAT("??????? ????? ????? 111 ????? 11100 11", csrrci, I,
+          word_t t = CSR(csrI(imm));
+          CSR(csrI(imm)) = t & ~zimm; R(rd) = t);
+  INSTPAT("??????? ????? ????? 010 ????? 11100 11", csrrs, I,
+          word_t t = CSR(csrI(imm));
+          CSR(csrI(imm)) = t | src1; R(rd) = t);
+  INSTPAT("??????? ????? ????? 110 ????? 11100 11", csrrsi, I,
+          word_t t = CSR(csrI(imm));
+          CSR(csrI(imm)) = t | zimm; R(rd) = t);
+  INSTPAT("??????? ????? ????? 001 ????? 11100 11", csrrw, I,
+          word_t t = CSR(csrI(imm));
+          CSR(csrI(imm)) = src1; R(rd) = t);
+  INSTPAT("??????? ????? ????? 101 ????? 11100 11", csrrwi, I,
+          word_t t = CSR(csrI(imm));
+          CSR(csrI(imm)) = zimm; R(rd) = t);
 
   INSTPAT("??????? ????? ????? 000 ????? 01000 11", sb, S,
           Mw(src1 + imm, 1, src2));
@@ -212,6 +239,8 @@ static int decode_exec(Decode *s) {
   INSTPAT("??????? ????? ????? ??? ????? 11011 11", jal, J, R(rd) = s->pc + 4;
           s->dnpc = s->pc + imm);
 
+  INSTPAT("0000000 00000 00000 000 00000 11101 11", ecall, N,
+          isa_raise_intr(0, s->pc));
   INSTPAT("0000000 00001 00000 000 00000 11100 11", ebreak, N,
           NEMUTRAP(s->pc, R(10)));
 
