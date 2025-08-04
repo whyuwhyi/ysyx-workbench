@@ -1,6 +1,7 @@
 #include <am.h>
 #include <klib.h>
 #include <riscv/riscv.h>
+#include <stdint.h>
 
 static Context *(*user_handler)(Event, Context *) = NULL;
 
@@ -8,7 +9,7 @@ Context *__am_irq_handle(Context *c) {
   if (user_handler) {
     Event ev = {0};
     switch (c->mcause) {
-    case -2:
+    case -1:
       ev.event = EVENT_YIELD;
       break;
     default:
@@ -19,7 +20,6 @@ Context *__am_irq_handle(Context *c) {
     c = user_handler(ev, c);
     assert(c != NULL);
   }
-
   return c;
 }
 
@@ -36,7 +36,11 @@ bool cte_init(Context *(*handler)(Event, Context *)) {
 }
 
 Context *kcontext(Area kstack, void (*entry)(void *), void *arg) {
-  return NULL;
+  Context *cp = kstack.end - sizeof(Context);
+  cp->mepc = (uintptr_t)entry;
+  cp->mstatus = 0x1800;
+  cp->gpr[10] = (uintptr_t)arg;
+  return cp;
 }
 
 void yield() {
