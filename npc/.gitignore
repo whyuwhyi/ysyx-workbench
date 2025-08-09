@@ -10,6 +10,8 @@
 !.gitignore
 !README.md
 !Kconfig
+!*.scala
+!build.sc
 build/
 include/config
 include/generated

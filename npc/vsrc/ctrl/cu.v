@@ -1,25 +1,33 @@
 `include "marco.v"
 
 module ysyx_25030081_cu(
-  input [6:0] funct7,
-  input [2:0] funct3,
-  input [6:0] opcode,
+  input [31:0] inst,
   output [2:0] ext_op,
   output reg_wen,
+  output [1:0] reg_wsel,
+  output csr_wen,
   output alu_a_src,
   output [1:0] alu_b_src,
   output [3:0] alu_op,
   output alu_unsigned_cmp,
   output [2:0] branch,
-  output mem_to_reg,
   output mem_wen,
   output mem_ren,
   output [2:0] mem_op
 );
+  wire [6:0] funct7;
+  wire [2:0] funct3;
+  wire [6:0] opcode;
+
+  assign funct7 = inst[31:25];
+  assign funct3 = inst[14:12];
+  assign opcode = inst[6:0];
 
   wire r_add, r_and, r_or, r_sll, r_slt, r_sltu, r_sra, r_srl, r_sub, r_xor;
-  wire i_addi, i_andi, i_jalr, i_lb, i_lbu, i_lh, i_lhu, i_lw, 
-       i_ori, i_slli, i_slti, i_sltiu, i_srai, i_srli, i_xori;
+  wire r_mret;
+  wire i_addi, i_andi, i_jalr, i_lb, i_lbu, i_lh, i_lhu, i_lw, i_ori, i_slli,
+       i_slti, i_sltiu, i_srai, i_srli, i_xori;
+  wire i_csrrc, i_csrrci, i_csrrs, i_csrrsi, i_csrrw, i_csrrwi, i_ecall, i_ebreak;
   wire s_sb, s_sh, s_sw;
   wire b_beq, b_bge, b_bgeu, b_blt, b_bltu, b_bne;
   wire u_auipc, u_lui, j_jal;
@@ -37,28 +45,40 @@ module ysyx_25030081_cu(
   assign r_srl  = `ysyx_25030081_R_TYPE(7'b0000000, 3'b101, 7'b0110011);
   assign r_sub  = `ysyx_25030081_R_TYPE(7'b0100000, 3'b000, 7'b0110011);
   assign r_xor  = `ysyx_25030081_R_TYPE(7'b0000000, 3'b100, 7'b0110011);
+
+  assign r_mret = inst == 32'h30200073;
   
   assign r_type = r_add | r_and | r_or | r_sll | r_slt | r_sltu | r_sra | r_srl | r_sub | r_xor;
 
   // I
-  assign i_addi  = `ysyx_25030081_I_TYPE(3'b000, 7'b0010011);
-  assign i_andi  = `ysyx_25030081_I_TYPE(3'b111, 7'b0010011);
-  assign i_jalr  = `ysyx_25030081_I_TYPE(3'b000, 7'b1100111);
-  assign i_lb    = `ysyx_25030081_I_TYPE(3'b000, 7'b0000011);
-  assign i_lbu   = `ysyx_25030081_I_TYPE(3'b100, 7'b0000011);
-  assign i_lh    = `ysyx_25030081_I_TYPE(3'b001, 7'b0000011);
-  assign i_lhu   = `ysyx_25030081_I_TYPE(3'b101, 7'b0000011);
-  assign i_lw    = `ysyx_25030081_I_TYPE(3'b010, 7'b0000011);
-  assign i_ori   = `ysyx_25030081_I_TYPE(3'b110, 7'b0010011);
-  assign i_slli  = `ysyx_25030081_I_TYPE_WITH_F7(7'b0000000, 3'b001, 7'b0010011);
-  assign i_slti  = `ysyx_25030081_I_TYPE(3'b010, 7'b0010011);
-  assign i_sltiu = `ysyx_25030081_I_TYPE(3'b011, 7'b0010011);
-  assign i_srai  = `ysyx_25030081_I_TYPE_WITH_F7(7'b0100000, 3'b101, 7'b0010011);
-  assign i_srli  = `ysyx_25030081_I_TYPE_WITH_F7(7'b0000000, 3'b101, 7'b0010011);
-  assign i_xori  = `ysyx_25030081_I_TYPE(3'b100, 7'b0010011);
+  assign i_addi   = `ysyx_25030081_I_TYPE(3'b000, 7'b0010011);
+  assign i_andi   = `ysyx_25030081_I_TYPE(3'b111, 7'b0010011);
+  assign i_jalr   = `ysyx_25030081_I_TYPE(3'b000, 7'b1100111);
+  assign i_lb     = `ysyx_25030081_I_TYPE(3'b000, 7'b0000011);
+  assign i_lbu    = `ysyx_25030081_I_TYPE(3'b100, 7'b0000011);
+  assign i_lh     = `ysyx_25030081_I_TYPE(3'b001, 7'b0000011);
+  assign i_lhu    = `ysyx_25030081_I_TYPE(3'b101, 7'b0000011);
+  assign i_lw     = `ysyx_25030081_I_TYPE(3'b010, 7'b0000011);
+  assign i_ori    = `ysyx_25030081_I_TYPE(3'b110, 7'b0010011);
+  assign i_slli   = `ysyx_25030081_I_TYPE(3'b001, 7'b0010011) & (funct7[6:1] == 6'b000000);
+  assign i_slti   = `ysyx_25030081_I_TYPE(3'b010, 7'b0010011);
+  assign i_sltiu  = `ysyx_25030081_I_TYPE(3'b011, 7'b0010011);
+  assign i_srai   = `ysyx_25030081_I_TYPE(3'b101, 7'b0010011) & (funct7[6:1] == 6'b010000);
+  assign i_srli   = `ysyx_25030081_I_TYPE(3'b101, 7'b0010011) & (funct7[6:1] == 6'b000000);
+  assign i_xori   = `ysyx_25030081_I_TYPE(3'b100, 7'b0010011);
+
+  assign i_csrrc  = `ysyx_25030081_I_TYPE(3'b011, 7'b1110011);
+  assign i_csrrci = `ysyx_25030081_I_TYPE(3'b111, 7'b1110011);
+  assign i_csrrs  = `ysyx_25030081_I_TYPE(3'b010, 7'b1110011);
+  assign i_csrrsi = `ysyx_25030081_I_TYPE(3'b110, 7'b1110011);
+  assign i_csrrw  = `ysyx_25030081_I_TYPE(3'b001, 7'b1110011);
+  assign i_csrrwi = `ysyx_25030081_I_TYPE(3'b101, 7'b1110011);
+  assign i_ecall  = inst == 32'h00000073;
+  assign i_ebreak = inst == 32'h00100073;
 
   assign i_type = i_addi | i_andi | i_jalr | i_lb | i_lbu | i_lh | i_lhu | i_lw |
-                  i_ori | i_slli | i_slti | i_sltiu | i_srai | i_srli | i_xori;
+                  i_ori | i_slli | i_slti | i_sltiu | i_srai | i_srli | i_xori |
+                  i_csrrc | i_csrrci | i_csrrs | i_csrrsi | i_csrrw | i_csrrwi;
 
   // S
   assign s_sb = `ysyx_25030081_S_TYPE(3'b000, 7'b0100011);
@@ -93,7 +113,12 @@ module ysyx_25030081_cu(
   assign ext_op[0] = s_type | u_type;
 
   assign reg_wen = r_type | i_type | u_type | j_type;
-  
+  assign reg_wsel[0] = i_lw | i_lh | i_lhu | i_lb | i_lbu;
+  assign reg_wsel[1] = i_csrrc | i_csrrci | i_csrrs | i_csrrsi | i_csrrw | i_csrrwi;
+
+  assign csr_wen = i_csrrc | i_csrrs | i_csrrw | i_csrrci | i_csrrsi | i_csrrwi;
+
+
   assign branch[2] = b_type;
   assign branch[1] = i_jalr | b_blt | b_bltu | b_bge | b_bgeu;
   assign branch[0] = b_bne  | b_bge | b_bgeu | j_jal;
@@ -113,14 +138,15 @@ module ysyx_25030081_cu(
 
   assign alu_unsigned_cmp = r_sltu | i_sltiu | b_bltu | b_bgeu;
 
-  assign mem_to_reg = i_lw | i_lh | i_lhu | i_lb | i_lbu;
-  
-  assign mem_ren = mem_to_reg;
-
+  assign mem_ren = i_lw | i_lh | i_lhu | i_lb | i_lbu;
   assign mem_wen = s_type;
 
   assign mem_op[2] = i_lbu | i_lhu;
   assign mem_op[1] = i_lw | s_sw;
   assign mem_op[0] = i_lh | i_lhu | s_sh;
+
+  always @(*)
+    if (i_ebreak)
+      ebreak();
 
  endmodule

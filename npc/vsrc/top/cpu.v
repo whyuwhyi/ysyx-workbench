@@ -17,12 +17,8 @@ wire [DATA_WIDTH-1:0] alu_op1;
 wire [DATA_WIDTH-1:0] alu_op2;
 wire [DATA_WIDTH-1:0] imm;
 
-wire [6:0] funct7;
-wire [2:0] funct3;
-wire [6:0] opcode;
-
-wire reg_wen, mem_to_reg, mem_wen, mem_ren, alu_a_src, alu_unsigned_cmp;
-wire [1:0] alu_b_src;
+wire reg_wen, csr_ren, csr_wen, mem_wen, mem_ren, alu_a_src, alu_unsigned_cmp;
+wire [1:0] reg_wsel, alu_b_src;
 wire [3:0] alu_op;
 wire [2:0] ext_op;
 wire [2:0] branch;
@@ -73,9 +69,7 @@ ysyx_25030081_idu idu_inst(
 );
 
 ysyx_25030081_cu cu_inst(
-  .funct7(funct7),
-  .funct3(funct3),
-  .opcode(opcode),
+  .inst(inst),
   .ext_op(ext_op),
   .reg_wen(reg_wen),
   .alu_a_src(alu_a_src),
@@ -127,8 +121,12 @@ ysyx_25030081_mem mem_inst(
   .rdata(mem_rdata)
 );
 
-always @(inst)
-  if (inst == 32'h00100073)
-    ebreak();
+ysyx_25030081_csr csr_inst(
+  .clk(clk),
+  .wen(csr_wen),
+  .addr(inst[31:20]),
+  .wdata(rf_rdata2),
+  .rdata(rf_wdata)
+);
 
 endmodule

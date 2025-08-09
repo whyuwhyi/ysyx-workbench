@@ -1,5 +1,5 @@
 # Sanity check
-ifeq ($(wildcard $(NPC_HOME)/src/npc-main.cpp),)
+ifeq ($(wildcard $(NPC_HOME)/csrc/npc-main.cpp),)
   $(error NPC_HOME=$(NPC_HOME) is not a NPC repo)
 endif
 
@@ -49,13 +49,11 @@ CFLAGS  += $(CFLAGS_BUILD) $(CFLAGS_TRACE)
 LDFLAGS += $(CFLAGS_BUILD)
 
 # Filelist discovery and inclusion
-FILELIST_MK = $(shell find -L ./src -name "filelist.mk")
+FILELIST_MK = $(shell find -L ./csrc -name "filelist.mk")
 include $(FILELIST_MK)
 
 # Source files
 VSRCS = $(shell find $(abspath ./vsrc) -name "*.v")
-DIRS-y += src/monitor
-DIRS-y += src/device
 DIRS-BLACKLIST-y += $(DIRS-BLACKLIST)
 SRCS-BLACKLIST-y += $(SRCS-BLACKLIST) $(shell find -L $(DIRS-BLACKLIST-y) -name "*.c" -o -name "*.cc" -o -name "*.cpp" 2>/dev/null || true)
 SRCS-y += $(shell find -L $(DIRS-y) -name "*.c" -o -name "*.cc" -o -name "*.cpp" 2>/dev/null || true)
