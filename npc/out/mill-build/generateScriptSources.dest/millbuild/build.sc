@@ -23,29 +23,28 @@ class build extends _root_.mill.main.RootModule {
 import mill._
 import mill.scalalib._
 
-trait NpcChiselModule extends SbtModule {
-  override def scalaVersion = "2.13.15"
+val defaultScalaVersion = "2.13.15"
+val chiselVersion = "6.6.0"
 
-  val chiselVersion = "6.6.0"
+trait HasChisel extends SbtModule {
+  override def scalaVersion = defaultScalaVersion
 
-  override def ivyDeps = Agg(
+  override def scalacOptions = super.scalacOptions() ++
+    Agg("-language:reflectiveCalls", "-Ymacro-annotations", "-Ytasty-reader")
+
+  override def ivyDeps = super.ivyDeps() ++ Agg(
     ivy"org.chipsalliance::chisel:${chiselVersion}"
   )
 
-  override def scalacPluginIvyDeps = Agg(
+  override def scalacPluginIvyDeps = super.scalacPluginIvyDeps() ++ Agg(
     ivy"org.chipsalliance:::chisel-plugin:${chiselVersion}"
-  )
-
-  override def scalacOptions = Seq(
-    "-language:reflectiveCalls",
-    "-Ymacro-annotations",
-    "-Ytasty-reader"
   )
 }
 
-object npc extends NpcChiselModule {
-  override def sources = T.sources(millSourcePath / "src" / "main" / "scala")
+object npc extends HasChisel {
+  override def millSourcePath = millOuterCtx.millSourcePath
 
+  override def sources = T.sources(millSourcePath / "src" / "main" / "scala")
   override def resources = T.sources(millSourcePath / "src" / "main" / "resources")
 }
 
