@@ -29,7 +29,7 @@ void init_ftrace(const char *elf_path) {
 
   Elf32_Ehdr ehdr;
   fread(&ehdr, 1, sizeof(ehdr), fp);
-  assert(*(vaddr_t *)ehdr.e_ident == 0x464c457f);
+  assert(*(word_t *)ehdr.e_ident == 0x464c457f);
 
   Elf32_Shdr shdr[ehdr.e_shnum];
   fseek(fp, ehdr.e_shoff, SEEK_SET);
