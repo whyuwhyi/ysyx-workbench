@@ -179,12 +179,10 @@ object IsMretField extends BoolDecodeField[RV32IInstruction] {
 object IllegalInstField extends BoolDecodeField[RV32IInstruction] {
   def name = "illegalInst"
   def genTable(inst: RV32IInstruction): BitPat =
-    n // All defined instructions are legal
+    n
 }
 
-// RV32I instruction set definition
 object RV32I {
-  // Bit pattern macros for cleaner definition
   def toBinary(value: Int, width: Int): String = {
     val binary = value.toBinaryString
     if (binary.length > width) binary.takeRight(width)
