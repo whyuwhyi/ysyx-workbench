@@ -43,6 +43,7 @@ static void exec_once() {
 
 void npc_cpu_exec(uint64_t n) {
   g_print_step = (n < 10);
+  npc_state.state = NPC_RUNNING;
 
   if (n == (uint64_t)-1) {
     Log("NPC started (continuous execution)");
