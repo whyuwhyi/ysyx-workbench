@@ -4,13 +4,11 @@ import chisel3._
 import chisel3.util._
 import chisel3.util.experimental.decode._
 
-// RV32I instruction patterns using DecodePattern
 case class RV32IInstruction(
     name: String,
     bitPat: BitPat
 ) extends DecodePattern
 
-// Decode fields for each control signal
 object PCSelField extends DecodeField[RV32IInstruction, PCSel.Type] {
   def name = "pcSel"
   def chiselType = PCSel()
@@ -321,4 +319,3 @@ object RV32I {
 
   val decodeTable = new DecodeTable(instructionPatterns, decodeFields)
 }
-

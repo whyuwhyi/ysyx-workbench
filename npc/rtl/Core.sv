@@ -76,7 +76,7 @@ module PC(	// src/main/scala/cpu/ifu/PC.scala:8:7
     else if (io_redirValid)	// src/main/scala/cpu/ifu/PC.scala:9:14
       pcReg <= io_redirPc;	// src/main/scala/cpu/ifu/PC.scala:21:22
     else begin	// src/main/scala/cpu/ifu/PC.scala:9:14
-      automatic logic       _take_T_11 = io_branchCond == 3'h1 & io_branchFlags_isZero;	// src/main/scala/cpu/ifu/PC.scala:31:47
+      automatic logic       _take_T_11 = io_branchCond == 3'h1 & io_branchFlags_isZero;	// src/main/scala/cpu/ifu/PC.scala:38:47
       automatic logic [7:0] _GEN =
         {{_take_T_11},
          {~io_branchFlags_isLessUnsigned},
@@ -85,14 +85,12 @@ module PC(	// src/main/scala/cpu/ifu/PC.scala:8:7
          {io_branchFlags_isLessSigned},
          {~io_branchFlags_isZero},
          {_take_T_11},
-         {_take_T_11}};	// src/main/scala/cpu/ifu/PC.scala:31:47, :34:24, :36:24, :38:25
-      if (io_pcSel == 3'h4 | io_pcSel == 3'h3 | io_pcSel == 3'h2
-          & _GEN[io_branchCond]) begin	// src/main/scala/cpu/ifu/PC.scala:23:23, :31:47, :42:46, :45:25
-        automatic logic _targetPre_T = io_pcSel == 3'h4;	// src/main/scala/cpu/ifu/PC.scala:23:23, :26:27
+         {_take_T_11}};	// src/main/scala/cpu/ifu/PC.scala:38:47, :41:24, :43:24, :45:25
+      if (io_pcSel == 3'h4 | io_pcSel == 3'h3 | io_pcSel == 3'h2 & _GEN[io_branchCond])	// src/main/scala/cpu/ifu/PC.scala:23:23, :26:41, :38:47, :49:46, :52:25
         pcReg <=
-          ({32{~_targetPre_T}} | 32'hFFFFFFFE) & (_targetPre_T ? io_rs1 : pcReg) + io_imm;	// src/main/scala/cpu/ifu/PC.scala:21:22, :26:{17,27}, :28:18, :29:{22,58}
-      end
-      else	// src/main/scala/cpu/ifu/PC.scala:42:46, :45:25
+          ({32{io_pcSel != 3'h4}} | 32'hFFFFFFFE)
+          & (io_pcSel == 3'h4 | io_pcSel == 3'h3 ? pcReg : io_rs1) + io_imm;	// src/main/scala/cpu/ifu/PC.scala:21:22, :23:23, :26:41, :35:18, :36:{22,32,58}
+      else	// src/main/scala/cpu/ifu/PC.scala:49:46, :52:25
         pcReg <= _pcPlus4_T;	// src/main/scala/cpu/ifu/PC.scala:21:22, :23:23
     end
   end // always @(posedge)
@@ -116,7 +114,7 @@ module PC(	// src/main/scala/cpu/ifu/PC.scala:8:7
   `endif // ENABLE_INITIAL_REG_
   SimProbePC #(
     .XLEN(32)
-  ) simProbePCInst (	// src/main/scala/cpu/ifu/PC.scala:55:32
+  ) simProbePCInst (	// src/main/scala/cpu/ifu/PC.scala:62:32
     .pc (pcReg)	// src/main/scala/cpu/ifu/PC.scala:21:22
   );
   assign io_pc = pcReg;	// src/main/scala/cpu/ifu/PC.scala:8:7, :21:22
