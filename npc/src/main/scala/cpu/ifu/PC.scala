@@ -23,24 +23,10 @@ class PC extends Module with Constants {
   val pcPlus4 = pcReg + 4.U
   io.pc4 := pcPlus4
 
-  val addA = MuxLookup(io.pcSel, io.rs1)(
-    Seq(
-      PCSel.PC_4 -> io.rs1,
-      PCSel.PC_BR -> io.rs1,
-      PCSel.PC_JAL -> pcReg,
-      PCSel.PC_JALR -> pcReg
-    )
-  )
+  val addA = Mux(io.pcSel === PCSel.PC_JAL, pcReg, io.rs1)
   val addB = io.imm
   val sum = addA + addB
-  val targetPre = MuxLookup(io.pcSel, sum)(
-    Seq(
-      PCSel.PC_4 -> sum,
-      PCSel.PC_BR -> sum,
-      PCSel.PC_JAL -> sum,
-      PCSel.PC_JALR -> (sum & ~1.U(32.W))
-    )
-  )
+  val targetPre = Mux(io.pcSel === PCSel.PC_JALR, sum & ~1.U(32.W), sum)
 
   val take = MuxLookup(io.branchCond, false.B)(
     Seq(
