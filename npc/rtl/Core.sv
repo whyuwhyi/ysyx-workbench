@@ -174,12 +174,12 @@ module ImmGen(	// src/main/scala/cpu/exu/ImmGen.scala:8:7
   wire [7:0][31:0] _GEN =
     {{32'h0},
      {32'h0},
-     {{1'h0, {11{io_inst[31]}}, io_inst[19:12], io_inst[20], io_inst[30:21], 1'h0}},
+     {{{12{io_inst[31]}}, io_inst[19:12], io_inst[20], io_inst[30:21], 1'h0}},
      {{io_inst[31:12], 12'h0}},
-     {{1'h0, {19{io_inst[31]}}, io_inst[7], io_inst[30:25], io_inst[11:8], 1'h0}},
+     {{{20{io_inst[31]}}, io_inst[7], io_inst[30:25], io_inst[11:8], 1'h0}},
      {{{20{io_inst[31]}}, io_inst[31:25], io_inst[11:7]}},
      {{{20{io_inst[31]}}, io_inst[31:20]}},
-     {32'h0}};	// src/main/scala/cpu/exu/ImmGen.scala:15:{17,22,34,48}, :16:{17,22,48,65}, :17:17, :18:9, :19:12, :20:12, :21:12, :24:{17,25}, :26:9, :27:12, :28:12, :29:12, :33:42
+     {32'h0}};	// src/main/scala/cpu/exu/ImmGen.scala:15:{17,22,34,48}, :16:{17,22,48,65}, :17:17, :18:9, :19:12, :20:12, :21:12, :24:{17,25}, :25:17, :26:9, :27:12, :28:12, :29:12, :33:42
   assign io_imm = _GEN[io_sel];	// src/main/scala/cpu/exu/ImmGen.scala:8:7, :33:42
 endmodule
 

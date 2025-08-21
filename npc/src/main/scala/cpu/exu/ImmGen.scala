@@ -15,7 +15,7 @@ class ImmGen extends Module with Constants {
   val immI = Cat(Fill(20, io.inst(31)), io.inst(31, 20))
   val immS = Cat(Fill(20, io.inst(31)), io.inst(31, 25), io.inst(11, 7))
   val immB = Cat(
-    Fill(19, io.inst(31)),
+    Fill(20, io.inst(31)),
     io.inst(7),
     io.inst(30, 25),
     io.inst(11, 8),
@@ -23,7 +23,7 @@ class ImmGen extends Module with Constants {
   )
   val immU = Cat(io.inst(31, 12), 0.U(12.W))
   val immJ = Cat(
-    Fill(11, io.inst(31)),
+    Fill(12, io.inst(31)),
     io.inst(19, 12),
     io.inst(20),
     io.inst(30, 21),
