@@ -27,6 +27,7 @@ static void reset(int n) {
   while (n-- > 0)
     single_cycle();
   RESET = 0;
+  top->eval();
 }
 
 void single_cycle() {
