@@ -1,0 +1,43 @@
+package cpu.exu
+
+import chisel3._
+import chisel3.util._
+import common._
+import common.ImmSel
+
+class ImmGen extends Module with Constants {
+  val io = IO(new Bundle {
+    val inst = Input(UInt(32.W))
+    val sel = Input(ImmSel())
+    val imm = Output(UInt(XLEN.W))
+  })
+
+  val immI = Cat(Fill(20, io.inst(31)), io.inst(31, 20))
+  val immS = Cat(Fill(20, io.inst(31)), io.inst(31, 25), io.inst(11, 7))
+  val immB = Cat(
+    Fill(19, io.inst(31)),
+    io.inst(7),
+    io.inst(30, 25),
+    io.inst(11, 8),
+    0.U(1.W)
+  )
+  val immU = Cat(io.inst(31, 12), 0.U(12.W))
+  val immJ = Cat(
+    Fill(11, io.inst(31)),
+    io.inst(19, 12),
+    io.inst(20),
+    io.inst(30, 21),
+    0.U(1.W)
+  )
+
+  val out = MuxLookup(io.sel.asUInt, 0.U)(
+    Seq(
+      ImmSel.I.asUInt -> immI,
+      ImmSel.S.asUInt -> immS,
+      ImmSel.B.asUInt -> immB,
+      ImmSel.U.asUInt -> immU,
+      ImmSel.J.asUInt -> immJ
+    )
+  )
+  io.imm := out
+}

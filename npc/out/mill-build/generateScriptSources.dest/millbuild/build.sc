@@ -42,10 +42,8 @@ trait HasChisel extends SbtModule {
 }
 
 object npc extends HasChisel {
-  override def millSourcePath = millOuterCtx.millSourcePath
-
-  override def sources = T.sources(millSourcePath / "src" / "main" / "scala")
-  override def resources = T.sources(millSourcePath / "src" / "main" / "resources")
+  override def sources = T.sources(os.pwd / "src" / "main" / "scala")
+  override def resources = T.sources(os.pwd / "src" / "main" / "resources")
 }
 
 }

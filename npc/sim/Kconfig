@@ -1,0 +1,55 @@
+mainmenu "NPC Configuration"
+
+menu "Build Options"
+  config WAVE_TRACE
+    bool "Enable wave trace generation"
+    default n
+    help
+      Enable generation of wave trace files for debugging and analysis.
+  config NVBOARD
+    bool "Enable NVBoard support"
+    default n
+    help
+      Enable NVBoard integration for hardware simulation.
+endmenu
+
+menu "Testing and Debugging"
+  config TRACE
+    bool "Enable tracing"
+    default y
+
+  config ITRACE
+    depends on TRACE
+    bool "Enable instruction tracing"
+    default y
+
+  config FTRACE
+    depends on TRACE  
+    bool "Enable function call tracing"
+    default n
+
+  config MTRACE
+    depends on TRACE
+    bool "Enable memory access tracing"
+    default n
+
+  config DIFFTEST
+    bool "Enable differential testing"
+    default n
+    
+  config DIFFTEST_REF_PATH
+    depends on DIFFTEST
+    string "NEMU reference path"
+    default "tools/difftest/ref.so"
+
+endmenu
+
+menu "Memory Configuration"
+  config MSIZE
+    hex "Memory size"
+    default 0x8000000
+
+  config MBASE
+    hex "Memory base address"
+    default 0x80000000
+endmenu
