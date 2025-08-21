@@ -97,6 +97,7 @@ endif
 
 # Default arguments for simulation
 override ARGS ?= --log=$(BUILD_DIR)/npc-log.txt
+ARGS += $(ARGS_DIFF)
 
 # Simulation target
 sim: $(TARGET)
