@@ -33,7 +33,14 @@ class PC extends Module with Constants {
   )
   val addB = io.imm
   val sum = addA + addB
-  val targetPre = Mux(io.pcSel === PCSel.PC_JALR, sum & (~1.U(XLEN.W)), sum)
+  val targetPre = MuxLookup(io.pcSel, sum)(
+    Seq(
+      PCSel.PC_4 -> sum,
+      PCSel.PC_BR -> sum,
+      PCSel.PC_JAL -> sum,
+      PCSel.PC_JALR -> (sum & ~1.U(32.W))
+    )
+  )
 
   val take = MuxLookup(io.branchCond, false.B)(
     Seq(
