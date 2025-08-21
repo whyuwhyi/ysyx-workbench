@@ -43,7 +43,7 @@ class PC extends Module with Constants {
     Seq(
       PCSel.PC_4 -> pcPlus4,
       PCSel.PC_BR -> Mux(take, targetPre, pcPlus4),
-      PCSel.PC_JMP -> targetPre,
+      PCSel.PC_JAL -> targetPre,
       PCSel.PC_JALR -> targetPre
     )
   )

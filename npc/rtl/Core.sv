@@ -55,8 +55,8 @@
 module PC(	// src/main/scala/cpu/ifu/PC.scala:8:7
   input         clock,	// src/main/scala/cpu/ifu/PC.scala:8:7
                 reset,	// src/main/scala/cpu/ifu/PC.scala:8:7
-  input  [1:0]  io_pcSel,	// src/main/scala/cpu/ifu/PC.scala:9:14
-  input  [2:0]  io_branchCond,	// src/main/scala/cpu/ifu/PC.scala:9:14
+  input  [2:0]  io_pcSel,	// src/main/scala/cpu/ifu/PC.scala:9:14
+                io_branchCond,	// src/main/scala/cpu/ifu/PC.scala:9:14
   input         io_branchFlags_isZero,	// src/main/scala/cpu/ifu/PC.scala:9:14
                 io_branchFlags_isLessSigned,	// src/main/scala/cpu/ifu/PC.scala:9:14
                 io_branchFlags_isLessUnsigned,	// src/main/scala/cpu/ifu/PC.scala:9:14
@@ -86,9 +86,12 @@ module PC(	// src/main/scala/cpu/ifu/PC.scala:8:7
          {~io_branchFlags_isZero},
          {_take_T_11},
          {_take_T_11}};	// src/main/scala/cpu/ifu/PC.scala:31:47, :34:24, :36:24, :38:25
-      if ((&io_pcSel) | io_pcSel == 2'h2 | io_pcSel == 2'h1 & _GEN[io_branchCond])	// src/main/scala/cpu/ifu/PC.scala:31:47, :42:46, :45:25
+      if (io_pcSel == 3'h4 | io_pcSel == 3'h3 | io_pcSel == 3'h2
+          & _GEN[io_branchCond]) begin	// src/main/scala/cpu/ifu/PC.scala:23:23, :31:47, :42:46, :45:25
+        automatic logic _targetPre_T = io_pcSel == 3'h4;	// src/main/scala/cpu/ifu/PC.scala:23:23, :26:27
         pcReg <=
-          ({32{~(&io_pcSel)}} | 32'hFFFFFFFE) & ((&io_pcSel) ? io_rs1 : pcReg) + io_imm;	// src/main/scala/cpu/ifu/PC.scala:21:22, :26:{17,27}, :28:18, :29:{22,58}
+          ({32{~_targetPre_T}} | 32'hFFFFFFFE) & (_targetPre_T ? io_rs1 : pcReg) + io_imm;	// src/main/scala/cpu/ifu/PC.scala:21:22, :26:{17,27}, :28:18, :29:{22,58}
+      end
       else	// src/main/scala/cpu/ifu/PC.scala:42:46, :45:25
         pcReg <= _pcPlus4_T;	// src/main/scala/cpu/ifu/PC.scala:21:22, :23:23
     end
@@ -125,8 +128,8 @@ endmodule
 module IFU(	// src/main/scala/cpu/ifu/IFU.scala:8:7
   input         clock,	// src/main/scala/cpu/ifu/IFU.scala:8:7
                 reset,	// src/main/scala/cpu/ifu/IFU.scala:8:7
-  input  [1:0]  io_pcSel,	// src/main/scala/cpu/ifu/IFU.scala:9:14
-  input  [2:0]  io_branchCond,	// src/main/scala/cpu/ifu/IFU.scala:9:14
+  input  [2:0]  io_pcSel,	// src/main/scala/cpu/ifu/IFU.scala:9:14
+                io_branchCond,	// src/main/scala/cpu/ifu/IFU.scala:9:14
   input         io_branchFlags_isZero,	// src/main/scala/cpu/ifu/IFU.scala:9:14
                 io_branchFlags_isLessSigned,	// src/main/scala/cpu/ifu/IFU.scala:9:14
                 io_branchFlags_isLessUnsigned,	// src/main/scala/cpu/ifu/IFU.scala:9:14
@@ -192,7 +195,7 @@ module ALU(	// src/main/scala/cpu/exu/ALU.scala:8:7
                 io_branchFlags_isLessUnsigned	// src/main/scala/cpu/exu/ALU.scala:9:14
 );
 
-  wire        cin = io_aluOp == 4'h1 | io_aluOp == 4'h8 | io_aluOp == 4'h9;	// src/main/scala/cpu/exu/ALU.scala:19:{21,61,75,82,101,116}
+  wire        cin = io_aluOp == 4'h2 | io_aluOp == 4'h9 | io_aluOp == 4'hA;	// src/main/scala/cpu/exu/ALU.scala:19:{21,61,75,82,101,116}
   wire [32:0] _wide_T_1 = {1'h0, io_opA} + {1'h0, {32{cin}} ^ io_opB} + {32'h0, cin};	// src/main/scala/cpu/exu/ALU.scala:19:82, :20:17, :22:{21,29}, :59:32
   wire        sltRes = io_opA[31] ^ io_opB[31] ? io_opA[31] : _wide_T_1[31];	// src/main/scala/cpu/exu/ALU.scala:22:29, :23:17, :26:21, :27:21, :28:20, :29:{22,29}
   wire [31:0] _GEN = {27'h0, io_opB[4:0]};	// src/main/scala/cpu/exu/ALU.scala:32:21, :33:20
@@ -239,17 +242,17 @@ module ALU(	// src/main/scala/cpu/exu/ALU.scala:8:7
      _sll_T_49[21:20],
      _sll_T_49[23]} & 19'h55555;	// src/main/scala/cpu/exu/ALU.scala:35:{20,28,37}
   assign io_out =
-    io_aluOp == 4'hA
+    io_aluOp == 4'hB
       ? io_opB
-      : io_aluOp == 4'h9
+      : io_aluOp == 4'hA
           ? {31'h0, ~(_wide_T_1[32])}
-          : io_aluOp == 4'h8
+          : io_aluOp == 4'h9
               ? {31'h0, sltRes}
-              : io_aluOp == 4'h7
+              : io_aluOp == 4'h8
                   ? $signed($signed(io_opA) >>> _GEN)
-                  : io_aluOp == 4'h6
+                  : io_aluOp == 4'h7
                       ? io_opA >> _GEN
-                      : io_aluOp == 4'h5
+                      : io_aluOp == 4'h6
                           ? {_sll_T_49[0],
                              _sll_T_49[1],
                              _sll_T_49[2],
@@ -270,11 +273,11 @@ module ALU(	// src/main/scala/cpu/exu/ALU.scala:8:7
                              _sll_T_49[29],
                              _sll_T_49[30],
                              _sll_T_49[31]}
-                          : io_aluOp == 4'h4
+                          : io_aluOp == 4'h5
                               ? io_opA ^ io_opB
-                              : io_aluOp == 4'h3
+                              : io_aluOp == 4'h4
                                   ? io_opA | io_opB
-                                  : io_aluOp == 4'h2 ? io_opA & io_opB : _wide_T_1[31:0];	// src/main/scala/cpu/exu/ALU.scala:8:7, :19:{75,116}, :22:{21,29}, :23:17, :24:22, :29:22, :30:21, :33:20, :34:28, :35:{20,28,37}, :37:23, :38:22, :39:23, :43:37
+                                  : io_aluOp == 4'h3 ? io_opA & io_opB : _wide_T_1[31:0];	// src/main/scala/cpu/exu/ALU.scala:8:7, :19:{75,116}, :22:{21,29}, :23:17, :24:22, :29:22, :30:21, :33:20, :34:28, :35:{20,28,37}, :37:23, :38:22, :39:23, :43:37
   assign io_branchFlags_isZero = _wide_T_1[31:0] == 32'h0;	// src/main/scala/cpu/exu/ALU.scala:8:7, :22:29, :23:17, :59:32
   assign io_branchFlags_isLessSigned = sltRes;	// src/main/scala/cpu/exu/ALU.scala:8:7, :29:22
   assign io_branchFlags_isLessUnsigned = ~(_wide_T_1[32]);	// src/main/scala/cpu/exu/ALU.scala:8:7, :22:29, :24:22, :30:21
@@ -494,11 +497,11 @@ endmodule
 module Datapath(	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:10:7
   input         clock,	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:10:7
                 reset,	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:10:7
-  input  [1:0]  io_pcSel,	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:11:14
-                io_opASel,	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:11:14
+  input  [2:0]  io_pcSel,	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:11:14
+  input  [1:0]  io_opASel,	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:11:14
                 io_opBSel,	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:11:14
   input  [3:0]  io_aluOp,	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:11:14
-  input  [1:0]  io_wbSel,	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:11:14
+  input  [2:0]  io_wbSel,	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:11:14
   input         io_regWen,	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:11:14
                 io_memWen,	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:11:14
                 io_memRen,	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:11:14
@@ -513,19 +516,17 @@ module Datapath(	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:10:7
                 io_rs1Data	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:11:14
 );
 
-  wire [31:0]      _registerFileInst_io_rs1Data;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:38:32
-  wire [31:0]      _registerFileInst_io_rs2Data;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:38:32
-  wire [31:0]      _lsuInst_io_rdataOut;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:37:23
-  wire [31:0]      _aluInst_io_out;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:36:23
-  wire             _aluInst_io_branchFlags_isZero;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:36:23
-  wire             _aluInst_io_branchFlags_isLessSigned;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:36:23
-  wire             _aluInst_io_branchFlags_isLessUnsigned;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:36:23
-  wire [31:0]      _immGenInst_io_imm;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:35:26
-  wire [31:0]      _ifuInst_io_inst;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:34:23
-  wire [31:0]      _ifuInst_io_pc;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:34:23
-  wire [31:0]      _ifuInst_io_pc4;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:34:23
-  wire [3:0][31:0] _GEN =
-    {{io_csrRdata}, {_ifuInst_io_pc4}, {_lsuInst_io_rdataOut}, {_aluInst_io_out}};	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:34:23, :36:23, :37:23, :85:51
+  wire [31:0] _registerFileInst_io_rs1Data;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:38:32
+  wire [31:0] _registerFileInst_io_rs2Data;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:38:32
+  wire [31:0] _lsuInst_io_rdataOut;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:37:23
+  wire [31:0] _aluInst_io_out;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:36:23
+  wire        _aluInst_io_branchFlags_isZero;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:36:23
+  wire        _aluInst_io_branchFlags_isLessSigned;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:36:23
+  wire        _aluInst_io_branchFlags_isLessUnsigned;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:36:23
+  wire [31:0] _immGenInst_io_imm;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:35:26
+  wire [31:0] _ifuInst_io_inst;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:34:23
+  wire [31:0] _ifuInst_io_pc;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:34:23
+  wire [31:0] _ifuInst_io_pc4;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:34:23
   IFU ifuInst (	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:34:23
     .clock                         (clock),
     .reset                         (reset),
@@ -549,9 +550,9 @@ module Datapath(	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:10:7
   );
   ALU aluInst (	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:36:23
     .io_opA
-      (io_opASel == 2'h1 ? _ifuInst_io_pc : _registerFileInst_io_rs1Data),	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:34:23, :38:32, :64:16, :65:15
+      (io_opASel == 2'h2 ? _ifuInst_io_pc : _registerFileInst_io_rs1Data),	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:34:23, :38:32, :64:16, :65:15
     .io_opB
-      (io_opBSel == 2'h1 ? _immGenInst_io_imm : _registerFileInst_io_rs2Data),	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:35:26, :38:32, :65:15, :69:16, :70:15
+      (io_opBSel == 2'h2 ? _immGenInst_io_imm : _registerFileInst_io_rs2Data),	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:35:26, :38:32, :65:15, :69:16, :70:15
     .io_aluOp                      (io_aluOp),
     .io_out                        (_aluInst_io_out),
     .io_branchFlags_isZero         (_aluInst_io_branchFlags_isZero),
@@ -572,7 +573,12 @@ module Datapath(	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:10:7
     .io_rs1Addr (_ifuInst_io_inst[18:15]),	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:34:23, :44:24, :48:31
     .io_rs2Addr (_ifuInst_io_inst[23:20]),	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:34:23, :45:24, :49:31
     .io_rdAddr  (_ifuInst_io_inst[10:7]),	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:34:23, :46:23, :50:30
-    .io_wdata   (_GEN[io_wbSel]),	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:85:51
+    .io_wdata
+      (io_wbSel == 3'h4
+         ? io_csrRdata
+         : io_wbSel == 3'h3
+             ? _ifuInst_io_pc4
+             : io_wbSel == 3'h2 ? _lsuInst_io_rdataOut : _aluInst_io_out),	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:34:23, :36:23, :37:23, :85:51
     .io_wen     (io_regWen),
     .io_rs1Data (_registerFileInst_io_rs1Data),
     .io_rs2Data (_registerFileInst_io_rs2Data)
@@ -584,353 +590,259 @@ endmodule
 
 // external module SimEbreak
 
-module IDU(	// src/main/scala/cpu/idu/IDU.scala:8:7
-  input  [31:0] io_inst,	// src/main/scala/cpu/idu/IDU.scala:9:14
-  output [1:0]  io_pcSel,	// src/main/scala/cpu/idu/IDU.scala:9:14
-                io_opASel,	// src/main/scala/cpu/idu/IDU.scala:9:14
-                io_opBSel,	// src/main/scala/cpu/idu/IDU.scala:9:14
-  output [3:0]  io_aluOp,	// src/main/scala/cpu/idu/IDU.scala:9:14
-  output [1:0]  io_wbSel,	// src/main/scala/cpu/idu/IDU.scala:9:14
-  output        io_regWen,	// src/main/scala/cpu/idu/IDU.scala:9:14
-                io_memWen,	// src/main/scala/cpu/idu/IDU.scala:9:14
-                io_memRen,	// src/main/scala/cpu/idu/IDU.scala:9:14
-  output [2:0]  io_memType,	// src/main/scala/cpu/idu/IDU.scala:9:14
-  output [1:0]  io_csrCmd,	// src/main/scala/cpu/idu/IDU.scala:9:14
-  output [2:0]  io_branchCond,	// src/main/scala/cpu/idu/IDU.scala:9:14
-                io_immSel,	// src/main/scala/cpu/idu/IDU.scala:9:14
-  output        io_isEcall,	// src/main/scala/cpu/idu/IDU.scala:9:14
-                io_isEbreak,	// src/main/scala/cpu/idu/IDU.scala:9:14
-                io_isMret,	// src/main/scala/cpu/idu/IDU.scala:9:14
-                io_illegalInst	// src/main/scala/cpu/idu/IDU.scala:9:14
+module IDU(	// src/main/scala/cpu/idu/IDU.scala:9:7
+  input  [31:0] io_inst,	// src/main/scala/cpu/idu/IDU.scala:10:14
+  output [2:0]  io_pcSel,	// src/main/scala/cpu/idu/IDU.scala:10:14
+  output [1:0]  io_opASel,	// src/main/scala/cpu/idu/IDU.scala:10:14
+                io_opBSel,	// src/main/scala/cpu/idu/IDU.scala:10:14
+  output [3:0]  io_aluOp,	// src/main/scala/cpu/idu/IDU.scala:10:14
+  output [2:0]  io_wbSel,	// src/main/scala/cpu/idu/IDU.scala:10:14
+  output        io_regWen,	// src/main/scala/cpu/idu/IDU.scala:10:14
+                io_memWen,	// src/main/scala/cpu/idu/IDU.scala:10:14
+                io_memRen,	// src/main/scala/cpu/idu/IDU.scala:10:14
+  output [2:0]  io_memType,	// src/main/scala/cpu/idu/IDU.scala:10:14
+  output [1:0]  io_csrOp,	// src/main/scala/cpu/idu/IDU.scala:10:14
+  output [2:0]  io_branchCond,	// src/main/scala/cpu/idu/IDU.scala:10:14
+                io_immSel,	// src/main/scala/cpu/idu/IDU.scala:10:14
+  output        io_isEcall,	// src/main/scala/cpu/idu/IDU.scala:10:14
+                io_isEbreak,	// src/main/scala/cpu/idu/IDU.scala:10:14
+                io_isMret,	// src/main/scala/cpu/idu/IDU.scala:10:14
+                io_illegalInst	// src/main/scala/cpu/idu/IDU.scala:10:14
 );
 
-  wire [16:0] _GEN = {io_inst[31:25], io_inst[14:12], io_inst[6:0]};	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_10 = _GEN == 17'h33;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_12 = _GEN == 17'h8033;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_14 = _GEN == 17'h3B3;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_16 = _GEN == 17'h333;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_18 = _GEN == 17'h233;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_20 = _GEN == 17'hB3;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_22 = _GEN == 17'h2B3;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_24 = _GEN == 17'h82B3;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_26 = _GEN == 17'h133;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_28 = _GEN == 17'h1B3;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire [9:0]  _GEN_0 = {io_inst[14:12], io_inst[6:0]};	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_30 = _GEN_0 == 10'h13;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_32 = _GEN_0 == 10'h393;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_34 = _GEN_0 == 10'h313;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_36 = _GEN_0 == 10'h213;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_38 = _GEN_0 == 10'h113;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_40 = _GEN_0 == 10'h193;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_42 = _GEN == 17'h93;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_44 = _GEN == 17'h293;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_46 = _GEN == 17'h8293;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_48 = _GEN_0 == 10'h3;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_50 = _GEN_0 == 10'h83;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_52 = _GEN_0 == 10'h103;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_54 = _GEN_0 == 10'h203;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_438 = _GEN_0 == 10'h283;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_58 = _GEN_0 == 10'h23;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_60 = _GEN_0 == 10'hA3;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_390 = _GEN_0 == 10'h123;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_64 = _GEN_0 == 10'h63;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_66 = _GEN_0 == 10'hE3;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_68 = _GEN_0 == 10'h263;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_70 = _GEN_0 == 10'h2E3;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_72 = _GEN_0 == 10'h363;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_74 = _GEN_0 == 10'h3E3;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_76 = io_inst[6:0] == 7'h6F;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_78 = _GEN_0 == 10'h67;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_80 = io_inst[6:0] == 7'h37;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_155 = io_inst[6:0] == 7'h17;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_649 = io_inst == 32'h73;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_693 = io_inst == 32'h100073;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_737 = io_inst == 32'h30200073;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_90 = _GEN_0 == 10'hF3;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_92 = _GEN_0 == 10'h173;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_94 = _GEN_0 == 10'h1F3;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_96 = _GEN_0 == 10'h2F3;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_98 = _GEN_0 == 10'h373;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _controlSignalsList_T_596 = _GEN_0 == 10'h3F3;	// src/main/scala/chisel3/util/Lookup.scala:31:38
-  wire        _GEN_1 =
-    _controlSignalsList_T_64 | _controlSignalsList_T_66 | _controlSignalsList_T_68
-    | _controlSignalsList_T_70 | _controlSignalsList_T_72 | _controlSignalsList_T_74;	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39
-  wire        _GEN_2 =
-    _controlSignalsList_T_58 | _controlSignalsList_T_60 | _controlSignalsList_T_390;	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39
-  wire        _GEN_3 =
-    _controlSignalsList_T_48 | _controlSignalsList_T_50 | _controlSignalsList_T_52
-    | _controlSignalsList_T_54 | _controlSignalsList_T_438 | _GEN_2;	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39
-  wire        _GEN_4 =
-    _controlSignalsList_T_30 | _controlSignalsList_T_32 | _controlSignalsList_T_34
-    | _controlSignalsList_T_36 | _controlSignalsList_T_38 | _controlSignalsList_T_40
-    | _controlSignalsList_T_42 | _controlSignalsList_T_44 | _controlSignalsList_T_46
-    | _GEN_3;	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39
-  wire        _GEN_5 =
-    _controlSignalsList_T_10 | _controlSignalsList_T_12 | _controlSignalsList_T_14
-    | _controlSignalsList_T_16 | _controlSignalsList_T_18 | _controlSignalsList_T_20
-    | _controlSignalsList_T_22 | _controlSignalsList_T_24 | _controlSignalsList_T_26
-    | _controlSignalsList_T_28 | _GEN_4;	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39
-  wire        _GEN_6 = _controlSignalsList_T_76 | _controlSignalsList_T_78;	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39
-  wire        _GEN_7 =
-    _controlSignalsList_T_58 | _controlSignalsList_T_60 | _controlSignalsList_T_390
-    | _GEN_1;	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39
-  wire        _GEN_8 =
-    _controlSignalsList_T_90 | _controlSignalsList_T_92 | _controlSignalsList_T_94
-    | _controlSignalsList_T_96 | _controlSignalsList_T_98;	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39
-  wire        _GEN_9 =
-    _controlSignalsList_T_649 | _controlSignalsList_T_693 | _controlSignalsList_T_737;	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39
-  wire        _GEN_10 = _controlSignalsList_T_80 | _controlSignalsList_T_155;	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39
-  wire        _GEN_11 = _controlSignalsList_T_76 | _controlSignalsList_T_78 | _GEN_10;	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39
-  wire        _GEN_12 =
-    _controlSignalsList_T_10 | _controlSignalsList_T_12 | _controlSignalsList_T_14
-    | _controlSignalsList_T_16 | _controlSignalsList_T_18 | _controlSignalsList_T_20
-    | _controlSignalsList_T_22 | _controlSignalsList_T_24 | _controlSignalsList_T_26
-    | _controlSignalsList_T_28;	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39
-  wire        _GEN_13 = _controlSignalsList_T_80 | _controlSignalsList_T_155 | _GEN_9;	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39
-  wire        _GEN_14 =
-    _controlSignalsList_T_48 | _controlSignalsList_T_50 | _controlSignalsList_T_52
-    | _controlSignalsList_T_54 | _controlSignalsList_T_438;	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39
-  wire        _GEN_15 =
-    _controlSignalsList_T_10 | _controlSignalsList_T_12 | _controlSignalsList_T_14
-    | _controlSignalsList_T_16 | _controlSignalsList_T_18 | _controlSignalsList_T_20
-    | _controlSignalsList_T_22 | _controlSignalsList_T_24 | _controlSignalsList_T_26
-    | _controlSignalsList_T_28 | _controlSignalsList_T_30 | _controlSignalsList_T_32
-    | _controlSignalsList_T_34 | _controlSignalsList_T_36 | _controlSignalsList_T_38
-    | _controlSignalsList_T_40 | _controlSignalsList_T_42 | _controlSignalsList_T_44
-    | _controlSignalsList_T_46;	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39
-  wire        _GEN_16 =
-    _controlSignalsList_T_30 | _controlSignalsList_T_32 | _controlSignalsList_T_34
-    | _controlSignalsList_T_36 | _controlSignalsList_T_38 | _controlSignalsList_T_40
-    | _controlSignalsList_T_42 | _controlSignalsList_T_44 | _controlSignalsList_T_46
-    | _GEN_14;	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39
-  wire        _GEN_17 =
-    _controlSignalsList_T_10 | _controlSignalsList_T_12 | _controlSignalsList_T_14
-    | _controlSignalsList_T_16 | _controlSignalsList_T_18 | _controlSignalsList_T_20
-    | _controlSignalsList_T_22 | _controlSignalsList_T_24 | _controlSignalsList_T_26
-    | _controlSignalsList_T_28 | _GEN_16;	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39
-  wire        controlSignalsList_13 =
-    ~(_controlSignalsList_T_10 | _controlSignalsList_T_12 | _controlSignalsList_T_14
-      | _controlSignalsList_T_16 | _controlSignalsList_T_18 | _controlSignalsList_T_20
-      | _controlSignalsList_T_22 | _controlSignalsList_T_24 | _controlSignalsList_T_26
-      | _controlSignalsList_T_28 | _controlSignalsList_T_30 | _controlSignalsList_T_32
-      | _controlSignalsList_T_34 | _controlSignalsList_T_36 | _controlSignalsList_T_38
-      | _controlSignalsList_T_40 | _controlSignalsList_T_42 | _controlSignalsList_T_44
-      | _controlSignalsList_T_46 | _controlSignalsList_T_48 | _controlSignalsList_T_50
-      | _controlSignalsList_T_52 | _controlSignalsList_T_54 | _controlSignalsList_T_438
-      | _controlSignalsList_T_58 | _controlSignalsList_T_60 | _controlSignalsList_T_390
-      | _controlSignalsList_T_64 | _controlSignalsList_T_66 | _controlSignalsList_T_68
-      | _controlSignalsList_T_70 | _controlSignalsList_T_72 | _controlSignalsList_T_74
-      | _controlSignalsList_T_76 | _controlSignalsList_T_78 | _controlSignalsList_T_80
-      | _controlSignalsList_T_155 | _controlSignalsList_T_649)
-    & _controlSignalsList_T_693;	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39
-  SimEbreak simEbreakInst (	// src/main/scala/cpu/idu/IDU.scala:58:31
-    .trig (controlSignalsList_13)	// src/main/scala/chisel3/util/Lookup.scala:34:39
+  wire [28:0] decoded_invInputs = ~(io_inst[30:2]);	// src/main/scala/chisel3/util/pla.scala:78:21, src/main/scala/cpu/idu/IDU.scala:10:14
+  wire [1:0]  _decoded_andMatrixOutputs_T = {decoded_invInputs[0], decoded_invInputs[3]};	// src/main/scala/chisel3/util/pla.scala:78:21, :91:29, :98:53
+  wire [1:0]  _decoded_andMatrixOutputs_T_1 =
+    {decoded_invInputs[2], decoded_invInputs[3]};	// src/main/scala/chisel3/util/pla.scala:78:21, :91:29, :98:53
+  wire [2:0]  _decoded_andMatrixOutputs_T_3 =
+    {io_inst[2], decoded_invInputs[1], decoded_invInputs[2]};	// src/main/scala/chisel3/util/pla.scala:78:21, :90:45, :91:29, :98:53
+  wire [1:0]  _decoded_andMatrixOutputs_T_4 = {io_inst[2], decoded_invInputs[3]};	// src/main/scala/chisel3/util/pla.scala:78:21, :90:45, :91:29, :98:53
+  wire [3:0]  _decoded_andMatrixOutputs_T_5 =
+    {io_inst[4], decoded_invInputs[3], decoded_invInputs[10], decoded_invInputs[11]};	// src/main/scala/chisel3/util/pla.scala:78:21, :90:45, :91:29, :98:53
+  wire [2:0]  _decoded_andMatrixOutputs_T_7 =
+    {decoded_invInputs[2], io_inst[5], decoded_invInputs[4]};	// src/main/scala/chisel3/util/pla.scala:78:21, :90:45, :91:29, :98:53
+  wire [3:0]  _decoded_andMatrixOutputs_T_8 =
+    {decoded_invInputs[0], io_inst[4], io_inst[5], decoded_invInputs[4]};	// src/main/scala/chisel3/util/pla.scala:78:21, :90:45, :91:29, :98:53
+  wire [2:0]  _decoded_andMatrixOutputs_T_9 = {io_inst[2], io_inst[4], io_inst[5]};	// src/main/scala/chisel3/util/pla.scala:90:45, :98:53
+  wire [3:0]  _decoded_andMatrixOutputs_T_10 =
+    {decoded_invInputs[0], decoded_invInputs[2], io_inst[6], decoded_invInputs[10]};	// src/main/scala/chisel3/util/pla.scala:78:21, :90:45, :91:29, :98:53
+  wire [5:0]  _decoded_andMatrixOutputs_T_11 =
+    {io_inst[4],
+     io_inst[6],
+     decoded_invInputs[10],
+     decoded_invInputs[11],
+     decoded_invInputs[18],
+     decoded_invInputs[19]};	// src/main/scala/chisel3/util/pla.scala:78:21, :90:45, :91:29, :98:53
+  wire [5:0]  _decoded_andMatrixOutputs_T_13 =
+    {decoded_invInputs[0],
+     io_inst[4],
+     decoded_invInputs[4],
+     io_inst[12],
+     decoded_invInputs[11],
+     decoded_invInputs[28]};	// src/main/scala/chisel3/util/pla.scala:78:21, :90:45, :91:29, :98:53
+  wire [4:0]  _decoded_andMatrixOutputs_T_14 =
+    {decoded_invInputs[0],
+     decoded_invInputs[2],
+     io_inst[6],
+     io_inst[12],
+     decoded_invInputs[12]};	// src/main/scala/chisel3/util/pla.scala:78:21, :90:45, :91:29, :98:53
+  wire [2:0]  _decoded_andMatrixOutputs_T_15 = {io_inst[4], io_inst[6], io_inst[12]};	// src/main/scala/chisel3/util/pla.scala:90:45, :98:53
+  wire [5:0]  _decoded_andMatrixOutputs_T_17 =
+    {decoded_invInputs[0],
+     io_inst[4],
+     decoded_invInputs[4],
+     decoded_invInputs[10],
+     io_inst[13],
+     decoded_invInputs[12]};	// src/main/scala/chisel3/util/pla.scala:78:21, :90:45, :91:29, :98:53
+  wire [2:0]  _decoded_andMatrixOutputs_T_19 = {io_inst[4], io_inst[6], io_inst[13]};	// src/main/scala/chisel3/util/pla.scala:90:45, :98:53
+  wire [4:0]  _decoded_andMatrixOutputs_T_21 =
+    {decoded_invInputs[0],
+     decoded_invInputs[4],
+     io_inst[12],
+     io_inst[13],
+     decoded_invInputs[12]};	// src/main/scala/chisel3/util/pla.scala:78:21, :90:45, :91:29, :98:53
+  wire [4:0]  _decoded_andMatrixOutputs_T_23 =
+    {decoded_invInputs[0],
+     io_inst[4],
+     decoded_invInputs[4],
+     decoded_invInputs[10],
+     io_inst[14]};	// src/main/scala/chisel3/util/pla.scala:78:21, :90:45, :91:29, :98:53
+  wire [5:0]  _decoded_andMatrixOutputs_T_26 =
+    {decoded_invInputs[0],
+     io_inst[4],
+     decoded_invInputs[4],
+     io_inst[12],
+     io_inst[14],
+     decoded_invInputs[28]};	// src/main/scala/chisel3/util/pla.scala:78:21, :90:45, :91:29, :98:53
+  wire [4:0]  _decoded_andMatrixOutputs_T_27 =
+    {decoded_invInputs[0], decoded_invInputs[2], io_inst[5], io_inst[12], io_inst[14]};	// src/main/scala/chisel3/util/pla.scala:78:21, :90:45, :91:29, :98:53
+  wire [4:0]  _decoded_andMatrixOutputs_T_28 =
+    {decoded_invInputs[0], decoded_invInputs[3], io_inst[12], io_inst[13], io_inst[14]};	// src/main/scala/chisel3/util/pla.scala:78:21, :90:45, :91:29, :98:53
+  wire [4:0]  _decoded_andMatrixOutputs_T_29 =
+    {io_inst[4], io_inst[6], decoded_invInputs[10], decoded_invInputs[11], io_inst[20]};	// src/main/scala/chisel3/util/pla.scala:78:21, :90:45, :91:29, :98:53
+  wire [4:0]  _decoded_andMatrixOutputs_T_30 =
+    {io_inst[4], io_inst[6], decoded_invInputs[10], decoded_invInputs[11], io_inst[21]};	// src/main/scala/chisel3/util/pla.scala:78:21, :90:45, :91:29, :98:53
+  wire [5:0]  _decoded_andMatrixOutputs_T_32 =
+    {decoded_invInputs[0],
+     io_inst[4],
+     decoded_invInputs[4],
+     io_inst[12],
+     decoded_invInputs[11],
+     io_inst[30]};	// src/main/scala/chisel3/util/pla.scala:78:21, :90:45, :91:29, :98:53
+  SimEbreak simEbreakInst (	// src/main/scala/cpu/idu/IDU.scala:55:31
+    .trig (&_decoded_andMatrixOutputs_T_29)	// src/main/scala/chisel3/util/pla.scala:98:{53,70}
   );
   assign io_pcSel =
-    _GEN_5
-      ? 2'h0
-      : _GEN_1 ? 2'h1 : _controlSignalsList_T_76 ? 2'h2 : {2{_controlSignalsList_T_78}};	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39, src/main/scala/common/Instructions.scala:64:11, src/main/scala/cpu/idu/IDU.scala:8:7
+    {&_decoded_andMatrixOutputs_T_3,
+     |{io_inst[3],
+       &_decoded_andMatrixOutputs_T_10,
+       &_decoded_andMatrixOutputs_T_14,
+       &_decoded_andMatrixOutputs_T_27},
+     |{&_decoded_andMatrixOutputs_T,
+       &_decoded_andMatrixOutputs_T_4,
+       io_inst[3],
+       &_decoded_andMatrixOutputs_T_7,
+       &_decoded_andMatrixOutputs_T_8,
+       &_decoded_andMatrixOutputs_T_9,
+       &_decoded_andMatrixOutputs_T_11,
+       &_decoded_andMatrixOutputs_T_15,
+       &_decoded_andMatrixOutputs_T_19,
+       &_decoded_andMatrixOutputs_T_29,
+       &_decoded_andMatrixOutputs_T_30}};	// src/main/scala/chisel3/util/experimental/decode/DecoderBundle.scala:88:106, src/main/scala/chisel3/util/pla.scala:90:45, :98:{53,70}, :114:{19,36}, src/main/scala/cpu/idu/IDU.scala:9:7
   assign io_opASel =
-    {1'h0,
-     ~(_controlSignalsList_T_10 | _controlSignalsList_T_12 | _controlSignalsList_T_14
-       | _controlSignalsList_T_16 | _controlSignalsList_T_18 | _controlSignalsList_T_20
-       | _controlSignalsList_T_22 | _controlSignalsList_T_24 | _controlSignalsList_T_26
-       | _controlSignalsList_T_28 | _controlSignalsList_T_30 | _controlSignalsList_T_32
-       | _controlSignalsList_T_34 | _controlSignalsList_T_36 | _controlSignalsList_T_38
-       | _controlSignalsList_T_40 | _controlSignalsList_T_42 | _controlSignalsList_T_44
-       | _controlSignalsList_T_46 | _controlSignalsList_T_48 | _controlSignalsList_T_50
-       | _controlSignalsList_T_52 | _controlSignalsList_T_54 | _controlSignalsList_T_438
-       | _GEN_7) & (_GEN_6 | ~_controlSignalsList_T_80 & _controlSignalsList_T_155)};	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39, src/main/scala/common/Instructions.scala:61:11, src/main/scala/common/Types.scala:48:41, src/main/scala/cpu/idu/IDU.scala:8:7
+    {|{&_decoded_andMatrixOutputs_T_3, &_decoded_andMatrixOutputs_T_4, io_inst[3]},
+     |{&_decoded_andMatrixOutputs_T,
+       &_decoded_andMatrixOutputs_T_7,
+       &_decoded_andMatrixOutputs_T_8,
+       &_decoded_andMatrixOutputs_T_9,
+       &_decoded_andMatrixOutputs_T_10,
+       &_decoded_andMatrixOutputs_T_11,
+       &_decoded_andMatrixOutputs_T_14,
+       &_decoded_andMatrixOutputs_T_15,
+       &_decoded_andMatrixOutputs_T_19,
+       &_decoded_andMatrixOutputs_T_27,
+       &_decoded_andMatrixOutputs_T_29,
+       &_decoded_andMatrixOutputs_T_30}};	// src/main/scala/chisel3/util/experimental/decode/DecoderBundle.scala:88:106, src/main/scala/chisel3/util/pla.scala:90:45, :98:{53,70}, :114:{19,36}, src/main/scala/cpu/idu/IDU.scala:9:7
   assign io_opBSel =
-    {1'h0,
-     ~_GEN_12
-       & (_GEN_4 | ~_GEN_1 & (_GEN_11 | ~_GEN_9 & (_GEN_8 | _controlSignalsList_T_596)))};	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39, src/main/scala/common/Instructions.scala:61:11, src/main/scala/common/Types.scala:49:41, src/main/scala/cpu/idu/IDU.scala:8:7
+    {|{&_decoded_andMatrixOutputs_T,
+       &_decoded_andMatrixOutputs_T_3,
+       &_decoded_andMatrixOutputs_T_4,
+       io_inst[3],
+       &_decoded_andMatrixOutputs_T_7,
+       &_decoded_andMatrixOutputs_T_9,
+       &_decoded_andMatrixOutputs_T_10,
+       &_decoded_andMatrixOutputs_T_11,
+       &_decoded_andMatrixOutputs_T_14,
+       &_decoded_andMatrixOutputs_T_15,
+       &_decoded_andMatrixOutputs_T_19,
+       &_decoded_andMatrixOutputs_T_27,
+       &_decoded_andMatrixOutputs_T_29,
+       &_decoded_andMatrixOutputs_T_30},
+     &_decoded_andMatrixOutputs_T_8};	// src/main/scala/chisel3/util/experimental/decode/DecoderBundle.scala:88:106, src/main/scala/chisel3/util/pla.scala:90:45, :98:{53,70}, :114:{19,36}, src/main/scala/cpu/idu/IDU.scala:9:7
   assign io_aluOp =
-    _controlSignalsList_T_10
-      ? 4'h0
-      : _controlSignalsList_T_12
-          ? 4'h1
-          : _controlSignalsList_T_14
-              ? 4'h2
-              : _controlSignalsList_T_16
-                  ? 4'h3
-                  : _controlSignalsList_T_18
-                      ? 4'h4
-                      : _controlSignalsList_T_20
-                          ? 4'h5
-                          : _controlSignalsList_T_22
-                              ? 4'h6
-                              : _controlSignalsList_T_24
-                                  ? 4'h7
-                                  : _controlSignalsList_T_26
-                                      ? 4'h8
-                                      : _controlSignalsList_T_28
-                                          ? 4'h9
-                                          : _controlSignalsList_T_30
-                                              ? 4'h0
-                                              : _controlSignalsList_T_32
-                                                  ? 4'h2
-                                                  : _controlSignalsList_T_34
-                                                      ? 4'h3
-                                                      : _controlSignalsList_T_36
-                                                          ? 4'h4
-                                                          : _controlSignalsList_T_38
-                                                              ? 4'h8
-                                                              : _controlSignalsList_T_40
-                                                                  ? 4'h9
-                                                                  : _controlSignalsList_T_42
-                                                                      ? 4'h5
-                                                                      : _controlSignalsList_T_44
-                                                                          ? 4'h6
-                                                                          : _controlSignalsList_T_46
-                                                                              ? 4'h7
-                                                                              : _GEN_3
-                                                                                  ? 4'h0
-                                                                                  : _GEN_1
-                                                                                      ? 4'h1
-                                                                                      : _GEN_6
-                                                                                        | ~_controlSignalsList_T_80
-                                                                                          ? 4'h0
-                                                                                          : 4'hA;	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39, src/main/scala/common/Instructions.scala:64:11, src/main/scala/cpu/idu/IDU.scala:8:7
+    {|{&_decoded_andMatrixOutputs_T_9,
+       &_decoded_andMatrixOutputs_T_17,
+       &_decoded_andMatrixOutputs_T_21,
+       &_decoded_andMatrixOutputs_T_32},
+     |{&_decoded_andMatrixOutputs_T_13, &_decoded_andMatrixOutputs_T_23},
+     |{&_decoded_andMatrixOutputs_T_9,
+       &_decoded_andMatrixOutputs_T_10,
+       &_decoded_andMatrixOutputs_T_13,
+       &_decoded_andMatrixOutputs_T_14,
+       &_decoded_andMatrixOutputs_T_21,
+       &_decoded_andMatrixOutputs_T_26,
+       &_decoded_andMatrixOutputs_T_27,
+       &_decoded_andMatrixOutputs_T_28,
+       &{io_inst[4],
+         io_inst[5],
+         decoded_invInputs[4],
+         decoded_invInputs[10],
+         io_inst[30]}},
+     |{&_decoded_andMatrixOutputs_T_1,
+       &_decoded_andMatrixOutputs_T_3,
+       &_decoded_andMatrixOutputs_T_4,
+       io_inst[3],
+       &_decoded_andMatrixOutputs_T_5,
+       &{io_inst[4], decoded_invInputs[10], decoded_invInputs[11], decoded_invInputs[28]},
+       &_decoded_andMatrixOutputs_T_7,
+       &_decoded_andMatrixOutputs_T_9,
+       &_decoded_andMatrixOutputs_T_15,
+       &_decoded_andMatrixOutputs_T_17,
+       &_decoded_andMatrixOutputs_T_19,
+       &_decoded_andMatrixOutputs_T_26,
+       &_decoded_andMatrixOutputs_T_28}};	// src/main/scala/chisel3/util/experimental/decode/DecoderBundle.scala:88:106, src/main/scala/chisel3/util/pla.scala:78:21, :90:45, :91:29, :98:{53,70}, :114:{19,36}, src/main/scala/cpu/idu/IDU.scala:9:7
   assign io_wbSel =
-    _GEN_15
-      ? 2'h0
-      : _GEN_14
-          ? 2'h1
-          : _GEN_7
-              ? 2'h0
-              : _GEN_6
-                  ? 2'h2
-                  : _GEN_13
-                      ? 2'h0
-                      : {2{_controlSignalsList_T_90 | _controlSignalsList_T_92
-                             | _controlSignalsList_T_94 | _controlSignalsList_T_96
-                             | _controlSignalsList_T_98 | _controlSignalsList_T_596}};	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39, src/main/scala/common/Instructions.scala:64:11, src/main/scala/cpu/idu/IDU.scala:8:7
+    {|{&_decoded_andMatrixOutputs_T_15, &_decoded_andMatrixOutputs_T_19},
+     |{&_decoded_andMatrixOutputs_T_1, &_decoded_andMatrixOutputs_T_3, io_inst[3]},
+     |{&_decoded_andMatrixOutputs_T_3,
+       &_decoded_andMatrixOutputs_T_4,
+       io_inst[3],
+       &_decoded_andMatrixOutputs_T_5,
+       &_decoded_andMatrixOutputs_T_7,
+       &_decoded_andMatrixOutputs_T_8,
+       &_decoded_andMatrixOutputs_T_9,
+       &_decoded_andMatrixOutputs_T_10,
+       &_decoded_andMatrixOutputs_T_11,
+       &_decoded_andMatrixOutputs_T_13,
+       &_decoded_andMatrixOutputs_T_14,
+       &_decoded_andMatrixOutputs_T_17,
+       &_decoded_andMatrixOutputs_T_21,
+       &_decoded_andMatrixOutputs_T_23,
+       &_decoded_andMatrixOutputs_T_27,
+       &_decoded_andMatrixOutputs_T_28,
+       &_decoded_andMatrixOutputs_T_29,
+       &_decoded_andMatrixOutputs_T_30,
+       &_decoded_andMatrixOutputs_T_32}};	// src/main/scala/chisel3/util/experimental/decode/DecoderBundle.scala:88:106, src/main/scala/chisel3/util/pla.scala:90:45, :98:{53,70}, :114:{19,36}, src/main/scala/cpu/idu/IDU.scala:9:7
   assign io_regWen =
-    _GEN_17 | ~_GEN_7 & (_GEN_11 | ~_GEN_9 & (_GEN_8 | _controlSignalsList_T_596));	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39, src/main/scala/cpu/idu/IDU.scala:8:7
-  assign io_memWen =
-    ~_GEN_17
-    & (_controlSignalsList_T_58 | _controlSignalsList_T_60 | _controlSignalsList_T_390);	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39, src/main/scala/cpu/idu/IDU.scala:8:7
-  assign io_memRen =
-    ~_GEN_15
-    & (_controlSignalsList_T_48 | _controlSignalsList_T_50 | _controlSignalsList_T_52
-       | _controlSignalsList_T_54 | _controlSignalsList_T_438);	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39, src/main/scala/cpu/idu/IDU.scala:8:7
+    |{&_decoded_andMatrixOutputs_T,
+      &_decoded_andMatrixOutputs_T_3,
+      &_decoded_andMatrixOutputs_T_4,
+      io_inst[3],
+      &_decoded_andMatrixOutputs_T_8,
+      &_decoded_andMatrixOutputs_T_9,
+      &_decoded_andMatrixOutputs_T_15,
+      &_decoded_andMatrixOutputs_T_19};	// src/main/scala/chisel3/util/pla.scala:90:45, :98:{53,70}, :114:{19,36}, src/main/scala/cpu/idu/IDU.scala:9:7
+  assign io_memWen = &_decoded_andMatrixOutputs_T_7;	// src/main/scala/chisel3/util/pla.scala:98:{53,70}, src/main/scala/cpu/idu/IDU.scala:9:7
+  assign io_memRen = &_decoded_andMatrixOutputs_T_1;	// src/main/scala/chisel3/util/pla.scala:98:{53,70}, src/main/scala/cpu/idu/IDU.scala:9:7
   assign io_memType =
-    _GEN_15
-      ? 3'h0
-      : _controlSignalsList_T_48
-          ? 3'h1
-          : _controlSignalsList_T_50
-              ? 3'h2
-              : _controlSignalsList_T_52
-                  ? 3'h3
-                  : _controlSignalsList_T_54
-                      ? 3'h4
-                      : _controlSignalsList_T_438
-                          ? 3'h5
-                          : {1'h0,
-                             _controlSignalsList_T_58
-                               ? 2'h1
-                               : _controlSignalsList_T_60
-                                   ? 2'h2
-                                   : {2{_controlSignalsList_T_390}}};	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39, src/main/scala/common/Instructions.scala:61:11, :64:11, src/main/scala/cpu/idu/IDU.scala:8:7
-  assign io_csrCmd =
-    _controlSignalsList_T_10 | _controlSignalsList_T_12 | _controlSignalsList_T_14
-    | _controlSignalsList_T_16 | _controlSignalsList_T_18 | _controlSignalsList_T_20
-    | _controlSignalsList_T_22 | _controlSignalsList_T_24 | _controlSignalsList_T_26
-    | _controlSignalsList_T_28 | _controlSignalsList_T_30 | _controlSignalsList_T_32
-    | _controlSignalsList_T_34 | _controlSignalsList_T_36 | _controlSignalsList_T_38
-    | _controlSignalsList_T_40 | _controlSignalsList_T_42 | _controlSignalsList_T_44
-    | _controlSignalsList_T_46 | _controlSignalsList_T_48 | _controlSignalsList_T_50
-    | _controlSignalsList_T_52 | _controlSignalsList_T_54 | _controlSignalsList_T_438
-    | _controlSignalsList_T_58 | _controlSignalsList_T_60 | _controlSignalsList_T_390
-    | _controlSignalsList_T_64 | _controlSignalsList_T_66 | _controlSignalsList_T_68
-    | _controlSignalsList_T_70 | _controlSignalsList_T_72 | _controlSignalsList_T_74
-    | _controlSignalsList_T_76 | _controlSignalsList_T_78 | _GEN_13
-      ? 2'h0
-      : _controlSignalsList_T_90
-          ? 2'h1
-          : _controlSignalsList_T_92
-              ? 2'h2
-              : _controlSignalsList_T_94
-                  ? 2'h3
-                  : _controlSignalsList_T_96
-                      ? 2'h1
-                      : _controlSignalsList_T_98 ? 2'h2 : {2{_controlSignalsList_T_596}};	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39, src/main/scala/common/Instructions.scala:64:11, src/main/scala/cpu/idu/IDU.scala:8:7
+    {&{decoded_invInputs[2], decoded_invInputs[3], io_inst[14]},
+     |{&{decoded_invInputs[2], decoded_invInputs[4], io_inst[12], decoded_invInputs[12]},
+       &{decoded_invInputs[2], decoded_invInputs[4], io_inst[13]}},
+     |{&{decoded_invInputs[2],
+         decoded_invInputs[4],
+         decoded_invInputs[10],
+         decoded_invInputs[12]},
+       &{decoded_invInputs[2], decoded_invInputs[3], io_inst[12], io_inst[14]}}};	// src/main/scala/chisel3/util/experimental/decode/DecoderBundle.scala:88:106, src/main/scala/chisel3/util/pla.scala:78:21, :90:45, :91:29, :98:{53,70}, :114:{19,36}, src/main/scala/cpu/idu/IDU.scala:9:7
+  assign io_csrOp = {&_decoded_andMatrixOutputs_T_19, &_decoded_andMatrixOutputs_T_15};	// src/main/scala/chisel3/util/experimental/decode/DecoderBundle.scala:88:106, src/main/scala/chisel3/util/pla.scala:98:{53,70}, src/main/scala/cpu/idu/IDU.scala:9:7
   assign io_branchCond =
-    _GEN_5
-      ? 3'h0
-      : _controlSignalsList_T_64
-          ? 3'h1
-          : _controlSignalsList_T_66
-              ? 3'h2
-              : _controlSignalsList_T_68
-                  ? 3'h3
-                  : _controlSignalsList_T_70
-                      ? 3'h4
-                      : _controlSignalsList_T_72
-                          ? 3'h5
-                          : _controlSignalsList_T_74 ? 3'h6 : 3'h0;	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39, src/main/scala/common/Instructions.scala:64:11, src/main/scala/cpu/idu/IDU.scala:8:7
+    {|{&{decoded_invInputs[0], decoded_invInputs[2], io_inst[6], io_inst[13]},
+       &_decoded_andMatrixOutputs_T_27},
+     |{&_decoded_andMatrixOutputs_T_14,
+       &{decoded_invInputs[0], decoded_invInputs[2], io_inst[12], io_inst[13]},
+       &{decoded_invInputs[0],
+         io_inst[6],
+         decoded_invInputs[10],
+         decoded_invInputs[11],
+         io_inst[14]}},
+     &_decoded_andMatrixOutputs_T_10};	// src/main/scala/chisel3/util/experimental/decode/DecoderBundle.scala:88:106, src/main/scala/chisel3/util/pla.scala:78:21, :90:45, :91:29, :98:{53,70}, :114:{19,36}, src/main/scala/cpu/idu/IDU.scala:9:7
   assign io_immSel =
-    _GEN_12
-      ? 3'h0
-      : _GEN_16
-          ? 3'h1
-          : _GEN_2
-              ? 3'h2
-              : _GEN_1
-                  ? 3'h3
-                  : _controlSignalsList_T_76
-                      ? 3'h5
-                      : _controlSignalsList_T_78
-                          ? 3'h1
-                          : _GEN_10
-                              ? 3'h4
-                              : {2'h0, ~_GEN_9 & (_GEN_8 | _controlSignalsList_T_596)};	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39, src/main/scala/common/Instructions.scala:64:11, src/main/scala/cpu/idu/IDU.scala:8:7
-  assign io_isEcall =
-    ~(_controlSignalsList_T_10 | _controlSignalsList_T_12 | _controlSignalsList_T_14
-      | _controlSignalsList_T_16 | _controlSignalsList_T_18 | _controlSignalsList_T_20
-      | _controlSignalsList_T_22 | _controlSignalsList_T_24 | _controlSignalsList_T_26
-      | _controlSignalsList_T_28 | _controlSignalsList_T_30 | _controlSignalsList_T_32
-      | _controlSignalsList_T_34 | _controlSignalsList_T_36 | _controlSignalsList_T_38
-      | _controlSignalsList_T_40 | _controlSignalsList_T_42 | _controlSignalsList_T_44
-      | _controlSignalsList_T_46 | _controlSignalsList_T_48 | _controlSignalsList_T_50
-      | _controlSignalsList_T_52 | _controlSignalsList_T_54 | _controlSignalsList_T_438
-      | _controlSignalsList_T_58 | _controlSignalsList_T_60 | _controlSignalsList_T_390
-      | _controlSignalsList_T_64 | _controlSignalsList_T_66 | _controlSignalsList_T_68
-      | _controlSignalsList_T_70 | _controlSignalsList_T_72 | _controlSignalsList_T_74
-      | _GEN_11) & _controlSignalsList_T_649;	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39, src/main/scala/cpu/idu/IDU.scala:8:7
-  assign io_isEbreak = controlSignalsList_13;	// src/main/scala/chisel3/util/Lookup.scala:34:39, src/main/scala/cpu/idu/IDU.scala:8:7
-  assign io_isMret =
-    ~(_controlSignalsList_T_10 | _controlSignalsList_T_12 | _controlSignalsList_T_14
-      | _controlSignalsList_T_16 | _controlSignalsList_T_18 | _controlSignalsList_T_20
-      | _controlSignalsList_T_22 | _controlSignalsList_T_24 | _controlSignalsList_T_26
-      | _controlSignalsList_T_28 | _controlSignalsList_T_30 | _controlSignalsList_T_32
-      | _controlSignalsList_T_34 | _controlSignalsList_T_36 | _controlSignalsList_T_38
-      | _controlSignalsList_T_40 | _controlSignalsList_T_42 | _controlSignalsList_T_44
-      | _controlSignalsList_T_46 | _controlSignalsList_T_48 | _controlSignalsList_T_50
-      | _controlSignalsList_T_52 | _controlSignalsList_T_54 | _controlSignalsList_T_438
-      | _controlSignalsList_T_58 | _controlSignalsList_T_60 | _controlSignalsList_T_390
-      | _controlSignalsList_T_64 | _controlSignalsList_T_66 | _controlSignalsList_T_68
-      | _controlSignalsList_T_70 | _controlSignalsList_T_72 | _controlSignalsList_T_74
-      | _controlSignalsList_T_76 | _controlSignalsList_T_78 | _controlSignalsList_T_80
-      | _controlSignalsList_T_155 | _controlSignalsList_T_649 | _controlSignalsList_T_693)
-    & _controlSignalsList_T_737;	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39, src/main/scala/cpu/idu/IDU.scala:8:7
-  assign io_illegalInst =
-    ~(_controlSignalsList_T_10 | _controlSignalsList_T_12 | _controlSignalsList_T_14
-      | _controlSignalsList_T_16 | _controlSignalsList_T_18 | _controlSignalsList_T_20
-      | _controlSignalsList_T_22 | _controlSignalsList_T_24 | _controlSignalsList_T_26
-      | _controlSignalsList_T_28 | _controlSignalsList_T_30 | _controlSignalsList_T_32
-      | _controlSignalsList_T_34 | _controlSignalsList_T_36 | _controlSignalsList_T_38
-      | _controlSignalsList_T_40 | _controlSignalsList_T_42 | _controlSignalsList_T_44
-      | _controlSignalsList_T_46 | _controlSignalsList_T_48 | _controlSignalsList_T_50
-      | _controlSignalsList_T_52 | _controlSignalsList_T_54 | _controlSignalsList_T_438
-      | _controlSignalsList_T_58 | _controlSignalsList_T_60 | _controlSignalsList_T_390
-      | _controlSignalsList_T_64 | _controlSignalsList_T_66 | _controlSignalsList_T_68
-      | _controlSignalsList_T_70 | _controlSignalsList_T_72 | _controlSignalsList_T_74
-      | _controlSignalsList_T_76 | _controlSignalsList_T_78 | _controlSignalsList_T_80
-      | _controlSignalsList_T_155 | _controlSignalsList_T_649 | _controlSignalsList_T_693
-      | _controlSignalsList_T_737 | _GEN_8) & ~_controlSignalsList_T_596;	// src/main/scala/chisel3/util/Lookup.scala:31:38, :34:39, src/main/scala/common/Instructions.scala:61:11, :64:11, src/main/scala/cpu/idu/IDU.scala:8:7
+    {|{&_decoded_andMatrixOutputs_T_4, io_inst[3], &_decoded_andMatrixOutputs_T_9},
+     |{&_decoded_andMatrixOutputs_T_7,
+       &_decoded_andMatrixOutputs_T_10,
+       &_decoded_andMatrixOutputs_T_14,
+       &_decoded_andMatrixOutputs_T_27},
+     |{&_decoded_andMatrixOutputs_T,
+       &_decoded_andMatrixOutputs_T_3,
+       io_inst[3],
+       &_decoded_andMatrixOutputs_T_10,
+       &_decoded_andMatrixOutputs_T_14,
+       &_decoded_andMatrixOutputs_T_15,
+       &_decoded_andMatrixOutputs_T_19,
+       &_decoded_andMatrixOutputs_T_27}};	// src/main/scala/chisel3/util/experimental/decode/DecoderBundle.scala:88:106, src/main/scala/chisel3/util/pla.scala:90:45, :98:{53,70}, :114:{19,36}, src/main/scala/cpu/idu/IDU.scala:9:7
+  assign io_isEcall = &_decoded_andMatrixOutputs_T_11;	// src/main/scala/chisel3/util/pla.scala:98:{53,70}, src/main/scala/cpu/idu/IDU.scala:9:7
+  assign io_isEbreak = &_decoded_andMatrixOutputs_T_29;	// src/main/scala/chisel3/util/pla.scala:98:{53,70}, src/main/scala/cpu/idu/IDU.scala:9:7
+  assign io_isMret = &_decoded_andMatrixOutputs_T_30;	// src/main/scala/chisel3/util/pla.scala:98:{53,70}, src/main/scala/cpu/idu/IDU.scala:9:7
+  assign io_illegalInst = 1'h0;	// src/main/scala/chisel3/util/pla.scala:102:36, src/main/scala/cpu/idu/IDU.scala:9:7
 endmodule
 
 module CSRFile(	// src/main/scala/cpu/csr/CSRFile.scala:8:7
@@ -940,7 +852,7 @@ module CSRFile(	// src/main/scala/cpu/csr/CSRFile.scala:8:7
                 io_isEcall,	// src/main/scala/cpu/csr/CSRFile.scala:9:14
                 io_isEbreak,	// src/main/scala/cpu/csr/CSRFile.scala:9:14
                 io_isMret,	// src/main/scala/cpu/csr/CSRFile.scala:9:14
-  input  [1:0]  io_csrCmd,	// src/main/scala/cpu/csr/CSRFile.scala:9:14
+  input  [1:0]  io_csrOp,	// src/main/scala/cpu/csr/CSRFile.scala:9:14
   input  [11:0] io_raddr,	// src/main/scala/cpu/csr/CSRFile.scala:9:14
                 io_inWaddr,	// src/main/scala/cpu/csr/CSRFile.scala:9:14
   input  [31:0] io_inWdata,	// src/main/scala/cpu/csr/CSRFile.scala:9:14
@@ -970,33 +882,33 @@ module CSRFile(	// src/main/scala/cpu/csr/CSRFile.scala:8:7
     end
     else begin	// src/main/scala/cpu/csr/CSRFile.scala:8:7
       automatic logic [3:0][31:0] _GEN =
-        {{rdata & ~io_inWdata}, {rdata | io_inWdata}, {io_inWdata}, {32'h0}};	// src/main/scala/cpu/csr/CSRFile.scala:24:24, :29:47, :40:53, :43:35, :44:{35,37}
+        {{rdata & ~io_inWdata}, {rdata | io_inWdata}, {io_inWdata}, {32'h0}};	// src/main/scala/cpu/csr/CSRFile.scala:24:24, :29:47, :40:45, :43:28, :44:{28,30}
       automatic logic             _GEN_0;	// src/main/scala/cpu/csr/CSRFile.scala:47:24
       automatic logic             _GEN_1;	// src/main/scala/cpu/csr/CSRFile.scala:47:24
       automatic logic             _GEN_2;	// src/main/scala/cpu/csr/CSRFile.scala:47:24
       _GEN_0 = io_inWaddr == 12'h300;	// src/main/scala/cpu/csr/CSRFile.scala:29:47, :47:24
       _GEN_1 = io_inWaddr == 12'h341;	// src/main/scala/cpu/csr/CSRFile.scala:29:47, :47:24
       _GEN_2 = io_inWaddr == 12'h342;	// src/main/scala/cpu/csr/CSRFile.scala:29:47, :47:24
-      if ((|io_csrCmd) & _GEN_0)	// src/main/scala/cpu/csr/CSRFile.scala:24:24, :39:{18,34}, :47:24, :48:42
-        mstatus <= _GEN[io_csrCmd];	// src/main/scala/cpu/csr/CSRFile.scala:24:24, :40:53
+      if ((|io_csrOp) & _GEN_0)	// src/main/scala/cpu/csr/CSRFile.scala:24:24, :39:{17,33}, :47:24, :48:42
+        mstatus <= _GEN[io_csrOp];	// src/main/scala/cpu/csr/CSRFile.scala:24:24, :40:45
       if (extTrap) begin	// src/main/scala/cpu/csr/CSRFile.scala:55:45
         mepc <= io_pc;	// src/main/scala/cpu/csr/CSRFile.scala:25:21
         mcause <= io_isEcall ? 32'hB : 32'h2;	// src/main/scala/cpu/csr/CSRFile.scala:26:23, :57:8
       end
       else begin	// src/main/scala/cpu/csr/CSRFile.scala:55:45
-        if (~(|io_csrCmd) | _GEN_0 | ~_GEN_1) begin	// src/main/scala/cpu/csr/CSRFile.scala:25:21, :39:{18,34}, :47:24
+        if (~(|io_csrOp) | _GEN_0 | ~_GEN_1) begin	// src/main/scala/cpu/csr/CSRFile.scala:25:21, :39:{17,33}, :47:24
         end
-        else	// src/main/scala/cpu/csr/CSRFile.scala:25:21, :39:34, :47:24
-          mepc <= _GEN[io_csrCmd];	// src/main/scala/cpu/csr/CSRFile.scala:25:21, :40:53
-        if (~(|io_csrCmd) | _GEN_0 | _GEN_1 | ~_GEN_2) begin	// src/main/scala/cpu/csr/CSRFile.scala:25:21, :26:23, :39:{18,34}, :47:24
+        else	// src/main/scala/cpu/csr/CSRFile.scala:25:21, :39:33, :47:24
+          mepc <= _GEN[io_csrOp];	// src/main/scala/cpu/csr/CSRFile.scala:25:21, :40:45
+        if (~(|io_csrOp) | _GEN_0 | _GEN_1 | ~_GEN_2) begin	// src/main/scala/cpu/csr/CSRFile.scala:25:21, :26:23, :39:{17,33}, :47:24
         end
-        else	// src/main/scala/cpu/csr/CSRFile.scala:26:23, :39:34, :47:24
-          mcause <= _GEN[io_csrCmd];	// src/main/scala/cpu/csr/CSRFile.scala:26:23, :40:53
+        else	// src/main/scala/cpu/csr/CSRFile.scala:26:23, :39:33, :47:24
+          mcause <= _GEN[io_csrOp];	// src/main/scala/cpu/csr/CSRFile.scala:26:23, :40:45
       end
-      if (~(|io_csrCmd) | _GEN_0 | _GEN_1 | _GEN_2 | io_inWaddr != 12'h305) begin	// src/main/scala/cpu/csr/CSRFile.scala:25:21, :27:22, :29:47, :39:{18,34}, :47:24
+      if (~(|io_csrOp) | _GEN_0 | _GEN_1 | _GEN_2 | io_inWaddr != 12'h305) begin	// src/main/scala/cpu/csr/CSRFile.scala:25:21, :27:22, :29:47, :39:{17,33}, :47:24
       end
-      else	// src/main/scala/cpu/csr/CSRFile.scala:27:22, :39:34, :47:24
-        mtvec <= _GEN[io_csrCmd];	// src/main/scala/cpu/csr/CSRFile.scala:27:22, :40:53
+      else	// src/main/scala/cpu/csr/CSRFile.scala:27:22, :39:33, :47:24
+        mtvec <= _GEN[io_csrOp];	// src/main/scala/cpu/csr/CSRFile.scala:27:22, :40:45
     end
   end // always @(posedge)
   `ifdef ENABLE_INITIAL_REG_	// src/main/scala/cpu/csr/CSRFile.scala:8:7
@@ -1035,16 +947,16 @@ module Core(	// src/main/scala/cpu/arch/single_cycle/Core.scala:9:7
   wire [31:0] _csrFileInst_io_rdata;	// src/main/scala/cpu/arch/single_cycle/Core.scala:14:27
   wire [31:0] _csrFileInst_io_nextPc;	// src/main/scala/cpu/arch/single_cycle/Core.scala:14:27
   wire        _csrFileInst_io_takeTrap;	// src/main/scala/cpu/arch/single_cycle/Core.scala:14:27
-  wire [1:0]  _iduInst_io_pcSel;	// src/main/scala/cpu/arch/single_cycle/Core.scala:13:23
+  wire [2:0]  _iduInst_io_pcSel;	// src/main/scala/cpu/arch/single_cycle/Core.scala:13:23
   wire [1:0]  _iduInst_io_opASel;	// src/main/scala/cpu/arch/single_cycle/Core.scala:13:23
   wire [1:0]  _iduInst_io_opBSel;	// src/main/scala/cpu/arch/single_cycle/Core.scala:13:23
   wire [3:0]  _iduInst_io_aluOp;	// src/main/scala/cpu/arch/single_cycle/Core.scala:13:23
-  wire [1:0]  _iduInst_io_wbSel;	// src/main/scala/cpu/arch/single_cycle/Core.scala:13:23
+  wire [2:0]  _iduInst_io_wbSel;	// src/main/scala/cpu/arch/single_cycle/Core.scala:13:23
   wire        _iduInst_io_regWen;	// src/main/scala/cpu/arch/single_cycle/Core.scala:13:23
   wire        _iduInst_io_memWen;	// src/main/scala/cpu/arch/single_cycle/Core.scala:13:23
   wire        _iduInst_io_memRen;	// src/main/scala/cpu/arch/single_cycle/Core.scala:13:23
   wire [2:0]  _iduInst_io_memType;	// src/main/scala/cpu/arch/single_cycle/Core.scala:13:23
-  wire [1:0]  _iduInst_io_csrCmd;	// src/main/scala/cpu/arch/single_cycle/Core.scala:13:23
+  wire [1:0]  _iduInst_io_csrOp;	// src/main/scala/cpu/arch/single_cycle/Core.scala:13:23
   wire [2:0]  _iduInst_io_branchCond;	// src/main/scala/cpu/arch/single_cycle/Core.scala:13:23
   wire [2:0]  _iduInst_io_immSel;	// src/main/scala/cpu/arch/single_cycle/Core.scala:13:23
   wire        _iduInst_io_isEcall;	// src/main/scala/cpu/arch/single_cycle/Core.scala:13:23
@@ -1086,7 +998,7 @@ module Core(	// src/main/scala/cpu/arch/single_cycle/Core.scala:9:7
     .io_memWen      (_iduInst_io_memWen),
     .io_memRen      (_iduInst_io_memRen),
     .io_memType     (_iduInst_io_memType),
-    .io_csrCmd      (_iduInst_io_csrCmd),
+    .io_csrOp       (_iduInst_io_csrOp),
     .io_branchCond  (_iduInst_io_branchCond),
     .io_immSel      (_iduInst_io_immSel),
     .io_isEcall     (_iduInst_io_isEcall),
@@ -1101,7 +1013,7 @@ module Core(	// src/main/scala/cpu/arch/single_cycle/Core.scala:9:7
     .io_isEcall   (_iduInst_io_isEcall),	// src/main/scala/cpu/arch/single_cycle/Core.scala:13:23
     .io_isEbreak  (_iduInst_io_isEbreak),	// src/main/scala/cpu/arch/single_cycle/Core.scala:13:23
     .io_isMret    (_iduInst_io_isMret),	// src/main/scala/cpu/arch/single_cycle/Core.scala:13:23
-    .io_csrCmd    (_iduInst_io_csrCmd),	// src/main/scala/cpu/arch/single_cycle/Core.scala:13:23
+    .io_csrOp     (_iduInst_io_csrOp),	// src/main/scala/cpu/arch/single_cycle/Core.scala:13:23
     .io_raddr     (_datapathInst_io_inst[31:20]),	// src/main/scala/cpu/arch/single_cycle/Core.scala:12:28, :36:47
     .io_inWaddr   (_datapathInst_io_inst[31:20]),	// src/main/scala/cpu/arch/single_cycle/Core.scala:12:28, :36:47
     .io_inWdata

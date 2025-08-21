@@ -11,7 +11,7 @@ class CSRFile extends Module with Constants {
     val isEcall = Input(Bool())
     val isEbreak = Input(Bool())
     val isMret = Input(Bool())
-    val csrCmd = Input(CSROp())
+    val csrOp = Input(CSROp())
     val raddr = Input(UInt(12.W))
     val inWaddr = Input(UInt(12.W))
     val inWdata = Input(UInt(XLEN.W))
@@ -36,12 +36,12 @@ class CSRFile extends Module with Constants {
   )
   io.rdata := rdata
 
-  when(io.csrCmd =/= CSROp.NONE) {
-    val w = MuxLookup(io.csrCmd.asUInt, 0.U(XLEN.W))(
+  when(io.csrOp =/= CSROp.NONE) {
+    val w = MuxLookup(io.csrOp, 0.U(XLEN.W))(
       Seq(
-        CSROp.RW.asUInt -> io.inWdata,
-        CSROp.RS.asUInt -> (rdata | io.inWdata),
-        CSROp.RC.asUInt -> (rdata & ~io.inWdata)
+        CSROp.RW -> io.inWdata,
+        CSROp.RS -> (rdata | io.inWdata),
+        CSROp.RC -> (rdata & ~io.inWdata)
       )
     )
     switch(io.inWaddr) {

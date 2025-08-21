@@ -31,7 +31,7 @@ class Core extends Module with Constants {
   csrFileInst.io.isEcall := iduInst.io.isEcall
   csrFileInst.io.isEbreak := iduInst.io.isEbreak
   csrFileInst.io.isMret := iduInst.io.isMret
-  csrFileInst.io.csrCmd := iduInst.io.csrCmd
+  csrFileInst.io.csrOp := iduInst.io.csrOp
 
   csrFileInst.io.raddr := datapathInst.io.inst(31, 20)
   csrFileInst.io.inWaddr := datapathInst.io.inst(31, 20)

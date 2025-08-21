@@ -2,6 +2,7 @@ package cpu.idu
 
 import chisel3._
 import chisel3.util._
+import chisel3.util.experimental.decode._
 import common._
 import common.BuildFlags
 
@@ -20,7 +21,7 @@ class IDU extends Module with Constants {
     val memRen = Output(Bool())
     val memType = Output(MemType())
 
-    val csrCmd = Output(CSROp())
+    val csrOp = Output(CSROp())
 
     val branchCond = Output(BranchCond())
     val immSel = Output(ImmSel())
@@ -31,28 +32,24 @@ class IDU extends Module with Constants {
     val illegalInst = Output(Bool())
   })
 
-  val defaultSignalsData = ControlSignalsData()
-  val lookupTable = RV32I.instructions
-  
-  val controlSignalsList = ListLookup(io.inst, defaultSignalsData.toList, lookupTable)
-  val controlSignals = ControlSignalsBundle.fromList(controlSignalsList)
+  val decoded = RV32I.decodeTable.decode(io.inst)
 
-  io.pcSel := controlSignals.pcSel
-  io.opASel := controlSignals.opASel
-  io.opBSel := controlSignals.opBSel
-  io.aluOp := controlSignals.aluOp
-  io.wbSel := controlSignals.wbSel
-  io.regWen := controlSignals.regWen
-  io.memWen := controlSignals.memWen
-  io.memRen := controlSignals.memRen
-  io.memType := controlSignals.memType
-  io.csrCmd := controlSignals.csrCmd
-  io.branchCond := controlSignals.branchCond
-  io.immSel := controlSignals.immSel
-  io.isEcall := controlSignals.isEcall
-  io.isEbreak := controlSignals.isEbreak
-  io.isMret := controlSignals.isMret
-  io.illegalInst := controlSignals.illegalInst
+  io.pcSel := decoded(PCSelField)
+  io.opASel := decoded(OpASelField)
+  io.opBSel := decoded(OpBSelField)
+  io.aluOp := decoded(AluOpField)
+  io.wbSel := decoded(WBSelField)
+  io.regWen := decoded(RegWenField)
+  io.memWen := decoded(MemWenField)
+  io.memRen := decoded(MemRenField)
+  io.memType := decoded(MemTypeField)
+  io.csrOp := decoded(CSROpField)
+  io.branchCond := decoded(BranchCondField)
+  io.immSel := decoded(ImmSelField)
+  io.isEcall := decoded(IsEcallField)
+  io.isEbreak := decoded(IsEbreakField)
+  io.isMret := decoded(IsMretField)
+  io.illegalInst := decoded(IllegalInstField)
 
   if (BuildFlags.sim) {
     val simEbreakInst = Module(new sim.SimEbreak)
