@@ -1,2 +1,2 @@
 SRCS-$(CONFIG_DIFFTEST) += src/difftest/difftest.cpp
-ARGS += --diff=$(DIFF_REF_SO)
+ARGS += --diff=sim/$(DIFF_REF_SO)

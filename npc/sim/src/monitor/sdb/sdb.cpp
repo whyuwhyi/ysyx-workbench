@@ -4,8 +4,7 @@
 #include <readline/history.h>
 #include <readline/readline.h>
 
-extern bool is_batch_mode;
-extern bool npc_state_stopped;
+bool is_batch_mode = false;
 
 // Forward declarations
 void init_regex();
@@ -36,9 +35,8 @@ static int cmd_c(char *args) {
 }
 
 static int cmd_q(char *args) {
-  extern NPCState npc_state;
   npc_state.state = NPC_QUIT;
-  return -1;
+  return 0;
 }
 
 static int cmd_help(char *args);
@@ -260,34 +258,12 @@ void sdb_mainloop() {
     return;
   }
 
-  static char *last_cmd = NULL;
-
   for (char *str; (str = rl_gets()) != NULL;) {
     char *str_end = str + strlen(str);
 
+    /* extract the first token as the command */
     char *cmd = strtok(str, " ");
     if (cmd == NULL) {
-      if (last_cmd != NULL) {
-        char *last_str = strdup(last_cmd);
-        char *last_cmd_token = strtok(last_str, " ");
-        char *last_args = last_cmd_token + strlen(last_cmd_token) + 1;
-        char *last_str_end = last_str + strlen(last_cmd);
-        if (last_args >= last_str_end) {
-          last_args = NULL;
-        }
-
-        int i;
-        for (i = 0; i < NR_CMD; i++) {
-          if (strcmp(last_cmd_token, cmd_table[i].name) == 0) {
-            if (cmd_table[i].handler(last_args) < 0) {
-              free(last_str);
-              return;
-            }
-            break;
-          }
-        }
-        free(last_str);
-      }
       continue;
     }
 
@@ -299,18 +275,15 @@ void sdb_mainloop() {
       args = NULL;
     }
 
-    if (last_cmd)
-      free(last_cmd);
-    last_cmd = strdup(str);
-
-    char *restored_str = strdup(str);
-    char *restored_cmd = strtok(restored_str, " ");
+#ifdef CONFIG_DEVICE
+    extern void sdl_clear_event_queue();
+    sdl_clear_event_queue();
+#endif
 
     int i;
     for (i = 0; i < NR_CMD; i++) {
       if (strcmp(cmd, cmd_table[i].name) == 0) {
         if (cmd_table[i].handler(args) < 0) {
-          free(restored_str);
           return;
         }
         break;
@@ -320,8 +293,6 @@ void sdb_mainloop() {
     if (i == NR_CMD) {
       printf("Unknown command '%s'\n", cmd);
     }
-
-    free(restored_str);
   }
 }
 

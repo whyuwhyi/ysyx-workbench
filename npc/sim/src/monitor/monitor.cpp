@@ -8,7 +8,7 @@
 #include <stdio.h>
 
 NPCState npc_state = {.state = NPC_STOP};
-bool is_batch_mode = false;
+extern bool is_batch_mode;
 
 static char *log_file = NULL;
 static char *img_file = NULL;

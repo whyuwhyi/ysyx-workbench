@@ -4,7 +4,6 @@
 #include <svdpi.h>
 
 static bool g_print_step = false;
-static uint64_t g_nr_guest_inst = 0;
 
 static void exec_once() {
   uint32_t pc = get_npc_pc();
@@ -13,8 +12,6 @@ static void exec_once() {
   single_cycle();
 
   uint32_t npc = get_npc_pc();
-
-  g_nr_guest_inst++;
 
 #ifdef CONFIG_ITRACE
   char logbuf[128];
@@ -25,7 +22,7 @@ static void exec_once() {
     printf("0x%08x:\t%08x:\t%s\n", pc, inst, logbuf);
   }
 
-  itrace_push(pc, inst);
+  itrace_push(pc, inst, logbuf);
 #endif
 
 #ifdef CONFIG_FTRACE
