@@ -8,7 +8,6 @@
 PROJ_ROOT    := $(abspath $(shell pwd))
 SIM_DIR      := $(abspath $(PROJ_ROOT)/sim)
 
-# Config from menuconfig (generated under sim/)
 -include $(SIM_DIR)/include/config/auto.conf
 -include $(SIM_DIR)/include/config/auto.conf.cmd
 
@@ -97,7 +96,11 @@ endif
 
 # Default arguments for simulation
 override ARGS ?= --log=$(BUILD_DIR)/npc-log.txt
-ARGS += $(ARGS_DIFF)
+
+ifdef CONFIG_DIFFTEST
+DIFF_REF_SO = $(NPC_HOME)/sim/$(call remove_quote,$(CONFIG_DIFFTEST_REF_PATH))
+ARGS_DIFF = --diff=$(DIFF_REF_SO)
+endif
 
 # Simulation target
 sim: $(TARGET)
