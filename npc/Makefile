@@ -97,9 +97,8 @@ endif
 # Default arguments for simulation
 override ARGS ?= --log=$(BUILD_DIR)/npc-log.txt
 
-ifdef CONFIG_DIFFTEST
-DIFF_REF_SO = $(NPC_HOME)/sim/$(call remove_quote,$(CONFIG_DIFFTEST_REF_PATH))
-ARGS += --diff=$(DIFF_REF_SO)
+ifneq ($(CONFIG_DIFFTEST),)
+ARGS += --diff=$(NPC_HOME)/sim/$(call remove_quote,$(CONFIG_DIFFTEST_REF_PATH))
 endif
 
 # Simulation target
