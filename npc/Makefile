@@ -99,7 +99,7 @@ override ARGS ?= --log=$(BUILD_DIR)/npc-log.txt
 
 ifdef CONFIG_DIFFTEST
 DIFF_REF_SO = $(NPC_HOME)/sim/$(call remove_quote,$(CONFIG_DIFFTEST_REF_PATH))
-ARGS_DIFF = --diff=$(DIFF_REF_SO)
+ARGS += --diff=$(DIFF_REF_SO)
 endif
 
 # Simulation target
