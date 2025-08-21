@@ -3,8 +3,6 @@
 #include <memory/memory.h>
 #include <svdpi.h>
 
-static bool g_print_step = false;
-
 static void exec_once() {
   uint32_t pc = get_npc_pc();
   uint32_t inst = pmem_read(pc);
@@ -18,9 +16,7 @@ static void exec_once() {
   void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
   disassemble(logbuf, sizeof(logbuf), pc, (uint8_t *)&inst, 4);
 
-  if (g_print_step) {
-    printf("0x%08x:\t%08x:\t%s\n", pc, inst, logbuf);
-  }
+  printf("0x%08x:\t%08x:\t%s\n", pc, inst, logbuf);
 
   itrace_push(pc, inst, logbuf);
 #endif
@@ -42,12 +38,10 @@ static void exec_once() {
 }
 
 void npc_cpu_exec(uint64_t n) {
-  g_print_step = (n < 10);
   npc_state.state = NPC_RUNNING;
 
   if (n == (uint64_t)-1) {
     Log("NPC started (continuous execution)");
-    g_print_step = false;
     while (npc_state.state == NPC_RUNNING) {
       exec_once();
     }
