@@ -95,7 +95,7 @@ endif
 endif
 
 # Default arguments for simulation
-override ARGS ?= --log=$(BUILD_DIR)/npc-log.txt
+# override ARGS ?= --log=$(BUILD_DIR)/npc-log.txt
 
 ifeq ($(CONFIG_DIFFTEST),y)
 ARGS += --diff=$(NPC_HOME)/sim/$(call remove_quote,$(CONFIG_DIFFTEST_REF_PATH))
