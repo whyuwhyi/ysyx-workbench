@@ -1,4 +1,5 @@
 #include <common.h>
+#include <cstdint>
 #include <defs.h>
 #include <dlfcn.h>
 #include <memory/memory.h>
@@ -113,10 +114,10 @@ static void checkregs(riscv32_CPU_state *ref, uint32_t pc) {
   }
 }
 
-void difftest_step(uint32_t pc, uint32_t npc) {
+void difftest_step(uint32_t pc) {
   if (ref_skip_difftest) {
-    ref_skip_difftest = false;
     dut_copy_to_ref();
+    ref_skip_difftest = false;
     return;
   }
   ref_difftest_exec(1);

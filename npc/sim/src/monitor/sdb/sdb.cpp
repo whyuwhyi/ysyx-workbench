@@ -173,7 +173,7 @@ static int cmd_x(char *args) {
 
   printf("address \t hex \t\t dec\n");
   for (int i = 0; i < n; ++i) {
-    value = pmem_read(addr);
+    value = paddr_read(addr, 4);
     printf("0x%08x\t 0x%08x\t %d\n", addr, value, value);
     addr += 4;
   }

@@ -3,18 +3,9 @@
 
 #include <common.h>
 
-extern "C" {
-int get_pc_value();
-int get_reg_value(int reg_idx);
-void ebreak();
-int pmem_read(int raddr);
-void pmem_write(int waddr, int wdata, char wmask);
-}
-
 uint32_t paddr_read(uint32_t addr, int len);
 void paddr_write(uint32_t addr, int len, uint32_t data);
 long load_img(const char *img_file);
-void init_mem();
 
 void init_device(void);
 void serial_init(void);
@@ -25,6 +16,7 @@ void serial_putchar(char c);
 int timer_get_time(void);
 
 uint32_t get_npc_pc();
+uint32_t get_npc_inst();
 uint32_t get_npc_reg(int reg_idx);
 
 void init_cpu();
@@ -62,6 +54,6 @@ void sdb_mainloop();
 void watchpoint_check();
 
 void init_difftest(char *ref_so_file, long img_size, int port);
-void difftest_step(uint32_t pc, uint32_t npc);
+void difftest_step(uint32_t pc);
 
 #endif

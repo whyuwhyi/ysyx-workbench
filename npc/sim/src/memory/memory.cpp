@@ -6,7 +6,7 @@
 
 uint8_t pmem[CONFIG_MSIZE];
 
-extern bool ref_skip_difftest;
+IFDEF(CONFIG_DIFFTEST, extern bool ref_skip_difftest);
 
 static inline bool in_pmem(uint32_t addr) {
   return addr >= CONFIG_MBASE && addr < CONFIG_MBASE + CONFIG_MSIZE;
@@ -103,14 +103,10 @@ long load_img(const char *img_file) {
   return size;
 }
 
-void init_mem() {
-  Log("Initialize memory: base=0x%08x, size=0x%08x", CONFIG_MBASE,
-      CONFIG_MSIZE);
-}
-
 extern "C" int pmem_read(int raddr) {
-  if (raddr == TIMER_ADDR) {
-    ref_skip_difftest = true;
+  if (raddr == TIMER_ADDR || raddr == SERIAL_ADDR) {
+
+    IFDEF(CONFIG_DIFFTEST, ref_skip_difftest = true);
     return timer_get_time();
   }
   return paddr_read(raddr, 4);
@@ -118,7 +114,8 @@ extern "C" int pmem_read(int raddr) {
 
 extern "C" void pmem_write(int waddr, int wdata, char wmask) {
   if (waddr == SERIAL_ADDR) {
-    ref_skip_difftest = true;
+
+    IFDEF(CONFIG_DIFFTEST, ref_skip_difftest = true);
     serial_putchar(wdata & 0xff);
     return;
   }
@@ -134,7 +131,7 @@ extern "C" void pmem_write(int waddr, int wdata, char wmask) {
     paddr_write(waddr, 4, wdata);
     break;
   default:
-    break;
+    assert(0);
   }
 }
 

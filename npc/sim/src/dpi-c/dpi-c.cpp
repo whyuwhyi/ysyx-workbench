@@ -6,14 +6,30 @@
 
 extern NPCState npc_state;
 
-#define PROBE_PC_INST "TOP.Core.datapathInst.ifuInst.pcInst.simProbePCInst"
+#define SIM_IMEM_INST "TOP.Core.datapathInst.ifuInst.simIMemInst"
 #define PROBE_RF_INST "TOP.Core.datapathInst.registerFileInst.simProbeRFInst"
 
+extern "C" {
+int get_pc_value();
+int get_reg_value(int reg_idx);
+int get_inst_value();
+void ebreak();
+int pmem_read(int raddr);
+void pmem_write(int waddr, int wdata, char wmask);
+}
+
 uint32_t get_npc_pc() {
-  svScope probe_pc_inst = svGetScopeFromName(PROBE_PC_INST);
-  assert(probe_pc_inst != NULL);
-  svSetScope(probe_pc_inst);
+  svScope sim_imem_inst = svGetScopeFromName(SIM_IMEM_INST);
+  assert(sim_imem_inst != NULL);
+  svSetScope(sim_imem_inst);
   return get_pc_value();
+}
+
+uint32_t get_npc_inst() {
+  svScope sim_imem_inst = svGetScopeFromName(SIM_IMEM_INST);
+  assert(sim_imem_inst != NULL);
+  svSetScope(sim_imem_inst);
+  return get_inst_value();
 }
 
 uint32_t get_npc_reg(int idx) {

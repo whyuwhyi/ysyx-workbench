@@ -51,9 +51,4 @@ class PC extends Module with Constants {
 
   val nextPc = Mux(io.redirValid, io.redirPc, coreNext)
   pcReg := nextPc
-
-  if (BuildFlags.sim) {
-    val simProbePCInst = Module(new sim.SimProbePC(xlen = XLEN))
-    simProbePCInst.io.pc := pcReg
-  }
 }
