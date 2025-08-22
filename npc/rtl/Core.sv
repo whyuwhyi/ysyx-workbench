@@ -86,10 +86,12 @@ module PC(	// src/main/scala/cpu/ifu/PC.scala:8:7
          {~io_branchFlags_isZero},
          {_take_T_11},
          {_take_T_11}};	// src/main/scala/cpu/ifu/PC.scala:32:47, :35:24, :37:24, :39:25
-      if (io_pcSel == 3'h4 | io_pcSel == 3'h3 | io_pcSel == 3'h2 & _GEN[io_branchCond])	// src/main/scala/cpu/ifu/PC.scala:23:23, :27:{18,47}, :32:47, :43:46, :46:25
+      if (io_pcSel == 3'h4 | io_pcSel == 3'h3 | io_pcSel == 3'h2
+          & _GEN[io_branchCond]) begin	// src/main/scala/cpu/ifu/PC.scala:23:23, :32:47, :43:46, :46:25
+        automatic logic _targetPre_T = io_pcSel == 3'h4;	// src/main/scala/cpu/ifu/PC.scala:23:23, :26:27
         pcReg <=
-          ({32{io_pcSel != 3'h4}} | 32'hFFFFFFFE)
-          & (io_pcSel == 3'h3 | io_pcSel == 3'h2 ? pcReg : io_rs1) + io_imm;	// src/main/scala/cpu/ifu/PC.scala:21:22, :23:23, :27:{8,18,35,47}, :29:18, :30:{22,32,57}
+          ({32{~_targetPre_T}} | 32'hFFFFFFFE) & (_targetPre_T ? io_rs1 : pcReg) + io_imm;	// src/main/scala/cpu/ifu/PC.scala:21:22, :26:{17,27}, :29:18, :30:{22,57}
+      end
       else	// src/main/scala/cpu/ifu/PC.scala:43:46, :46:25
         pcReg <= _pcPlus4_T;	// src/main/scala/cpu/ifu/PC.scala:21:22, :23:23
     end
@@ -193,8 +195,8 @@ module ALU(	// src/main/scala/cpu/exu/ALU.scala:8:7
                 io_branchFlags_isLessUnsigned	// src/main/scala/cpu/exu/ALU.scala:9:14
 );
 
-  wire        cin = io_aluOp == 4'h2 | io_aluOp == 4'h9 | io_aluOp == 4'hA;	// src/main/scala/cpu/exu/ALU.scala:19:{21,61,75,82,101,116}
-  wire [32:0] _wide_T_1 = {1'h0, io_opA} + {1'h0, {32{cin}} ^ io_opB} + {32'h0, cin};	// src/main/scala/cpu/exu/ALU.scala:19:82, :20:17, :22:{21,29}, :59:32
+  wire        cin = io_aluOp == 4'h2 | io_aluOp == 4'h9 | io_aluOp == 4'hA;	// src/main/scala/cpu/exu/ALU.scala:19:{14,40,54,66}
+  wire [32:0] _wide_T_1 = {1'h0, io_opA} + {1'h0, {32{cin}} ^ io_opB} + {32'h0, cin};	// src/main/scala/cpu/exu/ALU.scala:19:54, :20:17, :22:{21,29}, :59:32
   wire        sltRes = io_opA[31] ^ io_opB[31] ? io_opA[31] : _wide_T_1[31];	// src/main/scala/cpu/exu/ALU.scala:22:29, :23:17, :26:21, :27:21, :28:20, :29:{22,29}
   wire [31:0] _GEN = {27'h0, io_opB[4:0]};	// src/main/scala/cpu/exu/ALU.scala:32:21, :33:20
   wire [7:0]  _GEN_0 =
@@ -275,7 +277,7 @@ module ALU(	// src/main/scala/cpu/exu/ALU.scala:8:7
                               ? io_opA ^ io_opB
                               : io_aluOp == 4'h4
                                   ? io_opA | io_opB
-                                  : io_aluOp == 4'h3 ? io_opA & io_opB : _wide_T_1[31:0];	// src/main/scala/cpu/exu/ALU.scala:8:7, :19:{75,116}, :22:{21,29}, :23:17, :24:22, :29:22, :30:21, :33:20, :34:28, :35:{20,28,37}, :37:23, :38:22, :39:23, :43:37
+                                  : io_aluOp == 4'h3 ? io_opA & io_opB : _wide_T_1[31:0];	// src/main/scala/cpu/exu/ALU.scala:8:7, :19:{40,66}, :22:{21,29}, :23:17, :24:22, :29:22, :30:21, :33:20, :34:28, :35:{20,28,37}, :37:23, :38:22, :39:23, :43:37
   assign io_branchFlags_isZero = _wide_T_1[31:0] == 32'h0;	// src/main/scala/cpu/exu/ALU.scala:8:7, :22:29, :23:17, :59:32
   assign io_branchFlags_isLessSigned = sltRes;	// src/main/scala/cpu/exu/ALU.scala:8:7, :29:22
   assign io_branchFlags_isLessUnsigned = ~(_wide_T_1[32]);	// src/main/scala/cpu/exu/ALU.scala:8:7, :22:29, :24:22, :30:21

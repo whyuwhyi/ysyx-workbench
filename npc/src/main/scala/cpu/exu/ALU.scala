@@ -16,7 +16,7 @@ class ALU extends Module with Constants {
   })
 
   val subLike =
-    io.aluOp.asUInt === AluOp.SUB.asUInt || io.aluOp.asUInt === AluOp.SLT.asUInt || io.aluOp.asUInt === AluOp.SLTU.asUInt
+    io.aluOp === AluOp.SUB || io.aluOp === AluOp.SLT || io.aluOp === AluOp.SLTU
   val bXor = Mux(subLike, ~io.opB, io.opB)
   val cin = Mux(subLike, 1.U, 0.U)
   val wide = io.opA +& bXor + cin
