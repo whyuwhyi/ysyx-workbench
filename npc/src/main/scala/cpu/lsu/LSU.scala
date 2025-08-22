@@ -31,10 +31,10 @@ class LSU extends Module with Constants {
   val wmask = MuxLookup(io.memTypeIn, 4.U(8.W))(
     Seq(
       MemType.B -> 1.U,
-      MemType.H -> 2.U,
-      MemType.W -> 4.U,
+      MemType.H -> 3.U,
+      MemType.W -> 15.U,
       MemType.BU -> 1.U,
-      MemType.HU -> 2.U
+      MemType.HU -> 3.U
     )
   )
 

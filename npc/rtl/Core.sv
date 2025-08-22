@@ -295,7 +295,7 @@ module LSU(	// src/main/scala/cpu/lsu/LSU.scala:8:7
 );
 
   wire [31:0]      _simDMemInst_rdata;	// src/main/scala/cpu/lsu/LSU.scala:44:29
-  wire [7:0][7:0]  _GEN = '{8'h4, 8'h4, 8'h2, 8'h1, 8'h4, 8'h2, 8'h1, 8'h4};	// src/main/scala/cpu/lsu/LSU.scala:31:48
+  wire [7:0][7:0]  _GEN = '{8'h4, 8'h4, 8'h3, 8'h1, 8'hF, 8'h3, 8'h1, 8'h4};	// src/main/scala/cpu/lsu/LSU.scala:31:48
   wire [7:0][31:0] _GEN_0 =
     {{_simDMemInst_rdata},
      {_simDMemInst_rdata},
