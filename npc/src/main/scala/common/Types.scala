@@ -23,22 +23,3 @@ class BranchFlags extends Bundle with Constants {
   val isLessSigned = Bool()
   val isLessUnsigned = Bool()
 }
-
-class ControlSignalsBundle extends Bundle {
-  val pcSel = PCSel()
-  val opASel = OpASel()
-  val opBSel = OpBSel()
-  val aluOp = AluOp()
-  val wbSel = WBSel()
-  val regWen = Bool()
-  val memWen = Bool()
-  val memRen = Bool()
-  val memType = MemType()
-  val csrCmd = CSROp()
-  val branchCond = BranchCond()
-  val immSel = ImmSel()
-  val isEcall = Bool()
-  val isEbreak = Bool()
-  val isMret = Bool()
-  val illegalInst = Bool()
-}

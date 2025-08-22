@@ -17,3 +17,4 @@ build/
 include/config
 include/generated
 out/
+out/*
