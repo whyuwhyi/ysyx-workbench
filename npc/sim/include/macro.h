@@ -18,39 +18,50 @@
 
 #include <string.h>
 
+// macro concatenation
 #define concat_temp(x, y) x##y
 #define concat(x, y) concat_temp(x, y)
 #define concat3(x, y, z) concat(concat(x, y), z)
 #define concat4(w, x, y, z) concat3(concat(w, x), y, z)
 #define concat5(v, w, x, y, z) concat4(concat(v, w), x, y, z)
 
+// macro stringification
 #define str_temp(x) #x
 #define str(x) str_temp(x)
 
+// strlen() for string constant
 #define STRLEN(CONST_STR) (sizeof(CONST_STR) - 1)
 
+// calculate the length of an array
 #define ARRLEN(arr) (int)(sizeof(arr) / sizeof(arr[0]))
 
+// macro testing
+// See
+// https://stackoverflow.com/questions/26099745/test-if-preprocessor-symbol-is-defined-inside-macro
 #define CHOOSE2nd(a, b, ...) b
 #define MUX_WITH_COMMA(contain_comma, a, b) CHOOSE2nd(contain_comma a, b)
 #define MUX_MACRO_PROPERTY(p, macro, a, b)                                     \
   MUX_WITH_COMMA(concat(p, macro), a, b)
-
+// define placeholders for some property
 #define __P_DEF_0 X,
 #define __P_DEF_1 X,
 #define __P_ONE_1 X,
 #define __P_ZERO_0 X,
-
+// define some selection functions based on the properties of BOOLEAN macro
 #define MUXDEF(macro, X, Y) MUX_MACRO_PROPERTY(__P_DEF_, macro, X, Y)
 #define MUXNDEF(macro, X, Y) MUX_MACRO_PROPERTY(__P_DEF_, macro, Y, X)
 #define MUXONE(macro, X, Y) MUX_MACRO_PROPERTY(__P_ONE_, macro, X, Y)
 #define MUXZERO(macro, X, Y) MUX_MACRO_PROPERTY(__P_ZERO_, macro, X, Y)
 
+// test if a boolean macro is defined
 #define ISDEF(macro) MUXDEF(macro, 1, 0)
 #define ISNDEF(macro) MUXNDEF(macro, 1, 0)
 #define ISONE(macro) MUXONE(macro, 1, 0)
 #define ISZERO(macro) MUXZERO(macro, 1, 0)
 
+// functional-programming-like macro (X-macro)
+// apply the function `f` to each element in the container, and obtain a new
+// container NOTE: `f` must be a function-like macro
 #define MAP(c, f) c(f)
 
 #define ROUNDUP(a, sz) ((((uintptr_t)a) + (sz) - 1) & ~((sz) - 1))
@@ -58,11 +69,14 @@
 
 #define PG_ALIGN __attribute((aligned(4096)))
 
+// for conditional compilation
 #define __IGNORE(...)
 #define __KEEP(...) __VA_ARGS__
-
+// `keep` or `ignore` the code depending on the boolean macro `cond`
 #define IFDEF(cond, ...) MUXDEF(cond, __KEEP, __IGNORE)(__VA_ARGS__)
 #define IFNDEF(cond, ...) MUXNDEF(cond, __KEEP, __IGNORE)(__VA_ARGS__)
+
+// functional macro helpers
 
 #define __ANSI(fmt, str) "\033[" str "m" fmt "\033[0m"
 #define ANSI_FMT(fmt, str) __ANSI(fmt, str)

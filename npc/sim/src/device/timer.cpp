@@ -9,6 +9,7 @@ void timer_init() {
   struct timeval tv;
   gettimeofday(&tv, NULL);
   boot_time = tv.tv_sec * 1000000 + tv.tv_usec;
+  Log("Timer initialized");
 }
 
 int timer_get_time() {

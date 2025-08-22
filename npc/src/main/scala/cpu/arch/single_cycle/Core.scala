@@ -20,7 +20,7 @@ class Core extends Module with Constants {
   datapathInst.io.opBSel := iduInst.io.opBSel
   datapathInst.io.aluOp := iduInst.io.aluOp
   datapathInst.io.wbSel := iduInst.io.wbSel
-  datapathInst.io.regWen := iduInst.io.regWen
+  datapathInst.io.regWen := iduInst.io.regWen && !csrFileInst.io.takeTrap
   datapathInst.io.memWen := iduInst.io.memWen
   datapathInst.io.memRen := iduInst.io.memRen
   datapathInst.io.memType := iduInst.io.memType
@@ -40,8 +40,7 @@ class Core extends Module with Constants {
   csrFileInst.io.inWdata := Mux(csrUseImm, csrZimm, datapathInst.io.rs1Data)
   csrFileInst.io.pc := datapathInst.io.pc
 
-  datapathInst.io.redirValid := iduInst.io.illegalInst || iduInst.io.isEbreak ||
-    iduInst.io.isEcall || iduInst.io.isMret
+  datapathInst.io.redirValid := csrFileInst.io.takeTrap
   datapathInst.io.redirPc := csrFileInst.io.nextPc
   datapathInst.io.csrRdata := csrFileInst.io.rdata
 }

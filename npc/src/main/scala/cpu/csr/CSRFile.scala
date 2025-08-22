@@ -18,6 +18,7 @@ class CSRFile extends Module with Constants {
     val rdata = Output(UInt(XLEN.W))
     val pc = Input(UInt(XLEN.W))
     val nextPc = Output(UInt(XLEN.W))
+    val takeTrap = Output(Bool())
   })
 
   val mstatus = RegInit(0.U(XLEN.W))
@@ -51,11 +52,13 @@ class CSRFile extends Module with Constants {
     }
   }
 
+  val extTrap = io.trapValid || io.isEbreak || io.isEcall
   val causeVal =
     Mux(io.isEcall, ECALL_M_CAUSE.U(XLEN.W), ILLEGAL_INST_CAUSE.U(XLEN.W))
-  when(io.trapValid) {
+  when(extTrap) {
     mepc := io.pc
     mcause := causeVal
   }
   io.nextPc := Mux(io.isMret, mepc, mtvec)
+  io.takeTrap := extTrap || io.isMret
 }

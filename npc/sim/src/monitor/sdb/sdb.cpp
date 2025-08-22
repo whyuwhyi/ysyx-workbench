@@ -173,7 +173,7 @@ static int cmd_x(char *args) {
 
   printf("address \t hex \t\t dec\n");
   for (int i = 0; i < n; ++i) {
-    value = paddr_read(addr, 4);
+    value = pmem_read(addr);
     printf("0x%08x\t 0x%08x\t %d\n", addr, value, value);
     addr += 4;
   }
@@ -274,6 +274,11 @@ void sdb_mainloop() {
     if (args >= str_end) {
       args = NULL;
     }
+
+#ifdef CONFIG_DEVICE
+    extern void sdl_clear_event_queue();
+    sdl_clear_event_queue();
+#endif
 
     int i;
     for (i = 0; i < NR_CMD; i++) {
