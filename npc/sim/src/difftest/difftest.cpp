@@ -11,6 +11,9 @@ typedef struct {
 } riscv32_CPU_state;
 
 static riscv32_CPU_state dut_riscv32_cpu_state;
+
+static riscv32_CPU_state ref_riscv32_cpu_state;
+
 static void dut_copy_to_ref();
 
 bool ref_skip_difftest = false;
@@ -111,13 +114,12 @@ static void checkregs(riscv32_CPU_state *ref, uint32_t pc) {
 }
 
 void difftest_step(uint32_t pc, uint32_t npc) {
-  riscv32_CPU_state ref_r;
-
   if (ref_skip_difftest) {
     ref_skip_difftest = false;
     dut_copy_to_ref();
     return;
   }
   ref_difftest_exec(1);
-  checkregs(&ref_r, pc);
+  ref_difftest_regcpy(&ref_riscv32_cpu_state, DIFFTEST_TO_DUT);
+  checkregs(&ref_riscv32_cpu_state, pc);
 }
