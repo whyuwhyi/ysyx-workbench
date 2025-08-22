@@ -730,15 +730,15 @@ module IDU(	// src/main/scala/cpu/idu/IDU.scala:9:7
        io_inst[3],
        &_decoded_andMatrixOutputs_T_7,
        &_decoded_andMatrixOutputs_T_9,
-       &_decoded_andMatrixOutputs_T_10,
        &_decoded_andMatrixOutputs_T_11,
-       &_decoded_andMatrixOutputs_T_14,
        &_decoded_andMatrixOutputs_T_15,
        &_decoded_andMatrixOutputs_T_19,
-       &_decoded_andMatrixOutputs_T_27,
        &_decoded_andMatrixOutputs_T_29,
        &_decoded_andMatrixOutputs_T_30},
-     &_decoded_andMatrixOutputs_T_8};	// src/main/scala/chisel3/util/experimental/decode/DecoderBundle.scala:88:106, src/main/scala/chisel3/util/pla.scala:90:45, :98:{53,70}, :114:{19,36}, src/main/scala/cpu/idu/IDU.scala:9:7
+     |{&_decoded_andMatrixOutputs_T_8,
+       &_decoded_andMatrixOutputs_T_10,
+       &_decoded_andMatrixOutputs_T_14,
+       &_decoded_andMatrixOutputs_T_27}};	// src/main/scala/chisel3/util/experimental/decode/DecoderBundle.scala:88:106, src/main/scala/chisel3/util/pla.scala:90:45, :98:{53,70}, :114:{19,36}, src/main/scala/cpu/idu/IDU.scala:9:7
   assign io_aluOp =
     {|{&_decoded_andMatrixOutputs_T_9,
        &_decoded_andMatrixOutputs_T_17,

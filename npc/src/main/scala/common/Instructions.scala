@@ -36,7 +36,7 @@ object OpBSelField extends DecodeField[RV32IInstruction, OpBSel.Type] {
   def chiselType = OpBSel()
   def genTable(inst: RV32IInstruction): BitPat = inst.name match {
     case "ADD" | "SUB" | "AND" | "OR" | "XOR" | "SLL" | "SRL" | "SRA" | "SLT" |
-        "SLTU" =>
+        "SLTU" | "BEQ" | "BNE" | "BLT" | "BGE" | "BLTU" | "BGEU" =>
       BitPat(OpBSel.RS2.litValue.U(OpBSel.getWidth.W))
     case _ => BitPat(OpBSel.IMM.litValue.U(OpBSel.getWidth.W))
   }
