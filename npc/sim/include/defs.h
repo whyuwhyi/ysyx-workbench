@@ -8,8 +8,6 @@ void paddr_write(uint32_t addr, int len, uint32_t data);
 long load_img(const char *img_file);
 
 void init_device(void);
-void serial_init(void);
-void timer_init(void);
 
 void serial_putchar(char c);
 

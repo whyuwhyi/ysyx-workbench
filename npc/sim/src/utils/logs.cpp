@@ -17,3 +17,7 @@ void init_log(const char *log_file) {
 bool log_enable() { return log_enable_flag; }
 
 void log_set_enable(bool enable) { log_enable_flag = enable; }
+
+void assert_fail_msg() {
+  Log("Assertion failure at pc = 0x%08x", npc_state.halt_pc);
+}

@@ -118,8 +118,10 @@ void difftest_step(uint32_t pc) {
   if (ref_skip_difftest) {
     dut_copy_to_ref();
     ref_skip_difftest = false;
+    printf("001");
     return;
   }
+
   ref_difftest_exec(1);
   ref_difftest_regcpy(&ref_riscv32_cpu_state, DIFFTEST_TO_DUT);
   checkregs(&ref_riscv32_cpu_state, pc);
