@@ -26,6 +26,7 @@ typedef struct {
 } NPCState;
 
 extern NPCState npc_state;
+#define nr_reg 16
 
 bool log_enable();
 void init_log(const char *log_file);

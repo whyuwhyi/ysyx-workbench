@@ -11,6 +11,9 @@ typedef struct {
 } riscv32_CPU_state;
 
 static riscv32_CPU_state dut_riscv32_cpu_state;
+static void dut_copy_to_ref();
+
+bool ref_skip_difftest = false;
 
 void (*ref_difftest_memcpy)(uint32_t addr, void *buf, size_t n,
                             bool direction) = NULL;
@@ -56,7 +59,11 @@ void init_difftest(char *ref_so_file, long img_size, int port) {
   extern uint8_t pmem[];
   ref_difftest_memcpy(CONFIG_MBASE, pmem, img_size, DIFFTEST_TO_REF);
 
-  for (int i = 0; i < 32; i++) {
+  dut_copy_to_ref();
+}
+
+static void dut_copy_to_ref() {
+  for (int i = 0; i < nr_reg; i++) {
     dut_riscv32_cpu_state.gpr[i] = get_npc_reg(i);
   }
   dut_riscv32_cpu_state.pc = get_npc_pc();
@@ -106,8 +113,11 @@ static void checkregs(riscv32_CPU_state *ref, uint32_t pc) {
 void difftest_step(uint32_t pc, uint32_t npc) {
   riscv32_CPU_state ref_r;
 
+  if (ref_skip_difftest) {
+    ref_skip_difftest = false;
+    dut_copy_to_ref();
+    return;
+  }
   ref_difftest_exec(1);
-  ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);
-
   checkregs(&ref_r, pc);
 }

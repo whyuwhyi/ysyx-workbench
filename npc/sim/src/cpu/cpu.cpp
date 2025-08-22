@@ -7,10 +7,6 @@ static void exec_once() {
   uint32_t pc = get_npc_pc();
   uint32_t inst = pmem_read(pc);
 
-  single_cycle();
-
-  uint32_t npc = get_npc_pc();
-
 #ifdef CONFIG_ITRACE
   char logbuf[128];
   void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
@@ -20,6 +16,10 @@ static void exec_once() {
 
   itrace_push(pc, inst, logbuf);
 #endif
+
+  single_cycle();
+
+  uint32_t npc = get_npc_pc();
 
 #ifdef CONFIG_FTRACE
 

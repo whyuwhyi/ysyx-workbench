@@ -6,6 +6,8 @@
 
 uint8_t pmem[CONFIG_MSIZE];
 
+extern bool ref_skip_difftest;
+
 static inline bool in_pmem(uint32_t addr) {
   return addr >= CONFIG_MBASE && addr < CONFIG_MBASE + CONFIG_MSIZE;
 }
@@ -108,6 +110,7 @@ void init_mem() {
 
 extern "C" int pmem_read(int raddr) {
   if (raddr == TIMER_ADDR) {
+    ref_skip_difftest = true;
     return timer_get_time();
   }
   return paddr_read(raddr, 4);
@@ -115,6 +118,7 @@ extern "C" int pmem_read(int raddr) {
 
 extern "C" void pmem_write(int waddr, int wdata, char wmask) {
   if (waddr == SERIAL_ADDR) {
+    ref_skip_difftest = true;
     serial_putchar(wdata & 0xff);
     return;
   }
