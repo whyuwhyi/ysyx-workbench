@@ -79,7 +79,7 @@ static void checkregs(riscv32_CPU_state *ref, uint32_t pc) {
     diff_found = true;
   }
 
-  for (int i = 0; i < 32; i++) {
+  for (int i = 0; i < nr_reg; i++) {
     uint32_t dut_reg = get_npc_reg(i);
     if (ref->gpr[i] != dut_reg) {
       Log("Register x%d differs: REF=0x%08x, DUT=0x%08x at pc=0x%08x", i,
@@ -91,7 +91,7 @@ static void checkregs(riscv32_CPU_state *ref, uint32_t pc) {
   if (diff_found) {
     Log("DiffTest failed at pc=0x%08x", pc);
     Log("REF registers:");
-    for (int i = 0; i < 32; i++) {
+    for (int i = 0; i < nr_reg; i++) {
       Log("x%d=0x%08x ", i, ref->gpr[i]);
       if ((i + 1) % 4 == 0)
         Log("");
@@ -99,7 +99,7 @@ static void checkregs(riscv32_CPU_state *ref, uint32_t pc) {
     Log("pc=0x%08x", ref->pc);
 
     Log("DUT registers:");
-    for (int i = 0; i < 32; i++) {
+    for (int i = 0; i < nr_reg; i++) {
       Log("x%d=0x%08x ", i, get_npc_reg(i));
       if ((i + 1) % 4 == 0)
         Log("");
