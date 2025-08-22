@@ -7,20 +7,20 @@ import "DPI-C" function void pmem_write(input int waddr, input int wdata, input 
 module SimDMem #(
   parameter XLEN = 32
 )(
-  input  logic            ren,
-  input  logic [XLEN-1:0] raddr,
+
+  input  logic [XLEN-1:0] addr,
   input  logic            wen,
-  input  logic [XLEN-1:0] waddr,
-  input  logic [XLEN-1:0] wdata,
   input  logic [7:0] wmask,
+  input  logic [XLEN-1:0] wdata,
+  input  logic            ren,
   output logic [XLEN-1:0] rdata
 );
   always @(*) begin
-    if (ren) rdata = pmem_read(raddr);
+    if (ren) rdata = pmem_read(addr);
     else     rdata = '0;
   end
 
   always @(*) begin
-    if (wen) pmem_write(waddr, wdata, wmask);
+    if (wen) pmem_write(addr, wdata, wmask);
   end
 endmodule

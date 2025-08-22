@@ -28,13 +28,13 @@ class LSU extends Module with Constants {
     )
   )
 
-  val wmask = MuxLookup(io.memTypeIn, 0.U(8.W))(
+  val wmask = MuxLookup(io.memTypeIn, 4.U(8.W))(
     Seq(
-      MemType.B -> (1.U << byteSel),
-      MemType.H -> (3.U << (byteSel << 1)),
-      MemType.W -> 0xff.U,
-      MemType.BU -> (1.U << byteSel),
-      MemType.HU -> (3.U << (byteSel << 1))
+      MemType.B -> 1.U,
+      MemType.H -> 2.U,
+      MemType.W -> 4.U,
+      MemType.BU -> 1.U,
+      MemType.HU -> 2.U
     )
   )
 
@@ -42,15 +42,12 @@ class LSU extends Module with Constants {
 
   if (BuildFlags.sim) {
     val simDMemInst = Module(new sim.SimDMem(xlen = XLEN))
+    simDMemInst.io.addr := io.addrIn
     simDMemInst.io.ren := io.ren
-    simDMemInst.io.raddr := io.addrIn
+    rawRdata := simDMemInst.io.rdata
     simDMemInst.io.wen := io.wen
-    simDMemInst.io.waddr := io.addrIn
     simDMemInst.io.wdata := io.wdataIn
     simDMemInst.io.wmask := wmask
-    rawRdata := simDMemInst.io.rdata
-  } else {
-    rawRdata := 0.U
   }
 
   val rBU = Cat(0.U((XLEN - 8).W), rawRdata(7, 0))

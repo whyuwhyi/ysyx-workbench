@@ -295,20 +295,8 @@ module LSU(	// src/main/scala/cpu/lsu/LSU.scala:8:7
 );
 
   wire [31:0]      _simDMemInst_rdata;	// src/main/scala/cpu/lsu/LSU.scala:44:29
-  wire [8:0]       _GEN = {6'h0, io_addrIn[1:0], 1'h0};	// src/main/scala/cpu/lsu/LSU.scala:19:26, :34:{25,37}
-  wire [8:0]       _wmask_T_2 = 9'h3 << _GEN;	// src/main/scala/cpu/lsu/LSU.scala:34:25
-  wire [8:0]       _wmask_T_5 = 9'h3 << _GEN;	// src/main/scala/cpu/lsu/LSU.scala:34:25, :37:26
-  wire [7:0]       _GEN_0 = {4'h0, 4'h1 << io_addrIn[1:0]};	// src/main/scala/cpu/lsu/LSU.scala:19:26, :31:48, :33:25
-  wire [7:0][7:0]  _GEN_1 =
-    {{8'h0},
-     {8'h0},
-     {_wmask_T_5[7:0]},
-     {_GEN_0},
-     {8'hFF},
-     {_wmask_T_2[7:0]},
-     {_GEN_0},
-     {8'h0}};	// src/main/scala/cpu/lsu/LSU.scala:31:48, :34:25, :37:26
-  wire [7:0][31:0] _GEN_2 =
+  wire [7:0][7:0]  _GEN = '{8'h4, 8'h4, 8'h2, 8'h1, 8'h4, 8'h2, 8'h1, 8'h4};	// src/main/scala/cpu/lsu/LSU.scala:31:48
+  wire [7:0][31:0] _GEN_0 =
     {{_simDMemInst_rdata},
      {_simDMemInst_rdata},
      {{16'h0, _simDMemInst_rdata[15:0]}},
@@ -316,19 +304,18 @@ module LSU(	// src/main/scala/cpu/lsu/LSU.scala:8:7
      {_simDMemInst_rdata},
      {{{16{_simDMemInst_rdata[15]}}, _simDMemInst_rdata[15:0]}},
      {{{24{_simDMemInst_rdata[7]}}, _simDMemInst_rdata[7:0]}},
-     {_simDMemInst_rdata}};	// src/main/scala/cpu/lsu/LSU.scala:44:29, :56:{16,44}, :57:{16,45}, :58:{16,21,40}, :59:{16,21,41}, :61:51
+     {_simDMemInst_rdata}};	// src/main/scala/cpu/lsu/LSU.scala:44:29, :53:{16,44}, :54:{16,45}, :55:{16,21,40}, :56:{16,21,41}, :58:51
   SimDMem #(
     .XLEN(32)
   ) simDMemInst (	// src/main/scala/cpu/lsu/LSU.scala:44:29
+    .addr  (io_addrIn),
     .ren   (io_ren),
-    .raddr (io_addrIn),
+    .rdata (_simDMemInst_rdata),
     .wen   (io_wen),
-    .waddr (io_addrIn),
-    .wdata (io_wdataIn),
-    .wmask (_GEN_1[io_memTypeIn]),	// src/main/scala/cpu/lsu/LSU.scala:31:48
-    .rdata (_simDMemInst_rdata)
+    .wmask (_GEN[io_memTypeIn]),	// src/main/scala/cpu/lsu/LSU.scala:31:48
+    .wdata (io_wdataIn)
   );
-  assign io_rdataOut = _GEN_2[io_memTypeIn];	// src/main/scala/cpu/lsu/LSU.scala:8:7, :61:51
+  assign io_rdataOut = _GEN_0[io_memTypeIn];	// src/main/scala/cpu/lsu/LSU.scala:8:7, :58:51
 endmodule
 
 // external module SimProbeRF
@@ -1073,21 +1060,21 @@ import "DPI-C" function void pmem_write(input int waddr, input int wdata, input 
 module SimDMem #(
   parameter XLEN = 32
 )(
-  input  logic            ren,
-  input  logic [XLEN-1:0] raddr,
+
+  input  logic [XLEN-1:0] addr,
   input  logic            wen,
-  input  logic [XLEN-1:0] waddr,
-  input  logic [XLEN-1:0] wdata,
   input  logic [7:0] wmask,
+  input  logic [XLEN-1:0] wdata,
+  input  logic            ren,
   output logic [XLEN-1:0] rdata
 );
   always @(*) begin
-    if (ren) rdata = pmem_read(raddr);
+    if (ren) rdata = pmem_read(addr);
     else     rdata = '0;
   end
 
   always @(*) begin
-    if (wen) pmem_write(waddr, wdata, wmask);
+    if (wen) pmem_write(addr, wdata, wmask);
   end
 endmodule
 
