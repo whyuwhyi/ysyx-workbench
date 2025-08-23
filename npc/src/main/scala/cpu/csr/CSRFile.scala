@@ -55,7 +55,7 @@ class CSRFile extends Module with Constants {
     Mux(io.isEcall, ECALL_M_CAUSE.U(XLEN.W), ILLEGAL_INST_CAUSE.U(XLEN.W))
   when(io.trapValid) {
     mepc := io.pc
-    // mcause := causeVal
+    mcause := causeVal
   }
   io.nextPc := Mux(io.isMret, mepc, mtvec)
 }
