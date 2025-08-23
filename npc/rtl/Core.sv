@@ -853,14 +853,14 @@ module CSRFile(	// src/main/scala/cpu/csr/CSRFile.scala:8:7
       : _rdata_T_4 ? mcause : _rdata_T_2 ? mepc : _rdata_T ? mstatus : 32'h0;	// src/main/scala/cpu/csr/CSRFile.scala:22:24, :23:21, :24:23, :25:22, :27:47
   always @(posedge clock) begin	// src/main/scala/cpu/csr/CSRFile.scala:8:7
     if (reset) begin	// src/main/scala/cpu/csr/CSRFile.scala:8:7
-      mstatus <= 32'h0;	// src/main/scala/cpu/csr/CSRFile.scala:22:24
-      mepc <= 32'h0;	// src/main/scala/cpu/csr/CSRFile.scala:22:24, :23:21
-      mcause <= 32'h1800;	// src/main/scala/cpu/csr/CSRFile.scala:24:23
-      mtvec <= 32'h0;	// src/main/scala/cpu/csr/CSRFile.scala:22:24, :25:22
+      mstatus <= 32'h1800;	// src/main/scala/cpu/csr/CSRFile.scala:22:24
+      mepc <= 32'h0;	// src/main/scala/cpu/csr/CSRFile.scala:23:21
+      mcause <= 32'h0;	// src/main/scala/cpu/csr/CSRFile.scala:23:21, :24:23
+      mtvec <= 32'h0;	// src/main/scala/cpu/csr/CSRFile.scala:23:21, :25:22
     end
     else begin	// src/main/scala/cpu/csr/CSRFile.scala:8:7
       automatic logic [3:0][31:0] _GEN =
-        {{io_rdata_0 & ~io_wdata}, {io_rdata_0 | io_wdata}, {io_wdata}, {32'h0}};	// src/main/scala/cpu/csr/CSRFile.scala:22:24, :27:47, :38:45, :41:29, :42:{29,31}
+        {{io_rdata_0 & ~io_wdata}, {io_rdata_0 | io_wdata}, {io_wdata}, {32'h0}};	// src/main/scala/cpu/csr/CSRFile.scala:23:21, :27:47, :38:45, :41:29, :42:{29,31}
       if ((|io_csrOp) & _rdata_T)	// src/main/scala/cpu/csr/CSRFile.scala:22:24, :27:47, :37:{17,33}, :45:21, :46:42
         mstatus <= _GEN[io_csrOp];	// src/main/scala/cpu/csr/CSRFile.scala:22:24, :38:45
       if (io_trapValid) begin	// src/main/scala/cpu/csr/CSRFile.scala:9:14

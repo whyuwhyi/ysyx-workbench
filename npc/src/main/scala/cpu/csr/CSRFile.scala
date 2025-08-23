@@ -19,9 +19,9 @@ class CSRFile extends Module with Constants {
     val nextPc = Output(UInt(XLEN.W))
   })
 
-  val mstatus = RegInit(0.U(XLEN.W))
+  val mstatus = RegInit(0x1800.U(XLEN.W))
   val mepc = RegInit(0.U(XLEN.W))
-  val mcause = RegInit(0x1800.U(XLEN.W))
+  val mcause = RegInit(0.U(XLEN.W))
   val mtvec = RegInit(0.U(XLEN.W))
 
   val _rdata = MuxLookup(io.addr, 0.U(XLEN.W))(
