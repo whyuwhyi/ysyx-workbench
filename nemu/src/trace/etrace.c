@@ -2,6 +2,6 @@
 
 void init_etrace() { Log("Exception trace initialized"); }
 
-void etrace_call(word_t epc, word_t NO) {}
+void etrace_call(paddr_t epc) { Log("Exception at " FMT_PADDR "", epc); }
 
-void etrace_ret() {}
+void etrace_ret() { Log("Return from exception"); }

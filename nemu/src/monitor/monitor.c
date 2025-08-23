@@ -27,6 +27,7 @@ void init_itrace();
 void init_mtrace();
 void init_ftrace(const char *elf_path);
 void init_dtrace();
+void init_etrace();
 
 static void welcome() {
   Log("Trace: %s", MUXDEF(CONFIG_TRACE, ANSI_FMT("ON", ANSI_FG_GREEN),
@@ -154,6 +155,7 @@ void init_monitor(int argc, char *argv[]) {
   IFDEF(CONFIG_MTRACE, init_mtrace());
   IFDEF(CONFIG_FTRACE, init_ftrace(elf_file));
   IFDEF(CONFIG_DTRACE, init_dtrace());
+  IFDEF(CONFIG_ETRACE, init_etrace());
 
   /* Display welcome message. */
   welcome();

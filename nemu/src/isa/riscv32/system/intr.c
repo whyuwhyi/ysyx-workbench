@@ -16,10 +16,20 @@
 #include "../local-include/csr.h"
 #include <isa.h>
 
-word_t isa_raise_intr(word_t NO, vaddr_t epc) {
+void etrace_call(paddr_t epc);
+void etrace_ret();
+
+vaddr_t isa_raise_intr(word_t NO, vaddr_t epc) {
   CSR(mepc) = epc;
   CSR(mcause) = NO;
+
+  IFDEF(CONFIG_ETRACE, etrace_call(epc));
   return CSR(mtvec);
+}
+
+vaddr_t riscv_mret() {
+  IFDEF(CONFIG_ETRACE, etrace_ret());
+  return CSR(mepc);
 }
 
 word_t isa_query_intr() { return INTR_EMPTY; }

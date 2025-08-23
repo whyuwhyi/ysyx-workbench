@@ -59,7 +59,7 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
     ftrace_call(_this->pc, _this->dnpc);
   } else if (is_fret(_this->isa.inst)) {
     ftrace_ret(_this->pc, _this->dnpc);
-  });
+  };
 #endif
   watchpoint_check();
 }

@@ -18,9 +18,8 @@
 #include <memory/host.h>
 #include <memory/paddr.h>
 
-// Trace function declarations
-IFDEF(CONFIG_MTRACE, void mtrace_read(paddr_t addr, int len));
-IFDEF(CONFIG_MTRACE, void mtrace_write(paddr_t addr, int len, word_t data));
+void mtrace_read(paddr_t addr, int len, word_t data);
+void mtrace_write(paddr_t addr, int len, word_t data);
 
 #if defined(CONFIG_PMEM_MALLOC)
 static uint8_t *pmem = NULL;
@@ -58,8 +57,9 @@ void init_mem() {
 
 word_t paddr_read(paddr_t addr, int len) {
   if (likely(in_pmem(addr))) {
-    IFDEF(CONFIG_MTRACE, mtrace_read(addr, len));
-    return pmem_read(addr, len);
+    word_t data = pmem_read(addr, len);
+    IFDEF(CONFIG_MTRACE, mtrace_read(addr, len, data));
+    return data;
   }
   IFDEF(CONFIG_DEVICE, return mmio_read(addr, len));
   out_of_bound(addr);

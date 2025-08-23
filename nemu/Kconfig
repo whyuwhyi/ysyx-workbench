@@ -166,6 +166,11 @@ config DTRACE
   bool "Enable Device tracer"
   default n
 
+config ETRACE
+  depends on TRACE && TARGET_NATIVE_ELF && ENGINE_INTERPRETER
+  bool "Enable Exception tracer"
+  default y
+
 config DIFFTEST
   depends on TARGET_NATIVE_ELF
   bool "Enable differential testing"
