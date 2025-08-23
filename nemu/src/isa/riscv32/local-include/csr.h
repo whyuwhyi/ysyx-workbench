@@ -7,7 +7,7 @@
 enum {
   mstatus = 0x300,
   mtvec = 0x305,
-  macause = 0x342,
+  mcause = 0x342,
   mepc = 0x341,
   nr_csr = 1 << 12
 };

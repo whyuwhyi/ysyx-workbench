@@ -9,7 +9,7 @@ Context *__am_irq_handle(Context *c) {
   if (user_handler) {
     Event ev = {0};
     switch (c->mcause) {
-    case -1:
+    case 11:
       ev.event = EVENT_YIELD;
       break;
     case 0:
@@ -60,7 +60,7 @@ void yield() {
 #ifdef __riscv_e
   asm volatile("li a5, -1; ecall");
 #else
-  asm volatile("li a7, -1; ecall");
+  asm volatile("li a7, 11; ecall");
 #endif
 }
 

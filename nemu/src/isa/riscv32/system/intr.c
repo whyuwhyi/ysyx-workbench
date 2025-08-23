@@ -18,7 +18,7 @@
 
 word_t isa_raise_intr(word_t NO, vaddr_t epc) {
   CSR(mepc) = epc;
-  CSR(macause) = NO;
+  CSR(mcause) = NO;
   return CSR(mtvec);
 }
 
