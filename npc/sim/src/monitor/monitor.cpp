@@ -62,7 +62,6 @@ static int parse_args(int argc, char *argv[]) {
 }
 
 void init_monitor(int argc, char *argv[]) {
-  Log("Monitor initializing...");
   parse_args(argc, argv);
   init_log(log_file);
 
@@ -91,19 +90,12 @@ void init_monitor(int argc, char *argv[]) {
 #ifdef CONFIG_DIFFTEST
   init_difftest(diff_so_file, img_size, 1234);
 #endif
-
-  if (is_batch_mode) {
-    Log("Running in batch mode");
-  }
-
-  Log("Monitor initialized");
 }
 
 void engine_start() {
   if (is_batch_mode) {
     npc_cpu_exec(-1);
   } else {
-    Log("Starting interactive debugger...");
     sdb_mainloop();
   }
 
@@ -114,8 +106,4 @@ bool is_exit_status_bad() {
   bool good = (npc_state.state == NPC_END && npc_state.halt_ret == 0) ||
               (npc_state.state == NPC_QUIT);
   return !good;
-}
-
-void assert_fail_msg() {
-  Log("Assertion failure at pc = 0x%08x", npc_state.halt_pc);
 }

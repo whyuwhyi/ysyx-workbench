@@ -5,11 +5,7 @@
 
 static void exec_once() {
   uint32_t pc = get_npc_pc();
-  uint32_t inst = pmem_read(pc);
-
-  single_cycle();
-
-  uint32_t npc = get_npc_pc();
+  uint32_t inst = get_npc_inst();
 
 #ifdef CONFIG_ITRACE
   char logbuf[128];
@@ -21,7 +17,11 @@ static void exec_once() {
   itrace_push(pc, inst, logbuf);
 #endif
 
+  single_cycle();
+
 #ifdef CONFIG_FTRACE
+
+  uint32_t npc = get_npc_pc();
 
   if (is_fcall(inst)) {
     ftrace_call(pc, npc);
@@ -31,22 +31,22 @@ static void exec_once() {
 #endif
 
 #ifdef CONFIG_DIFFTEST
-  difftest_step(pc, npc);
+  difftest_step(pc);
 #endif
 
   watchpoint_check();
 }
 
 void npc_cpu_exec(uint64_t n) {
-  npc_state.state = NPC_RUNNING;
+  if (npc_state.state == NPC_STOP) {
+    npc_state.state = NPC_RUNNING;
+  }
 
   if (n == (uint64_t)-1) {
-    Log("NPC started (continuous execution)");
     while (npc_state.state == NPC_RUNNING) {
       exec_once();
     }
   } else {
-    Log("NPC executing %lu instructions", n);
     for (uint64_t i = 0; i < n && npc_state.state == NPC_RUNNING; i++) {
       exec_once();
     }
