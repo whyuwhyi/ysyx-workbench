@@ -91,7 +91,7 @@ static int itoa_base(long long num, char *buf, int base, bool uppercase) {
 }
 
 static int format_number(char *out, size_t available, long long num, int base,
-                         bool uppercase, int width, int zero_pad) {
+                         bool uppercase, int width, bool zero_pad) {
   char numbuf[64];
   int len = itoa_base(num, numbuf, base, uppercase);
   int written = 0;
@@ -160,8 +160,8 @@ int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {
     } else {
       fmt++;
 
-      int zero_pad = 0;
-      int left_align = 0;
+      bool zero_pad = 0;
+      bool left_align = 0;
       while (*fmt == '0' || *fmt == '-') {
         if (*fmt == '0')
           zero_pad = 1;
