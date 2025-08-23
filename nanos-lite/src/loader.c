@@ -16,7 +16,7 @@
 #define EXPECT_TYPE EM_X86_64
 #elif defined(__ISA_RISCV32__)
 #define EXPECT_TYPE EM_RISCV
-#elif defined(__ISA_RISCV32e__)
+#elif defined(__ISA_RISCV32E__)
 #define EXPECT_TYPE EM_RISCV
 #elif defined(__ISA_RISCV32MINI__)
 #define EXPECT_TYPE EM_RISCV
