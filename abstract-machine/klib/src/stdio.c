@@ -51,7 +51,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
   return vsnprintf(out, SIZE_MAX, fmt, ap);
 }
 
-static int itoa_base(long long num, char *buf, int base, int uppercase) {
+static int itoa_base(long long num, char *buf, int base, bool uppercase) {
   if (base < 2 || base > 36)
     return 0;
 
@@ -91,7 +91,7 @@ static int itoa_base(long long num, char *buf, int base, int uppercase) {
 }
 
 static int format_number(char *out, size_t available, long long num, int base,
-                         int uppercase, int width, int zero_pad) {
+                         bool uppercase, int width, int zero_pad) {
   char numbuf[64];
   int len = itoa_base(num, numbuf, base, uppercase);
   int written = 0;
@@ -160,7 +160,6 @@ int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {
     } else {
       fmt++;
 
-      // Parse flags
       int zero_pad = 0;
       int left_align = 0;
       while (*fmt == '0' || *fmt == '-') {
@@ -171,17 +170,14 @@ int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {
         fmt++;
       }
 
-      // Parse width
       int width = 0;
       while (*fmt >= '0' && *fmt <= '9') {
         width = width * 10 + (*fmt - '0');
         fmt++;
       }
 
-      // Parse format specifier
       switch (*fmt) {
-      case 'd':
-      case 'i': {
+      case 'd': {
         int num = va_arg(ap, int);
         int len = format_number(ptr, available, num, 10, 0, width,
                                 zero_pad && !left_align);
@@ -270,22 +266,18 @@ int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {
         if (!s)
           s = "(null)";
 
-        // Calculate actual string length (up to width limit if specified)
         int str_len = 0;
         while (s[str_len] && (width == 0 || str_len < width)) {
           str_len++;
         }
 
-        // Add padding if width is specified and string is shorter
         int pad_len = (width > str_len) ? width - str_len : 0;
 
-        // Add left padding (spaces)
         for (int i = 0; i < pad_len && available > 1; i++) {
           *ptr++ = ' ';
           available--;
         }
 
-        // Copy the string
         for (int i = 0; i < str_len && available > 1; i++) {
           *ptr++ = s[i];
           available--;
@@ -328,9 +320,7 @@ int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {
     }
   }
 
-  if (n > 0) {
-    *ptr = '\0';
-  }
+  *ptr = '\0';
   return (int)total;
 }
 
