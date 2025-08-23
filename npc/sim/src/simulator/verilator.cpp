@@ -50,7 +50,6 @@ void sim_init() {
 }
 
 void sim_exit() {
-  single_cycle();
 
 #ifdef CONFIG_WAVE_TRACE
   tfp->close();
