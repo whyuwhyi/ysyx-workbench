@@ -12,9 +12,8 @@ class CSRFile extends Module with Constants {
     val isEbreak = Input(Bool())
     val isMret = Input(Bool())
     val csrOp = Input(CSROp())
-    val raddr = Input(UInt(12.W))
-    val inWaddr = Input(UInt(12.W))
-    val inWdata = Input(UInt(XLEN.W))
+    val addr = Input(UInt(12.W))
+    val wdata = Input(UInt(XLEN.W))
     val rdata = Output(UInt(XLEN.W))
     val pc = Input(UInt(XLEN.W))
     val nextPc = Output(UInt(XLEN.W))
@@ -25,7 +24,7 @@ class CSRFile extends Module with Constants {
   val mcause = RegInit(0x1800.U(XLEN.W))
   val mtvec = RegInit(0.U(XLEN.W))
 
-  val rdata = MuxLookup(io.raddr, 0.U(XLEN.W))(
+  val _rdata = MuxLookup(io.addr, 0.U(XLEN.W))(
     Seq(
       MSTATUS_ADDR.U(12.W) -> mstatus,
       MEPC_ADDR.U(12.W) -> mepc,
@@ -33,17 +32,17 @@ class CSRFile extends Module with Constants {
       MTVEC_ADDR.U(12.W) -> mtvec
     )
   )
-  io.rdata := rdata
+  io.rdata := _rdata
 
   when(io.csrOp =/= CSROp.NONE) {
     val w = MuxLookup(io.csrOp, 0.U(XLEN.W))(
       Seq(
-        CSROp.RW -> io.inWdata,
-        CSROp.RS -> (rdata | io.inWdata),
-        CSROp.RC -> (rdata & ~io.inWdata)
+        CSROp.RW -> io.wdata,
+        CSROp.RS -> (_rdata | io.wdata),
+        CSROp.RC -> (_rdata & ~io.wdata)
       )
     )
-    switch(io.inWaddr) {
+    switch(io.addr) {
       is(MSTATUS_ADDR.U(12.W)) { mstatus := w }
       is(MEPC_ADDR.U(12.W)) { mepc := w }
       is(MCAUSE_ADDR.U(12.W)) { mcause := w }

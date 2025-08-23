@@ -33,11 +33,10 @@ class Core extends Module with Constants {
   csrFileInst.io.isMret := iduInst.io.isMret
   csrFileInst.io.csrOp := iduInst.io.csrOp
 
-  csrFileInst.io.raddr := datapathInst.io.inst(31, 20)
-  csrFileInst.io.inWaddr := datapathInst.io.inst(31, 20)
+  csrFileInst.io.addr := datapathInst.io.inst(31, 20)
   val csrZimm = Cat(0.U((XLEN - 5).W), datapathInst.io.inst(19, 15))
   val csrUseImm = datapathInst.io.inst(14)
-  csrFileInst.io.inWdata := Mux(csrUseImm, csrZimm, datapathInst.io.rs1Data)
+  csrFileInst.io.wdata := Mux(csrUseImm, csrZimm, datapathInst.io.rs1Data)
   csrFileInst.io.pc := datapathInst.io.pc
 
   datapathInst.io.redirValid := iduInst.io.illegalInst || iduInst.io.isEbreak ||
