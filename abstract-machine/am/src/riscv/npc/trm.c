@@ -15,11 +15,8 @@ static const char mainargs[MAINARGS_MAX_LEN] =
     MAINARGS_PLACEHOLDER; // defined in CFLAGS
 
 #define SERIAL_ADDR 0xa00003f8
-void putch(char ch) {
-  // aolatile char *uart_tx = (volatile char *)0xa00003f8;
-  // *uart_tx = ch;
-  outb((uintptr_t)SERIAL_ADDR, ch);
-}
+
+void putch(char ch) { outb((uintptr_t)SERIAL_ADDR, ch); }
 
 void halt(int code) {
 
