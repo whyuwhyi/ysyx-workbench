@@ -38,7 +38,17 @@ static void exec_once() {
 }
 
 void npc_cpu_exec(uint64_t n) {
-  if (npc_state.state == NPC_STOP) {
+  // if (npc_state.state == NPC_STOP) {
+  //   npc_state.state = NPC_RUNNING;
+  // }
+  switch (npc_state.state) {
+  case NPC_END:
+  case NPC_ABORT:
+  case NPC_QUIT:
+    printf("Program execution has ended. To restart the program, exit NEMU and "
+           "run again.\n");
+    return;
+  default:
     npc_state.state = NPC_RUNNING;
   }
 
