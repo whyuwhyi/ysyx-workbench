@@ -829,7 +829,6 @@ module CSRFile(	// src/main/scala/cpu/csr/CSRFile.scala:8:7
   input         clock,	// src/main/scala/cpu/csr/CSRFile.scala:8:7
                 reset,	// src/main/scala/cpu/csr/CSRFile.scala:8:7
                 io_trapValid,	// src/main/scala/cpu/csr/CSRFile.scala:9:14
-                io_isEcall,	// src/main/scala/cpu/csr/CSRFile.scala:9:14
                 io_isMret,	// src/main/scala/cpu/csr/CSRFile.scala:9:14
   input  [1:0]  io_csrOp,	// src/main/scala/cpu/csr/CSRFile.scala:9:14
   input  [11:0] io_raddr,	// src/main/scala/cpu/csr/CSRFile.scala:9:14
@@ -862,26 +861,21 @@ module CSRFile(	// src/main/scala/cpu/csr/CSRFile.scala:8:7
         {{rdata & ~io_inWdata}, {rdata | io_inWdata}, {io_inWdata}, {32'h0}};	// src/main/scala/cpu/csr/CSRFile.scala:23:24, :28:47, :39:45, :42:28, :43:{28,30}
       automatic logic             _GEN_0;	// src/main/scala/cpu/csr/CSRFile.scala:46:24
       automatic logic             _GEN_1;	// src/main/scala/cpu/csr/CSRFile.scala:46:24
-      automatic logic             _GEN_2;	// src/main/scala/cpu/csr/CSRFile.scala:46:24
+      automatic logic             _GEN_2 = io_inWaddr == 12'h342;	// src/main/scala/cpu/csr/CSRFile.scala:28:47, :46:24
       _GEN_0 = io_inWaddr == 12'h300;	// src/main/scala/cpu/csr/CSRFile.scala:28:47, :46:24
       _GEN_1 = io_inWaddr == 12'h341;	// src/main/scala/cpu/csr/CSRFile.scala:28:47, :46:24
-      _GEN_2 = io_inWaddr == 12'h342;	// src/main/scala/cpu/csr/CSRFile.scala:28:47, :46:24
       if ((|io_csrOp) & _GEN_0)	// src/main/scala/cpu/csr/CSRFile.scala:23:24, :38:{17,33}, :46:24, :47:42
         mstatus <= _GEN[io_csrOp];	// src/main/scala/cpu/csr/CSRFile.scala:23:24, :39:45
-      if (io_trapValid) begin	// src/main/scala/cpu/csr/CSRFile.scala:9:14
+      if (io_trapValid)	// src/main/scala/cpu/csr/CSRFile.scala:9:14
         mepc <= io_pc;	// src/main/scala/cpu/csr/CSRFile.scala:24:21
-        mcause <= io_isEcall ? 32'hB : 32'h2;	// src/main/scala/cpu/csr/CSRFile.scala:25:23, :55:8
+      else if (~(|io_csrOp) | _GEN_0 | ~_GEN_1) begin	// src/main/scala/cpu/csr/CSRFile.scala:24:21, :38:{17,33}, :46:24
       end
-      else begin	// src/main/scala/cpu/csr/CSRFile.scala:9:14
-        if (~(|io_csrOp) | _GEN_0 | ~_GEN_1) begin	// src/main/scala/cpu/csr/CSRFile.scala:24:21, :38:{17,33}, :46:24
-        end
-        else	// src/main/scala/cpu/csr/CSRFile.scala:24:21, :38:33, :46:24
-          mepc <= _GEN[io_csrOp];	// src/main/scala/cpu/csr/CSRFile.scala:24:21, :39:45
-        if (~(|io_csrOp) | _GEN_0 | _GEN_1 | ~_GEN_2) begin	// src/main/scala/cpu/csr/CSRFile.scala:24:21, :25:23, :38:{17,33}, :46:24
-        end
-        else	// src/main/scala/cpu/csr/CSRFile.scala:25:23, :38:33, :46:24
-          mcause <= _GEN[io_csrOp];	// src/main/scala/cpu/csr/CSRFile.scala:25:23, :39:45
+      else	// src/main/scala/cpu/csr/CSRFile.scala:24:21, :38:33, :46:24
+        mepc <= _GEN[io_csrOp];	// src/main/scala/cpu/csr/CSRFile.scala:24:21, :39:45
+      if (~(|io_csrOp) | _GEN_0 | _GEN_1 | ~_GEN_2) begin	// src/main/scala/cpu/csr/CSRFile.scala:24:21, :25:23, :38:{17,33}, :46:24
       end
+      else	// src/main/scala/cpu/csr/CSRFile.scala:25:23, :38:33, :46:24
+        mcause <= _GEN[io_csrOp];	// src/main/scala/cpu/csr/CSRFile.scala:25:23, :39:45
       if (~(|io_csrOp) | _GEN_0 | _GEN_1 | _GEN_2 | io_inWaddr != 12'h305) begin	// src/main/scala/cpu/csr/CSRFile.scala:24:21, :26:22, :28:47, :38:{17,33}, :46:24
       end
       else	// src/main/scala/cpu/csr/CSRFile.scala:26:22, :38:33, :46:24
@@ -988,7 +982,6 @@ module Core(	// src/main/scala/cpu/arch/single_cycle/Core.scala:9:7
     .clock        (clock),
     .reset        (reset),
     .io_trapValid (_datapathInst_io_redirValid_T | _iduInst_io_isEcall),	// src/main/scala/cpu/arch/single_cycle/Core.scala:13:23, :30:{54,77}
-    .io_isEcall   (_iduInst_io_isEcall),	// src/main/scala/cpu/arch/single_cycle/Core.scala:13:23
     .io_isMret    (_iduInst_io_isMret),	// src/main/scala/cpu/arch/single_cycle/Core.scala:13:23
     .io_csrOp     (_iduInst_io_csrOp),	// src/main/scala/cpu/arch/single_cycle/Core.scala:13:23
     .io_raddr     (_datapathInst_io_inst[31:20]),	// src/main/scala/cpu/arch/single_cycle/Core.scala:12:28, :36:47
