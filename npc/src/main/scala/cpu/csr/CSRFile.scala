@@ -22,7 +22,7 @@ class CSRFile extends Module with Constants {
 
   val mstatus = RegInit(0.U(XLEN.W))
   val mepc = RegInit(0.U(XLEN.W))
-  val mcause = RegInit(0.U(XLEN.W))
+  val mcause = RegInit(0x1800.U(XLEN.W))
   val mtvec = RegInit(0.U(XLEN.W))
 
   val rdata = MuxLookup(io.raddr, 0.U(XLEN.W))(

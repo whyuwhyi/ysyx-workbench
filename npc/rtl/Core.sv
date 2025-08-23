@@ -854,7 +854,7 @@ module CSRFile(	// src/main/scala/cpu/csr/CSRFile.scala:8:7
     if (reset) begin	// src/main/scala/cpu/csr/CSRFile.scala:8:7
       mstatus <= 32'h0;	// src/main/scala/cpu/csr/CSRFile.scala:23:24
       mepc <= 32'h0;	// src/main/scala/cpu/csr/CSRFile.scala:23:24, :24:21
-      mcause <= 32'h0;	// src/main/scala/cpu/csr/CSRFile.scala:23:24, :25:23
+      mcause <= 32'h1800;	// src/main/scala/cpu/csr/CSRFile.scala:25:23
       mtvec <= 32'h0;	// src/main/scala/cpu/csr/CSRFile.scala:23:24, :26:22
     end
     else begin	// src/main/scala/cpu/csr/CSRFile.scala:8:7
