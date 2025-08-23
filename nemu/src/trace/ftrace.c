@@ -30,13 +30,13 @@ static int call_depth = 0;
 
 void init_ftrace(const char *elf_path) {
   if (!elf_path) {
-    Log("Function trace may can not work well: no ELF file provided");
+    Log("Function trace may can not work well: no ELF file provided.");
     return;
   }
 
   FILE *fp = fopen(elf_path, "rb");
   if (!fp) {
-    Log("Function trace may can not work well: cannot open ELF file %s",
+    Log("Function trace may can not work well: cannot open ELF file %s.",
         elf_path);
     return;
   }
@@ -87,7 +87,7 @@ void init_ftrace(const char *elf_path) {
   free(strtab);
   fclose(fp);
 
-  Log("Function trace initialized with %d functions", func_cnt);
+  Log("Function trace initialized with %d functions.", func_cnt);
 }
 
 const char *ftrace_func_name(vaddr_t addr) {
@@ -114,7 +114,7 @@ void ftrace_call(vaddr_t from, vaddr_t to) {
     snprintf(buf + call_depth, sizeof(buf) - call_depth,
              "[" FMT_WORD "] call -> [" FMT_WORD "]", from, to);
   }
-  Log("%s", buf);
+  Log("%s.", buf);
   call_depth = call_depth > 10 ? 10 : call_depth + 1;
 }
 
@@ -132,7 +132,7 @@ void ftrace_ret(vaddr_t from, vaddr_t to) {
     snprintf(buf + call_depth, sizeof(buf) - call_depth,
              "[" FMT_WORD "] ret -> [" FMT_WORD "]", from, to);
   }
-  Log("%s", buf);
+  Log("%s.", buf);
 }
 
 bool is_fcall(word_t inst) {

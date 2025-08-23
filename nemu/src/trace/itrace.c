@@ -18,7 +18,7 @@ static InstTrace i_trace;
 void init_itrace() {
   i_trace.current = 0;
   memset(i_trace.entries, 0, sizeof(i_trace.entries));
-  Log("Instruction trace initialized");
+  Log("Instruction trace initialized.");
 }
 
 void itrace_push(paddr_t pc, word_t inst, const char *disasm) {
