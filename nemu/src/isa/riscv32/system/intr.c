@@ -22,7 +22,7 @@ void etrace_ret();
 vaddr_t isa_raise_intr(word_t NO, vaddr_t epc) {
   csr(MEPC) = epc;
   csr(MCAUSE) = NO;
-  // csr(MSTATUS) = 0x80;
+  csr(MSTATUS) = 0x1800;
 
   IFDEF(CONFIG_ETRACE, etrace_call(epc));
   return csr(MTVEC);
