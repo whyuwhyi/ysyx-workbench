@@ -1,7 +1,7 @@
 #include "syscall.h"
 #include <common.h>
 
-#define SYSCALL_TRACE false
+#define SYSCALL_TRACE 1
 
 static void strace_call(int id);
 static void sys_exit(int code) __attribute__((noreturn));
@@ -54,7 +54,7 @@ const char *syscall_name[] = {
     "SYS_link",  "SYS_unlink", "SYS_wait",   "SYS_times",  "SYS_gettimeofday"};
 
 static void strace_call(int id) {
-  if (SYSCALL_TRACE) {
-    Log("Syscall %s is invoked.", syscall_name[id]);
-  }
+#ifdef SYSCALL_TRACE
+  Log("Syscall %s is invoked.", syscall_name[id]);
+#endif
 }
