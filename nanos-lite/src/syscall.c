@@ -3,7 +3,7 @@
 
 #define SYSCALL_TRACE 1
 
-static void strace_call(int id);
+static void strace(int id);
 static void sys_exit(int code) __attribute__((noreturn));
 static int sys_yield(void);
 
@@ -22,7 +22,6 @@ void do_syscall(Context *c) {
   case SYS_yield:
     c->GPRx = sys_yield();
     break;
-
   case SYS_write:
     c->GPRx = sys_write(c->GPR2, (void *)c->GPR3, c->GPR4);
     break;
@@ -34,7 +33,7 @@ void do_syscall(Context *c) {
   default:
     panic("Unhandled syscall ID = %d", a[0]);
   }
-  strace_call(a[0]);
+  strace(a[0]);
 }
 
 static void sys_exit(int code) { halt(code); }
@@ -62,7 +61,7 @@ const char *syscall_name[] = {
     "SYS_fstat", "SYS_time",   "SYS_signal", "SYS_execve", "SYS_fork",
     "SYS_link",  "SYS_unlink", "SYS_wait",   "SYS_times",  "SYS_gettimeofday"};
 
-static void strace_call(int id) {
+static void strace(int id) {
 #ifdef SYSCALL_TRACE
   Log("Syscall %s is invoked.", syscall_name[id]);
 #endif
