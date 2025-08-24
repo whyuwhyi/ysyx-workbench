@@ -13,7 +13,7 @@
  * See the Mulan PSL v2 for more details.
  ***************************************************************************************/
 
-#include "local-include/csr.h"
+#include "local-include/reg.h"
 #include <isa.h>
 #include <memory/paddr.h>
 
@@ -42,5 +42,5 @@ void init_isa() {
   /* Initialize this virtual computer system. */
   restart();
 
-  init_csr();
+  csr(MSTATUS) = 0x00001800;
 }

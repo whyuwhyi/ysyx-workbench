@@ -13,7 +13,7 @@
  * See the Mulan PSL v2 for more details.
  ***************************************************************************************/
 
-#include "../local-include/csr.h"
+#include "../local-include/reg.h"
 #include <isa.h>
 
 void etrace_call(paddr_t epc);
