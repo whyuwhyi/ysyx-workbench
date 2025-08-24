@@ -46,9 +46,9 @@ word_t isa_reg_str2val(const char *s, bool *success) {
   return 0;
 }
 
-const char *isa_reg_name(int regno) {
-  if (regno < 0 || regno >= 32) {
-    return NULL;
-  }
-  return regs[regno];
-}
+// const char *isa_reg_name(int regno) {
+//   if (regno < 0 || regno >= 32) {
+//     return NULL;
+//   }
+//   return regs[regno];
+// }
