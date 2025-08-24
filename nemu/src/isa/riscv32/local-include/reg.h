@@ -36,10 +36,12 @@ static inline const char *reg_name(int idx) {
 #define MEPC 0x341
 #define MCAUSE 0x342
 
+#define csr(ADDR) (*get_csr_ptr(ADDR))
+
 static inline word_t *get_csr_ptr(int addr) {
   switch (addr) {
   case MSTATUS:
-    return (word_t *)&cpu.csr.mstatus;
+    return &cpu.csr.mstatus;
   case MTVEC:
     return &cpu.csr.mtvec;
   case MEPC:
@@ -51,9 +53,6 @@ static inline word_t *get_csr_ptr(int addr) {
     return NULL;
   }
 }
-
-#define csr(i) (*get_csr_ptr(i))
-
 static inline const char *csr_name(int addr) {
   extern const char *csrs[];
   return csrs[addr];
