@@ -34,15 +34,18 @@ static inline void riscv_csr_display(int addr) {
 
 void isa_reg_display() {
   printf("Name        Dec         Hex        \n");
+  printf("----------------General Purpose Registers----------------\n");
   for (int i = 0; i < 32; ++i) {
     printf("%-11s %-11d " FMT_WORD "\n", regs[i], (int32_t)gpr(i), gpr(i));
   }
 
+  printf("----------------Control and Status Registers----------------\n");
   riscv_csr_display(MSTATUS);
   riscv_csr_display(MTVEC);
   riscv_csr_display(MEPC);
   riscv_csr_display(MCAUSE);
 
+  printf("----------------Program Counter----------------\n");
   printf("%-11s %-11d " FMT_WORD "\n", "pc", (int32_t)cpu.pc, cpu.pc);
 }
 
