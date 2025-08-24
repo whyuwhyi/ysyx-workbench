@@ -1,22 +1,32 @@
 #ifndef __CSR_H__
 #define __CSR_H__
 #include <common.h>
+#include <isa.h>
 
-#define CSR(i) riscv_csr[i]
+#define MSTATUS 0x300
+#define MTVEC 0x305
+#define MEPC 0x341
+#define MCAUSE 0x342
 
-enum {
-  mstatus = 0x300,
-  mtvec = 0x305,
-  mcause = 0x342,
-  mepc = 0x341,
-  nr_csr = 1 << 12
-};
-extern word_t riscv_csr[nr_csr];
-
-static inline void init_csr() {
-  riscv_csr[mstatus] = 0x1800;
-  Log("CSR initialized: mstatus = 0x1800");
+static inline word_t *get_csr_ptr(int addr) {
+  switch (addr) {
+  case MSTATUS:
+    return &cpu.csr.mstatus;
+  case MTVEC:
+    return &cpu.csr.mtvec;
+  case MEPC:
+    return &cpu.csr.mepc;
+  case MCAUSE:
+    return &cpu.csr.mcause;
+  default:
+    Assert(0, "Unimplemented CSR address: 0x%x", addr);
+    return NULL;
+  }
 }
+
+#define csr(i) (*get_csr_ptr(i))
+
+static inline void init_csr() { csr(MSTATUS) = 0x1800; }
 
 static inline const char *csr_name(int addr) {
   extern const char *csr_names[];

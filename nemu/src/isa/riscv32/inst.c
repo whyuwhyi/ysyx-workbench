@@ -221,31 +221,31 @@ static int decode_exec(Decode *s) {
           s->dnpc = s->pc + imm);
 
   INSTPAT("??????? ????? ????? 011 ????? 11100 11", csrrc, I,
-          word_t t = CSR(csrI(imm));
-          CSR(csrI(imm)) = t & ~src1; R(rd) = t);
+          word_t t = csr(csrI(imm));
+          csr(csrI(imm)) = t & ~src1; R(rd) = t);
   INSTPAT("??????? ????? ????? 111 ????? 11100 11", csrrci, I,
-          word_t t = CSR(csrI(imm));
-          CSR(csrI(imm)) = t & ~zimm; R(rd) = t);
+          word_t t = csr(csrI(imm));
+          csr(csrI(imm)) = t & ~zimm; R(rd) = t);
   INSTPAT("??????? ????? ????? 010 ????? 11100 11", csrrs, I,
-          word_t t = CSR(csrI(imm));
-          CSR(csrI(imm)) = t | src1; R(rd) = t);
+          word_t t = csr(csrI(imm));
+          csr(csrI(imm)) = t | src1; R(rd) = t);
   INSTPAT("??????? ????? ????? 110 ????? 11100 11", csrrsi, I,
-          word_t t = CSR(csrI(imm));
-          CSR(csrI(imm)) = t | zimm; R(rd) = t);
+          word_t t = csr(csrI(imm));
+          csr(csrI(imm)) = t | zimm; R(rd) = t);
   INSTPAT("??????? ????? ????? 001 ????? 11100 11", csrrw, I,
-          word_t t = CSR(csrI(imm));
-          CSR(csrI(imm)) = src1; R(rd) = t);
+          word_t t = csr(csrI(imm));
+          csr(csrI(imm)) = src1; R(rd) = t);
   INSTPAT("??????? ????? ????? 101 ????? 11100 11", csrrwi, I,
-          word_t t = CSR(csrI(imm));
-          CSR(csrI(imm)) = zimm; R(rd) = t);
+          word_t t = csr(csrI(imm));
+          csr(csrI(imm)) = zimm; R(rd) = t);
 
   INSTPAT("0000000 00001 00000 000 00000 11100 11", ebreak, N,
           NEMUTRAP(s->pc, R(10)));
   INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall, N,
           s->dnpc = isa_raise_intr(11, s->pc));
-  vaddr_t riscv_mret();
+  vaddr_t isa_return_intr();
   INSTPAT("0011000 00010 00000 000 00000 11100 11", mret, R,
-          s->dnpc = riscv_mret());
+          s->dnpc = isa_return_intr());
 
   INSTPAT("??????? ????? ????? ??? ????? ????? ??", inv, N, INV(s->pc));
   INSTPAT_END();

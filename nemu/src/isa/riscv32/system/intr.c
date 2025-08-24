@@ -20,16 +20,16 @@ void etrace_call(paddr_t epc);
 void etrace_ret();
 
 vaddr_t isa_raise_intr(word_t NO, vaddr_t epc) {
-  CSR(mepc) = epc;
-  CSR(mcause) = NO;
+  csr(MEPC) = epc;
+  csr(MCAUSE) = NO;
 
   IFDEF(CONFIG_ETRACE, etrace_call(epc));
-  return CSR(mtvec);
+  return csr(MTVEC);
 }
 
-vaddr_t riscv_mret() {
+vaddr_t isa_return_intr() {
   IFDEF(CONFIG_ETRACE, etrace_ret());
-  return CSR(mepc);
+  return csr(MEPC);
 }
 
 word_t isa_query_intr() { return INTR_EMPTY; }

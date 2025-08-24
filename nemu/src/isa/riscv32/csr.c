@@ -1,9 +1,9 @@
 #include "local-include/csr.h"
-#include <common.h>
+#include <isa.h>
 
-word_t riscv_csr[nr_csr];
-
-const char *csr_names[] = {[mepc] = "mepc",
-                           [mtvec] = "mtvec",
-                           [mstatus] = "mstatus",
-                           [mcause] = "macause"};
+const char *csr_names[] = {
+    "mstatus",
+    "mtvec",
+    "mepc",
+    "mcause",
+};
