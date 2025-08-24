@@ -68,26 +68,6 @@ word_t isa_reg_str2val(const char *s, bool *success) {
   CSR2VAL(MEPC)
   CSR2VAL(MCAUSE)
 
-  // if (strcmp("mstatus", s) == 0) {
-  //   *success = true;
-  //   return csr(MSTATUS);
-  // }
-  //
-  // if (strcmp("mtvec", s) == 0) {
-  //   *success = true;
-  //   return csr(MTVEC);
-  // }
-  //
-  // if (strcmp("mepc", s) == 0) {
-  //   *success = true;
-  //   return csr(MEPC);
-  // }
-  //
-  // if (strcmp("mcause", s) == 0) {
-  //   *success = true;
-  //   return csr(MCAUSE);
-  // }
-  //
   if (strcmp("pc", s) == 0) {
     *success = true;
     return cpu.pc;
