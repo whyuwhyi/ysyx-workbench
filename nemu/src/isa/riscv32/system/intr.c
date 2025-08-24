@@ -29,6 +29,7 @@ vaddr_t isa_raise_intr(word_t NO, vaddr_t epc) {
 
 vaddr_t isa_return_intr() {
   IFDEF(CONFIG_ETRACE, etrace_ret());
+  csr(MSTATUS) = 0x80;
   return csr(MEPC);
 }
 
