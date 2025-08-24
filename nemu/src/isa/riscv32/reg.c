@@ -28,14 +28,14 @@ const char *csrs[] = {[MSTATUS] = "mstatus",
                       [MCAUSE] = "mcause"};
 
 static inline void riscv_csr_display(int addr) {
-  printf("%-8s %-11d " FMT_WORD "\n", csrs[addr], (int32_t)csr(addr),
+  printf("%-11s %-11d " FMT_WORD "\n", csrs[addr], (int32_t)csr(addr),
          csr(addr));
 }
 
 void isa_reg_display() {
-  printf("Name     Dec         Hex        \n");
+  printf("Name        Dec         Hex        \n");
   for (int i = 0; i < 32; ++i) {
-    printf("%-8s %-11d " FMT_WORD "\n", regs[i], (int32_t)gpr(i), gpr(i));
+    printf("%-11s %-11d " FMT_WORD "\n", regs[i], (int32_t)gpr(i), gpr(i));
   }
 
   riscv_csr_display(MSTATUS);
@@ -43,7 +43,7 @@ void isa_reg_display() {
   riscv_csr_display(MEPC);
   riscv_csr_display(MCAUSE);
 
-  printf("%-8s %-11d " FMT_WORD "\n", "pc", (int32_t)cpu.pc, cpu.pc);
+  printf("%-11s %-11d " FMT_WORD "\n", "pc", (int32_t)cpu.pc, cpu.pc);
 }
 
 word_t isa_reg_str2val(const char *s, bool *success) {
