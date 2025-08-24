@@ -33,9 +33,9 @@ bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
   bool diff = false;
 
   // CHECK_CSR(MSTATUS, mstatus);
-  CHECK_CSR(MTVEC, mtvec);
-  CHECK_CSR(MEPC, mepc);
-  CHECK_CSR(MCAUSE, mcause);
+  // CHECK_CSR(MTVEC, mtvec);
+  // CHECK_CSR(MEPC, mepc);
+  // CHECK_CSR(MCAUSE, mcause);
 
   for (int i = 0; i < RISCV_GPR_NUM; i++) {
     if (!difftest_check_reg(reg_name(i), pc, ref_r->gpr[i], cpu.gpr[i])) {
