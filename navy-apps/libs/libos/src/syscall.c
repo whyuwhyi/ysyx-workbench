@@ -1,5 +1,6 @@
 #include "syscall.h"
 #include <assert.h>
+#include <stdint.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <time.h>
@@ -74,7 +75,18 @@ int _write(int fd, void *buf, size_t count) {
   return 0;
 }
 
-void *_sbrk(intptr_t increment) { return (void *)-1; }
+void *_sbrk(intptr_t increment) {
+  extern char _end;
+  static intptr_t current = (intptr_t)&_end;
+  intptr_t prev = current;
+  intptr_t next = current + increment;
+  if (!_syscall_(SYS_brk, next, 0, 0)) {
+    current = next;
+    return (void *)prev;
+  }
+
+  return (void *)-1;
+}
 
 int _read(int fd, void *buf, size_t count) {
   _exit(SYS_read);

@@ -6,9 +6,10 @@
 static void strace_call(int id);
 static void sys_exit(int code) __attribute__((noreturn));
 static int sys_yield(void);
-// static int sys_open(const char *path, int flags, int mode);
-// static int sys_read(int fd, void *buf, size_t count);
+
 static int sys_write(int fd, void *buf, size_t count);
+
+static int sys_sbrk(intptr_t program_break);
 
 void do_syscall(Context *c) {
   uintptr_t a[4];
@@ -21,9 +22,15 @@ void do_syscall(Context *c) {
   case SYS_yield:
     c->GPRx = sys_yield();
     break;
+
   case SYS_write:
     c->GPRx = sys_write(c->GPR2, (void *)c->GPR3, c->GPR4);
     break;
+
+  case SYS_brk:
+    c->GPRx = sys_sbrk(c->GPR2);
+    break;
+
   default:
     panic("Unhandled syscall ID = %d", a[0]);
   }
@@ -46,6 +53,8 @@ static int sys_write(int fd, void *buf, size_t count) {
   }
   return -1;
 }
+
+static int sys_sbrk(intptr_t program_break) { return 0; }
 
 const char *syscall_name[] = {
     "SYS_exit",  "SYS_yield",  "SYS_open",   "SYS_read",   "SYS_write",
