@@ -17,9 +17,9 @@
 #include <cpu/difftest.h>
 #include <isa.h>
 
-#define CHECK_CSR(UP, field)                                                   \
+#define CHECK_CSR(ADDR, field)                                                 \
   do {                                                                         \
-    if (!difftest_check_reg(csr_name(UP), pc, ref_r->csr.field,                \
+    if (!difftest_check_reg(csr_name(ADDR), pc, ref_r->csr.field,              \
                             cpu.csr.field)) {                                  \
       diff = true;                                                             \
     }                                                                          \

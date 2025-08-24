@@ -39,7 +39,7 @@ static inline const char *reg_name(int idx) {
 static inline word_t *get_csr_ptr(int addr) {
   switch (addr) {
   case MSTATUS:
-    return &cpu.csr.mstatus;
+    return (word_t *)&cpu.csr.mstatus;
   case MTVEC:
     return &cpu.csr.mtvec;
   case MEPC:

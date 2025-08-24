@@ -22,6 +22,10 @@ void etrace_ret();
 vaddr_t isa_raise_intr(word_t NO, vaddr_t epc) {
   csr(MEPC) = epc;
   csr(MCAUSE) = NO;
+  csr(MSTATUS) &= ~0x80;
+  csr(MSTATUS) |= ((csr(MSTATUS) & 0x8) << 4);
+  csr(MSTATUS) &= ~0x8;
+  csr(MSTATUS) |= 0x2;
 
   IFDEF(CONFIG_ETRACE, etrace_call(epc));
   return csr(MTVEC);
@@ -29,7 +33,7 @@ vaddr_t isa_raise_intr(word_t NO, vaddr_t epc) {
 
 vaddr_t isa_return_intr() {
   IFDEF(CONFIG_ETRACE, etrace_ret());
-  csr(MSTATUS) = 0x80;
+  csr(MSTATUS) |= 0x80;
   return csr(MEPC);
 }
 
