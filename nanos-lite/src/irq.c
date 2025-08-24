@@ -7,7 +7,6 @@ static Context *do_event(Event e, Context *c) {
     Log("Yielding...");
     break;
   case EVENT_SYSCALL:
-    Log("Handling syscall...");
     do_syscall(c);
     break;
   default:
