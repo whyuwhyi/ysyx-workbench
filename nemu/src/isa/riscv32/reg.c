@@ -49,6 +49,12 @@ void isa_reg_display() {
   printf("%-11s %-11d " FMT_WORD "\n", "pc", (int32_t)cpu.pc, cpu.pc);
 }
 
+#define CSR2VAL(addr)                                                          \
+  if (strcmp(csrs[addr], s) == 0) {                                            \
+    *success = true;                                                           \
+    return csr(addr);                                                          \
+  }
+
 word_t isa_reg_str2val(const char *s, bool *success) {
   for (int i = 0; i < 32; ++i) {
     if (strcmp(regs[i], s) == 0) {
@@ -57,26 +63,31 @@ word_t isa_reg_str2val(const char *s, bool *success) {
     }
   }
 
-  if (strcmp("mstatus", s) == 0) {
-    *success = true;
-    return csr(MSTATUS);
-  }
+  CSR2VAL(MSTATUS)
+  CSR2VAL(MTVEC)
+  CSR2VAL(MEPC)
+  CSR2VAL(MCAUSE)
 
-  if (strcmp("mtvec", s) == 0) {
-    *success = true;
-    return csr(MTVEC);
-  }
-
-  if (strcmp("mepc", s) == 0) {
-    *success = true;
-    return csr(MEPC);
-  }
-
-  if (strcmp("mcause", s) == 0) {
-    *success = true;
-    return csr(MCAUSE);
-  }
-
+  // if (strcmp("mstatus", s) == 0) {
+  //   *success = true;
+  //   return csr(MSTATUS);
+  // }
+  //
+  // if (strcmp("mtvec", s) == 0) {
+  //   *success = true;
+  //   return csr(MTVEC);
+  // }
+  //
+  // if (strcmp("mepc", s) == 0) {
+  //   *success = true;
+  //   return csr(MEPC);
+  // }
+  //
+  // if (strcmp("mcause", s) == 0) {
+  //   *success = true;
+  //   return csr(MCAUSE);
+  // }
+  //
   if (strcmp("pc", s) == 0) {
     *success = true;
     return cpu.pc;

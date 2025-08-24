@@ -55,7 +55,7 @@ static inline word_t *get_csr_ptr(int addr) {
 #define csr(i) (*get_csr_ptr(i))
 
 static inline const char *csr_name(int addr) {
-  extern const char *csr_names[];
-  return csr_names[addr];
+  extern const char *csrs[];
+  return csrs[addr];
 }
 #endif
