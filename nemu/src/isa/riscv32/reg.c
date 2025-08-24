@@ -14,6 +14,7 @@
  ***************************************************************************************/
 
 #include "local-include/reg.h"
+#include "common.h"
 #include <isa.h>
 
 const char *regs[] = {"$0", "ra", "sp",  "gp",  "tp", "t0", "t1", "t2",
@@ -26,20 +27,21 @@ const char *csrs[] = {[MSTATUS] = "mstatus",
                       [MEPC] = "mepc",
                       [MCAUSE] = "mcause"};
 
+static inline void riscv_csr_display(int addr) {
+  printf("%-8s %-11d " FMT_WORD "\n", csrs[addr], (int32_t)csr(addr),
+         csr(addr));
+}
+
 void isa_reg_display() {
-  printf("Name Dec         Hex        \n");
+  printf("Name     Dec         Hex        \n");
   for (int i = 0; i < 32; ++i) {
     printf("%-8s %-11d " FMT_WORD "\n", regs[i], (int32_t)gpr(i), gpr(i));
   }
 
-  printf("%-8s %-11d " FMT_WORD "\n", csrs[MSTATUS], (int32_t)csr(MSTATUS),
-         csr(MSTATUS));
-  printf("%-8s %-11d " FMT_WORD "\n", csrs[MTVEC], (int32_t)csr(MTVEC),
-         csr(MTVEC));
-  printf("%-8s %-11d " FMT_WORD "\n", csrs[MEPC], (int32_t)csr(MEPC),
-         csr(MEPC));
-  printf("%-8s %-11d " FMT_WORD "\n", csrs[MCAUSE], (int32_t)csr(MCAUSE),
-         csr(MCAUSE));
+  riscv_csr_display(MSTATUS);
+  riscv_csr_display(MTVEC);
+  riscv_csr_display(MEPC);
+  riscv_csr_display(MCAUSE);
 
   printf("%-8s %-11d " FMT_WORD "\n", "pc", (int32_t)cpu.pc, cpu.pc);
 }
