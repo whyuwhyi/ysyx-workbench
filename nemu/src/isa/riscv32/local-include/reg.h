@@ -53,6 +53,14 @@ static inline word_t *get_csr_ptr(int addr) {
     return NULL;
   }
 }
+
+// static inline word_t csr_read(int addr) {
+//
+// }
+//
+// static inline void csr_write(int addr, word_t val) {
+// }
+
 static inline const char *csr_name(int addr) {
   extern const char *csrs[];
   return csrs[addr];
