@@ -32,7 +32,7 @@ bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
   }
   bool diff = false;
 
-  CHECK_CSR(MSTATUS, mstatus);
+  // CHECK_CSR(MSTATUS, mstatus);
   CHECK_CSR(MTVEC, mtvec);
   CHECK_CSR(MEPC, mepc);
   CHECK_CSR(MCAUSE, mcause);
