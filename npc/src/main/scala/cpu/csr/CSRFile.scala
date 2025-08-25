@@ -7,9 +7,7 @@ import common.CSROp
 
 class CSRFile extends Module with Constants {
   val io = IO(new Bundle {
-    val trapValid = Input(Bool())
     val isEcall = Input(Bool())
-    val isEbreak = Input(Bool())
     val isMret = Input(Bool())
     val csrOp = Input(CSROp())
     val addr = Input(UInt(12.W))
@@ -50,11 +48,15 @@ class CSRFile extends Module with Constants {
     }
   }
 
-  val causeVal =
-    Mux(io.isEcall, ECALL_M_CAUSE.U(XLEN.W), ILLEGAL_INST_CAUSE.U(XLEN.W))
-  when(io.trapValid) {
+  when(io.isEcall) {
     mepc := io.pc
-    mcause := causeVal
+    mcause := ECALL_M_CAUSE.U(XLEN.W)
+    mstatus := 0x1800.U(XLEN.W)
   }
-  io.nextPc := Mux(io.isMret, mepc, mtvec)
+
+  when(io.isMret) {
+    mstatus := 0x0080.U(XLEN.W)
+  }
+
+  io.nextPc := Mux(io.isEcall, mtvec, Mux(io.isMret, mepc, 0.U(XLEN.W)))
 }

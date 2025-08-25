@@ -27,9 +27,7 @@ class Core extends Module with Constants {
   datapathInst.io.branchCond := iduInst.io.branchCond
   datapathInst.io.immSel := iduInst.io.immSel
 
-  csrFileInst.io.trapValid := iduInst.io.illegalInst || iduInst.io.isEbreak || iduInst.io.isEcall
   csrFileInst.io.isEcall := iduInst.io.isEcall
-  csrFileInst.io.isEbreak := iduInst.io.isEbreak
   csrFileInst.io.isMret := iduInst.io.isMret
   csrFileInst.io.csrOp := iduInst.io.csrOp
 
@@ -39,8 +37,7 @@ class Core extends Module with Constants {
   csrFileInst.io.wdata := Mux(csrUseImm, csrZimm, datapathInst.io.rs1Data)
   csrFileInst.io.pc := datapathInst.io.pc
 
-  datapathInst.io.redirValid := iduInst.io.illegalInst || iduInst.io.isEbreak ||
-    iduInst.io.isEcall || iduInst.io.isMret
+  datapathInst.io.redirValid := iduInst.io.isEcall || iduInst.io.isMret
   datapathInst.io.redirPc := csrFileInst.io.nextPc
   datapathInst.io.csrRdata := csrFileInst.io.rdata
 }
