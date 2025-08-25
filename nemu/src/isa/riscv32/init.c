@@ -42,5 +42,5 @@ void init_isa() {
   /* Initialize this virtual computer system. */
   restart();
 
-  // csr(MSTATUS) = 0x00001800;
+  csr(MSTATUS) = 0x1800;
 }
