@@ -4,7 +4,7 @@ import chisel3._
 import chisel3.util._
 import common._
 import cpu.idu._
-import cpu.csr._
+import cpu.priv._
 
 class Core extends Module with Constants {
   val io = IO(new Bundle {})

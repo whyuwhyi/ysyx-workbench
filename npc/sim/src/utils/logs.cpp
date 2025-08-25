@@ -1,4 +1,5 @@
 #include <defs.h>
+
 FILE *log_fp = NULL;
 static bool log_enable_flag = true;
 

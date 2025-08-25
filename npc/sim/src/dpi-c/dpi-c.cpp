@@ -6,11 +6,13 @@ extern NPCState npc_state;
 
 #define SIM_IMEM_INST "TOP.Core.datapathInst.ifuInst.simIMemInst"
 #define PROBE_RF_INST "TOP.Core.datapathInst.registerFileInst.simProbeRFInst"
+#define PROBE_CSR_INST "TOP.Core.csrFileInst.simProbeCSRInst"
 
 extern "C" {
 int get_pc_value();
-int get_reg_value(int reg_idx);
 int get_inst_value();
+int get_reg_value(int reg_idx);
+int get_csr_value(int addr);
 void ebreak();
 int pmem_read(int raddr);
 void pmem_write(int waddr, int wdata, char wmask);
@@ -35,6 +37,13 @@ word_t get_npc_reg(int idx) {
   assert(probe_rf_inst != NULL);
   svSetScope(probe_rf_inst);
   return get_reg_value(idx);
+}
+
+word_t get_npc_csr(int csr) {
+  svScope probe_rf_inst = svGetScopeFromName(PROBE_CSR_INST);
+  assert(probe_rf_inst != NULL);
+  svSetScope(probe_rf_inst);
+  return get_csr_value(csr);
 }
 
 extern "C" void ebreak() {

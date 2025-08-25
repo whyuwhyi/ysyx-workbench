@@ -1,3 +1,4 @@
+#include "common.h"
 #include <defs.h>
 #include <dlfcn.h>
 #include <memory/memory.h>
@@ -5,8 +6,16 @@
 enum { DIFFTEST_TO_DUT, DIFFTEST_TO_REF };
 
 typedef struct {
-  uint32_t gpr[32];
-  uint32_t pc;
+  word_t mstatus;
+  word_t mtvec;
+  word_t mepc;
+  word_t mcause;
+} RISCV_csr;
+
+typedef struct {
+  word_t gpr[32];
+  word_t mstatus;
+  paddr_t pc;
 } riscv32_CPU_state;
 
 static riscv32_CPU_state dut_riscv32_cpu_state;

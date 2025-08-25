@@ -821,92 +821,102 @@ module IDU(	// src/main/scala/cpu/idu/IDU.scala:9:7
   assign io_isMret = &_decoded_andMatrixOutputs_T_30;	// src/main/scala/chisel3/util/pla.scala:98:{53,70}, src/main/scala/cpu/idu/IDU.scala:9:7
 endmodule
 
-module CSRFile(	// src/main/scala/cpu/csr/CSRFile.scala:8:7
-  input         clock,	// src/main/scala/cpu/csr/CSRFile.scala:8:7
-                reset,	// src/main/scala/cpu/csr/CSRFile.scala:8:7
-                io_isEcall,	// src/main/scala/cpu/csr/CSRFile.scala:9:14
-                io_isMret,	// src/main/scala/cpu/csr/CSRFile.scala:9:14
-  input  [1:0]  io_csrOp,	// src/main/scala/cpu/csr/CSRFile.scala:9:14
-  input  [11:0] io_addr,	// src/main/scala/cpu/csr/CSRFile.scala:9:14
-  input  [31:0] io_wdata,	// src/main/scala/cpu/csr/CSRFile.scala:9:14
-  output [31:0] io_rdata,	// src/main/scala/cpu/csr/CSRFile.scala:9:14
-  input  [31:0] io_pc,	// src/main/scala/cpu/csr/CSRFile.scala:9:14
-  output [31:0] io_nextPc	// src/main/scala/cpu/csr/CSRFile.scala:9:14
+// external module SimProbeCSR
+
+module CSRFile(	// src/main/scala/cpu/priv/CSRFile.scala:10:7
+  input         clock,	// src/main/scala/cpu/priv/CSRFile.scala:10:7
+                reset,	// src/main/scala/cpu/priv/CSRFile.scala:10:7
+                io_isEcall,	// src/main/scala/cpu/priv/CSRFile.scala:11:14
+                io_isMret,	// src/main/scala/cpu/priv/CSRFile.scala:11:14
+  input  [1:0]  io_csrOp,	// src/main/scala/cpu/priv/CSRFile.scala:11:14
+  input  [11:0] io_addr,	// src/main/scala/cpu/priv/CSRFile.scala:11:14
+  input  [31:0] io_wdata,	// src/main/scala/cpu/priv/CSRFile.scala:11:14
+  output [31:0] io_rdata,	// src/main/scala/cpu/priv/CSRFile.scala:11:14
+  input  [31:0] io_pc,	// src/main/scala/cpu/priv/CSRFile.scala:11:14
+  output [31:0] io_nextPc	// src/main/scala/cpu/priv/CSRFile.scala:11:14
 );
 
-  reg  [31:0] mstatus;	// src/main/scala/cpu/csr/CSRFile.scala:20:24
-  reg  [31:0] mepc;	// src/main/scala/cpu/csr/CSRFile.scala:21:21
-  reg  [31:0] mcause;	// src/main/scala/cpu/csr/CSRFile.scala:22:23
-  reg  [31:0] mtvec;	// src/main/scala/cpu/csr/CSRFile.scala:23:22
-  wire        _rdata_T = io_addr == 12'h300;	// src/main/scala/cpu/csr/CSRFile.scala:25:47
-  wire        _rdata_T_2 = io_addr == 12'h341;	// src/main/scala/cpu/csr/CSRFile.scala:25:47
-  wire        _rdata_T_4 = io_addr == 12'h342;	// src/main/scala/cpu/csr/CSRFile.scala:25:47
-  wire        _rdata_T_6 = io_addr == 12'h305;	// src/main/scala/cpu/csr/CSRFile.scala:25:47
+  reg  [31:0] mstatus;	// src/main/scala/cpu/priv/CSRFile.scala:22:24
+  reg  [31:0] mepc;	// src/main/scala/cpu/priv/CSRFile.scala:23:21
+  reg  [31:0] mcause;	// src/main/scala/cpu/priv/CSRFile.scala:24:23
+  reg  [31:0] mtvec;	// src/main/scala/cpu/priv/CSRFile.scala:25:22
+  wire        _rdata_T = io_addr == 12'h300;	// src/main/scala/cpu/priv/CSRFile.scala:27:47
+  wire        _rdata_T_2 = io_addr == 12'h341;	// src/main/scala/cpu/priv/CSRFile.scala:27:47
+  wire        _rdata_T_4 = io_addr == 12'h342;	// src/main/scala/cpu/priv/CSRFile.scala:27:47
+  wire        _rdata_T_6 = io_addr == 12'h305;	// src/main/scala/cpu/priv/CSRFile.scala:27:47
   wire [31:0] io_rdata_0 =
     _rdata_T_6
       ? mtvec
-      : _rdata_T_4 ? mcause : _rdata_T_2 ? mepc : _rdata_T ? mstatus : 32'h0;	// src/main/scala/cpu/csr/CSRFile.scala:20:24, :21:21, :22:23, :23:22, :25:47
-  always @(posedge clock) begin	// src/main/scala/cpu/csr/CSRFile.scala:8:7
-    if (reset) begin	// src/main/scala/cpu/csr/CSRFile.scala:8:7
-      mstatus <= 32'h1800;	// src/main/scala/cpu/csr/CSRFile.scala:20:24
-      mepc <= 32'h0;	// src/main/scala/cpu/csr/CSRFile.scala:21:21
-      mcause <= 32'h0;	// src/main/scala/cpu/csr/CSRFile.scala:21:21, :22:23
-      mtvec <= 32'h0;	// src/main/scala/cpu/csr/CSRFile.scala:21:21, :23:22
+      : _rdata_T_4 ? mcause : _rdata_T_2 ? mepc : _rdata_T ? mstatus : 32'h0;	// src/main/scala/cpu/priv/CSRFile.scala:22:24, :23:21, :24:23, :25:22, :27:47
+  always @(posedge clock) begin	// src/main/scala/cpu/priv/CSRFile.scala:10:7
+    if (reset) begin	// src/main/scala/cpu/priv/CSRFile.scala:10:7
+      mstatus <= 32'h1800;	// src/main/scala/cpu/priv/CSRFile.scala:22:24
+      mepc <= 32'h0;	// src/main/scala/cpu/priv/CSRFile.scala:23:21
+      mcause <= 32'h0;	// src/main/scala/cpu/priv/CSRFile.scala:23:21, :24:23
+      mtvec <= 32'h0;	// src/main/scala/cpu/priv/CSRFile.scala:23:21, :25:22
     end
-    else begin	// src/main/scala/cpu/csr/CSRFile.scala:8:7
+    else begin	// src/main/scala/cpu/priv/CSRFile.scala:10:7
       automatic logic [3:0][31:0] _GEN =
-        {{io_rdata_0 & ~io_wdata}, {io_rdata_0 | io_wdata}, {io_wdata}, {32'h0}};	// src/main/scala/cpu/csr/CSRFile.scala:21:21, :25:47, :36:45, :39:29, :40:{29,31}
-      if (io_isMret)	// src/main/scala/cpu/csr/CSRFile.scala:9:14
-        mstatus <= 32'h80;	// src/main/scala/cpu/csr/CSRFile.scala:20:24, :58:13
-      else if (io_isEcall)	// src/main/scala/cpu/csr/CSRFile.scala:9:14
-        mstatus <= 32'h1800;	// src/main/scala/cpu/csr/CSRFile.scala:20:24
-      else if ((|io_csrOp) & _rdata_T)	// src/main/scala/cpu/csr/CSRFile.scala:20:24, :25:47, :35:{17,33}, :43:21, :44:42
-        mstatus <= _GEN[io_csrOp];	// src/main/scala/cpu/csr/CSRFile.scala:20:24, :36:45
-      if (io_isEcall) begin	// src/main/scala/cpu/csr/CSRFile.scala:9:14
-        mepc <= io_pc;	// src/main/scala/cpu/csr/CSRFile.scala:21:21
-        mcause <= 32'hB;	// src/main/scala/cpu/csr/CSRFile.scala:22:23, :53:12
+        {{io_rdata_0 & ~io_wdata}, {io_rdata_0 | io_wdata}, {io_wdata}, {32'h0}};	// src/main/scala/cpu/priv/CSRFile.scala:23:21, :27:47, :38:45, :41:29, :42:{29,31}
+      if (io_isMret)	// src/main/scala/cpu/priv/CSRFile.scala:11:14
+        mstatus <= 32'h80;	// src/main/scala/cpu/priv/CSRFile.scala:22:24, :60:13
+      else if (io_isEcall)	// src/main/scala/cpu/priv/CSRFile.scala:11:14
+        mstatus <= 32'h1800;	// src/main/scala/cpu/priv/CSRFile.scala:22:24
+      else if ((|io_csrOp) & _rdata_T)	// src/main/scala/cpu/priv/CSRFile.scala:22:24, :27:47, :37:{17,33}, :45:21, :46:42
+        mstatus <= _GEN[io_csrOp];	// src/main/scala/cpu/priv/CSRFile.scala:22:24, :38:45
+      if (io_isEcall) begin	// src/main/scala/cpu/priv/CSRFile.scala:11:14
+        mepc <= io_pc;	// src/main/scala/cpu/priv/CSRFile.scala:23:21
+        mcause <= 32'hB;	// src/main/scala/cpu/priv/CSRFile.scala:24:23, :55:12
       end
-      else begin	// src/main/scala/cpu/csr/CSRFile.scala:9:14
-        if (~(|io_csrOp) | _rdata_T | ~_rdata_T_2) begin	// src/main/scala/cpu/csr/CSRFile.scala:21:21, :25:47, :35:{17,33}, :43:21
+      else begin	// src/main/scala/cpu/priv/CSRFile.scala:11:14
+        if (~(|io_csrOp) | _rdata_T | ~_rdata_T_2) begin	// src/main/scala/cpu/priv/CSRFile.scala:23:21, :27:47, :37:{17,33}, :45:21
         end
-        else	// src/main/scala/cpu/csr/CSRFile.scala:21:21, :35:33, :43:21
-          mepc <= _GEN[io_csrOp];	// src/main/scala/cpu/csr/CSRFile.scala:21:21, :36:45
-        if (~(|io_csrOp) | _rdata_T | _rdata_T_2 | ~_rdata_T_4) begin	// src/main/scala/cpu/csr/CSRFile.scala:21:21, :22:23, :25:47, :35:{17,33}, :43:21
+        else	// src/main/scala/cpu/priv/CSRFile.scala:23:21, :37:33, :45:21
+          mepc <= _GEN[io_csrOp];	// src/main/scala/cpu/priv/CSRFile.scala:23:21, :38:45
+        if (~(|io_csrOp) | _rdata_T | _rdata_T_2 | ~_rdata_T_4) begin	// src/main/scala/cpu/priv/CSRFile.scala:23:21, :24:23, :27:47, :37:{17,33}, :45:21
         end
-        else	// src/main/scala/cpu/csr/CSRFile.scala:22:23, :35:33, :43:21
-          mcause <= _GEN[io_csrOp];	// src/main/scala/cpu/csr/CSRFile.scala:22:23, :36:45
+        else	// src/main/scala/cpu/priv/CSRFile.scala:24:23, :37:33, :45:21
+          mcause <= _GEN[io_csrOp];	// src/main/scala/cpu/priv/CSRFile.scala:24:23, :38:45
       end
-      if (~(|io_csrOp) | _rdata_T | _rdata_T_2 | _rdata_T_4 | ~_rdata_T_6) begin	// src/main/scala/cpu/csr/CSRFile.scala:21:21, :23:22, :25:47, :35:{17,33}, :43:21
+      if (~(|io_csrOp) | _rdata_T | _rdata_T_2 | _rdata_T_4 | ~_rdata_T_6) begin	// src/main/scala/cpu/priv/CSRFile.scala:23:21, :25:22, :27:47, :37:{17,33}, :45:21
       end
-      else	// src/main/scala/cpu/csr/CSRFile.scala:23:22, :35:33, :43:21
-        mtvec <= _GEN[io_csrOp];	// src/main/scala/cpu/csr/CSRFile.scala:23:22, :36:45
+      else	// src/main/scala/cpu/priv/CSRFile.scala:25:22, :37:33, :45:21
+        mtvec <= _GEN[io_csrOp];	// src/main/scala/cpu/priv/CSRFile.scala:25:22, :38:45
     end
   end // always @(posedge)
-  `ifdef ENABLE_INITIAL_REG_	// src/main/scala/cpu/csr/CSRFile.scala:8:7
-    `ifdef FIRRTL_BEFORE_INITIAL	// src/main/scala/cpu/csr/CSRFile.scala:8:7
-      `FIRRTL_BEFORE_INITIAL	// src/main/scala/cpu/csr/CSRFile.scala:8:7
+  `ifdef ENABLE_INITIAL_REG_	// src/main/scala/cpu/priv/CSRFile.scala:10:7
+    `ifdef FIRRTL_BEFORE_INITIAL	// src/main/scala/cpu/priv/CSRFile.scala:10:7
+      `FIRRTL_BEFORE_INITIAL	// src/main/scala/cpu/priv/CSRFile.scala:10:7
     `endif // FIRRTL_BEFORE_INITIAL
-    initial begin	// src/main/scala/cpu/csr/CSRFile.scala:8:7
-      automatic logic [31:0] _RANDOM[0:3];	// src/main/scala/cpu/csr/CSRFile.scala:8:7
-      `ifdef INIT_RANDOM_PROLOG_	// src/main/scala/cpu/csr/CSRFile.scala:8:7
-        `INIT_RANDOM_PROLOG_	// src/main/scala/cpu/csr/CSRFile.scala:8:7
+    initial begin	// src/main/scala/cpu/priv/CSRFile.scala:10:7
+      automatic logic [31:0] _RANDOM[0:3];	// src/main/scala/cpu/priv/CSRFile.scala:10:7
+      `ifdef INIT_RANDOM_PROLOG_	// src/main/scala/cpu/priv/CSRFile.scala:10:7
+        `INIT_RANDOM_PROLOG_	// src/main/scala/cpu/priv/CSRFile.scala:10:7
       `endif // INIT_RANDOM_PROLOG_
-      `ifdef RANDOMIZE_REG_INIT	// src/main/scala/cpu/csr/CSRFile.scala:8:7
+      `ifdef RANDOMIZE_REG_INIT	// src/main/scala/cpu/priv/CSRFile.scala:10:7
         for (logic [2:0] i = 3'h0; i < 3'h4; i += 3'h1) begin
-          _RANDOM[i[1:0]] = `RANDOM;	// src/main/scala/cpu/csr/CSRFile.scala:8:7
-        end	// src/main/scala/cpu/csr/CSRFile.scala:8:7
-        mstatus = _RANDOM[2'h0];	// src/main/scala/cpu/csr/CSRFile.scala:8:7, :20:24
-        mepc = _RANDOM[2'h1];	// src/main/scala/cpu/csr/CSRFile.scala:8:7, :21:21
-        mcause = _RANDOM[2'h2];	// src/main/scala/cpu/csr/CSRFile.scala:8:7, :22:23
-        mtvec = _RANDOM[2'h3];	// src/main/scala/cpu/csr/CSRFile.scala:8:7, :23:22
+          _RANDOM[i[1:0]] = `RANDOM;	// src/main/scala/cpu/priv/CSRFile.scala:10:7
+        end	// src/main/scala/cpu/priv/CSRFile.scala:10:7
+        mstatus = _RANDOM[2'h0];	// src/main/scala/cpu/priv/CSRFile.scala:10:7, :22:24
+        mepc = _RANDOM[2'h1];	// src/main/scala/cpu/priv/CSRFile.scala:10:7, :23:21
+        mcause = _RANDOM[2'h2];	// src/main/scala/cpu/priv/CSRFile.scala:10:7, :24:23
+        mtvec = _RANDOM[2'h3];	// src/main/scala/cpu/priv/CSRFile.scala:10:7, :25:22
       `endif // RANDOMIZE_REG_INIT
     end // initial
-    `ifdef FIRRTL_AFTER_INITIAL	// src/main/scala/cpu/csr/CSRFile.scala:8:7
-      `FIRRTL_AFTER_INITIAL	// src/main/scala/cpu/csr/CSRFile.scala:8:7
+    `ifdef FIRRTL_AFTER_INITIAL	// src/main/scala/cpu/priv/CSRFile.scala:10:7
+      `FIRRTL_AFTER_INITIAL	// src/main/scala/cpu/priv/CSRFile.scala:10:7
     `endif // FIRRTL_AFTER_INITIAL
   `endif // ENABLE_INITIAL_REG_
-  assign io_rdata = io_rdata_0;	// src/main/scala/cpu/csr/CSRFile.scala:8:7, :25:47
-  assign io_nextPc = io_isEcall ? mtvec : io_isMret ? mepc : 32'h0;	// src/main/scala/cpu/csr/CSRFile.scala:8:7, :21:21, :23:22, :61:{19,42}
+  SimProbeCSR #(
+    .XLEN(32)
+  ) simProbeCSRInst (	// src/main/scala/cpu/priv/CSRFile.scala:66:33
+    .mstatus (mstatus),	// src/main/scala/cpu/priv/CSRFile.scala:22:24
+    .mtvec   (mtvec),	// src/main/scala/cpu/priv/CSRFile.scala:25:22
+    .mepc    (mepc),	// src/main/scala/cpu/priv/CSRFile.scala:23:21
+    .mcause  (mcause)	// src/main/scala/cpu/priv/CSRFile.scala:24:23
+  );
+  assign io_rdata = io_rdata_0;	// src/main/scala/cpu/priv/CSRFile.scala:10:7, :27:47
+  assign io_nextPc = io_isEcall ? mtvec : io_isMret ? mepc : 32'h0;	// src/main/scala/cpu/priv/CSRFile.scala:10:7, :23:21, :25:22, :63:{19,42}
 endmodule
 
 module Core(	// src/main/scala/cpu/arch/single_cycle/Core.scala:9:7
@@ -1082,9 +1092,35 @@ module SimEbreak (
   end
 endmodule
 
+// ----- 8< ----- FILE "./SimProbeCSR.sv" ----- 8< -----
+
+// Generated by CIRCT firtool-1.62.1
+module SimProbeCSR #(
+  parameter XLEN   = 32
+) (
+  input logic [XLEN-1:0] mstatus,
+  input logic [XLEN-1:0] mtvec,
+  input logic [XLEN-1:0] mepc,
+  input logic [XLEN-1:0] mcause
+);
+
+  export "DPI-C" function get_csr_value;
+  function int get_csr_value(input int addr);
+    case (addr)
+      32'h300: get_csr_value = mstatus;
+      32'h305: get_csr_value = mtvec;
+      32'h341: get_csr_value = mepc;
+      32'h342: get_csr_value = mcause;
+      default: get_csr_value = 0;
+    endcase
+  endfunction
+
+endmodule
+
 // ----- 8< ----- FILE "firrtl_black_box_resource_files.f" ----- 8< -----
 
 SimDMem.sv
 SimEbreak.sv
 SimIMem.sv
+SimProbeCSR.sv
 SimProbeRF.sv

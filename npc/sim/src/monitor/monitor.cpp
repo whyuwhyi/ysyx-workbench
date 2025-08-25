@@ -81,7 +81,7 @@ void init_monitor(int argc, char *argv[]) {
 
   init_device();
 
-  long img_size = load_image(img_file);
+  long img_size = load_img(img_file);
 
   sim_init();
 

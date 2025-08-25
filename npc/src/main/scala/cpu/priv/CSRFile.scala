@@ -1,9 +1,11 @@
-package cpu.csr
+package cpu.priv
 
 import chisel3._
 import chisel3.util._
 import common._
 import common.CSROp
+import common.BuildFlags
+import sim._
 
 class CSRFile extends Module with Constants {
   val io = IO(new Bundle {
@@ -59,4 +61,12 @@ class CSRFile extends Module with Constants {
   }
 
   io.nextPc := Mux(io.isEcall, mtvec, Mux(io.isMret, mepc, 0.U(XLEN.W)))
+
+  if (BuildFlags.sim) {
+    val simProbeCSRInst = Module(new sim.SimProbeCSR(xlen = XLEN))
+    simProbeCSRInst.io.mstatus := mstatus
+    simProbeCSRInst.io.mtvec := mtvec
+    simProbeCSRInst.io.mepc := mepc
+    simProbeCSRInst.io.mcause := mcause
+  }
 }

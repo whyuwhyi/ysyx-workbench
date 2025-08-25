@@ -68,40 +68,6 @@ void paddr_write(paddr_t addr, int len, word_t data) {
   }
 }
 
-long load_img(const char *img_file) {
-  if (img_file == NULL) {
-    Log("No image file specified");
-    return 0;
-  }
-
-  FILE *fp = fopen(img_file, "rb");
-  if (fp == NULL) {
-    Log("Cannot open image file: %s", img_file);
-    return 0;
-  }
-
-  fseek(fp, 0, SEEK_END);
-  long size = ftell(fp);
-  fseek(fp, 0, SEEK_SET);
-
-  if (size > CONFIG_MSIZE) {
-    Log("Image file too large: %ld > %d", size, CONFIG_MSIZE);
-    fclose(fp);
-    return 0;
-  }
-
-  int ret = fread(pmem, size, 1, fp);
-  if (ret != 1) {
-    Log("Failed to read image file");
-    fclose(fp);
-    return 0;
-  }
-
-  fclose(fp);
-  Log("Loaded image file: %s, size: %ld bytes", img_file, size);
-  return size;
-}
-
 extern "C" int pmem_read(int raddr) {
   if (raddr == TIMER_ADDR || raddr == SERIAL_ADDR) {
 
@@ -134,7 +100,7 @@ extern "C" void pmem_write(int waddr, int wdata, char wmask) {
   }
 }
 
-long load_image(char *img_file) {
+long load_img(const char *img_file) {
   Assert(img_file != NULL, "Image file path must not be NULL");
 
   FILE *fp = fopen(img_file, "rb");
