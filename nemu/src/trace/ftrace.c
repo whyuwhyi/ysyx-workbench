@@ -4,7 +4,7 @@
 #define MAX_FUNC 65536
 #define MAX_FUNC_NAME_LEN 256
 
-#ifdef __LP64__
+#ifdef _LP64__
 #define Elf_Ehdr Elf64_Ehdr
 #define Elf_Phdr Elf64_Phdr
 #define Elf_Shdr Elf64_Shdr
