@@ -1,5 +1,3 @@
-#include <common.h>
-#include <cstdint>
 #include <defs.h>
 #include <dlfcn.h>
 #include <memory/memory.h>

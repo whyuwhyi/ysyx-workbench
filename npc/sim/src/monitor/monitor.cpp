@@ -1,5 +1,3 @@
-#include <assert.h>
-#include <common.h>
 #include <defs.h>
 #include <device/device.h>
 #include <getopt.h>

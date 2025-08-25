@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <defs.h>
 #include <device/device.h>
 #include <memory/memory.h>
@@ -8,18 +7,18 @@ uint8_t pmem[CONFIG_MSIZE];
 
 IFDEF(CONFIG_DIFFTEST, extern bool ref_skip_difftest);
 
-static inline bool in_pmem(uint32_t addr) {
+static inline bool in_pmem(paddr_t addr) {
   return addr >= CONFIG_MBASE && addr < CONFIG_MBASE + CONFIG_MSIZE;
 }
 
-uint32_t paddr_read(uint32_t addr, int len) {
+word_t paddr_read(paddr_t addr, int len) {
   if (!in_pmem(addr)) {
     Log("Read from invalid address: 0x%08x", addr);
     return 0;
   }
 
-  uint32_t offset = addr - CONFIG_MBASE;
-  uint32_t data = 0;
+  paddr_t offset = addr - CONFIG_MBASE;
+  word_t data = 0;
 
   switch (len) {
   case 1:
@@ -36,13 +35,13 @@ uint32_t paddr_read(uint32_t addr, int len) {
   }
 
 #ifdef CONFIG_MTRACE
-  mtrace_read(addr, len);
+  mtrace_read(addr, len, data);
 #endif
 
   return data;
 }
 
-void paddr_write(uint32_t addr, int len, uint32_t data) {
+void paddr_write(paddr_t addr, int len, word_t data) {
   if (!in_pmem(addr)) {
     Log("Write to invalid address: 0x%08x", addr);
     return;
@@ -52,7 +51,7 @@ void paddr_write(uint32_t addr, int len, uint32_t data) {
   mtrace_write(addr, len, data);
 #endif
 
-  uint32_t offset = addr - CONFIG_MBASE;
+  paddr_t offset = addr - CONFIG_MBASE;
 
   switch (len) {
   case 1:
