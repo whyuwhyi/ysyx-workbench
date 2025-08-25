@@ -90,7 +90,7 @@ void init_ftrace(const char *elf_path) {
   Log("Function trace initialized with %d functions.", func_cnt);
 }
 
-const char *ftrace_func_name(vaddr_t addr) {
+const char *ftrace_func_name(paddr_t addr) {
   for (int i = 0; i < func_cnt; i++) {
     if (addr >= funcs[i].addr && addr < funcs[i].addr + funcs[i].size) {
       return funcs[i].name;
@@ -101,7 +101,7 @@ const char *ftrace_func_name(vaddr_t addr) {
 
 static char buf[256];
 
-void ftrace_call(vaddr_t from, vaddr_t to) {
+void ftrace_call(paddr_t from, paddr_t to) {
   for (int i = 0; i < call_depth; i++) {
     buf[i] = ' ';
   }
@@ -118,7 +118,7 @@ void ftrace_call(vaddr_t from, vaddr_t to) {
   call_depth = call_depth > 10 ? 10 : call_depth + 1;
 }
 
-void ftrace_ret(vaddr_t from, vaddr_t to) {
+void ftrace_ret(paddr_t from, paddr_t to) {
   call_depth = call_depth > 0 ? call_depth - 1 : 0;
   for (int i = 0; i < call_depth; i++) {
     buf[i] = ' ';

@@ -3,7 +3,7 @@
 #define MAX_TRACE_LEN 24
 
 typedef struct {
-  vaddr_t pc;
+  paddr_t pc;
   word_t inst;
   char disasm[64];
 } TraceEntry;

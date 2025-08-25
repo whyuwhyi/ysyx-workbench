@@ -3,8 +3,8 @@
 
 #include <common.h>
 
-uint32_t paddr_read(uint32_t addr, int len);
-void paddr_write(uint32_t addr, int len, uint32_t data);
+uint32_t paddr_read(paddr_t addr, int len);
+void paddr_write(paddr_t addr, int len, word_t data);
 long load_img(const char *img_file);
 
 void init_device(void);
@@ -13,9 +13,9 @@ void serial_putchar(char c);
 
 int timer_get_time(void);
 
-uint32_t get_npc_pc();
-uint32_t get_npc_inst();
-uint32_t get_npc_reg(int reg_idx);
+paddr_t get_npc_pc();
+word_t get_npc_inst();
+word_t get_npc_reg(int reg_idx);
 
 void init_cpu();
 void init_cpu_difftest(char *ref_so_file, long img_size);
@@ -28,7 +28,7 @@ void single_cycle();
 
 bool is_exit_status_bad(void);
 
-uint32_t npc_reg_str2val(const char *reg_name, bool *success);
+word_t npc_reg_str2val(const char *reg_name, bool *success);
 
 void init_monitor(int argc, char *argv[]);
 void monitor_exit(void);
@@ -37,21 +37,21 @@ long load_image(char *img_file);
 
 void init_itrace();
 void init_mtrace();
-void mtrace_read(uint32_t addr, int len);
-void mtrace_write(uint32_t addr, int len, uint32_t data);
+void mtrace_read(paddr_t addr, int len);
+void mtrace_write(paddr_t addr, int len, word_t data);
 void init_ftrace(const char *elf_path);
-void itrace_push(uint32_t pc, uint32_t inst, const char *disasm);
+void itrace_push(paddr_t pc, word_t inst, const char *disasm);
 void itrace_display();
-void ftrace_call(uint32_t caller_pc, uint32_t target_pc);
-void ftrace_ret(uint32_t ret_pc, uint32_t target_pc);
-bool is_fcall(uint32_t inst);
-bool is_fret(uint32_t inst);
+void ftrace_call(paddr_t caller_pc, paddr_t target_pc);
+void ftrace_ret(paddr_t ret_pc, paddr_t target_pc);
+bool is_fcall(word_t inst);
+bool is_fret(word_t inst);
 
 void init_sdb();
 void sdb_mainloop();
 void watchpoint_check();
 
 void init_difftest(char *ref_so_file, long img_size, int port);
-void difftest_step(uint32_t pc);
+void difftest_step(paddr_t pc);
 
 #endif

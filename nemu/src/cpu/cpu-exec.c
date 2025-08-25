@@ -13,17 +13,18 @@
  * See the Mulan PSL v2 for more details.
  ***************************************************************************************/
 
+#include "common.h"
 #include <cpu/cpu.h>
 #include <cpu/decode.h>
 #include <cpu/difftest.h>
 #include <locale.h>
 
 // Trace function declarations
-void ftrace_call(uint32_t from, uint32_t to);
-void ftrace_ret(uint32_t from, uint32_t to);
-bool is_fcall(uint32_t inst);
-bool is_fret(uint32_t inst);
-void itrace_push(paddr_t pc, uint32_t inst, const char *disasm);
+void ftrace_call(paddr_t from, paddr_t to);
+void ftrace_ret(paddr_t from, paddr_t to);
+bool is_fcall(word_t inst);
+bool is_fret(word_t inst);
+void itrace_push(paddr_t pc, word_t inst, const char *disasm);
 void itrace_display();
 void watchpoint_check();
 
