@@ -2,7 +2,7 @@
 #include <common.h>
 #include <fs.h>
 
-#define SYSCALL_TRACE 1
+// #define SYSCALL_TRACE 1
 
 static void strace(int id);
 
