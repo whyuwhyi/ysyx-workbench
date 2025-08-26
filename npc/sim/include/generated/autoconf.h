@@ -10,5 +10,5 @@
 #define CONFIG_MBASE 0x80000000
 #define CONFIG_FTRACE 1
 #define CONFIG_MTRACE 1
-#define CONFIG_DIFFTEST_REF_PATH "tools/difftest/riscv32-nemu-interrupt"
+#define CONFIG_DIFFTEST_REF_PATH "tools/difftest/riscv32-nemu-interpreter-so"
 #define CONFIG_TRACE 1
