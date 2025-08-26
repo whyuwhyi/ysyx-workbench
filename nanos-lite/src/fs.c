@@ -132,38 +132,26 @@ size_t fs_lseek(int fd, size_t offset, int whence) {
 
   Finfo *f = &file_table[fd];
 
-  int64_t base = 0;
+  size_t base = 0;
   switch (whence) {
   case SEEK_SET:
     base = 0;
     break;
   case SEEK_CUR:
-    base = (int64_t)f->open_offset;
+    base = (size_t)f->open_offset;
     break;
   case SEEK_END:
-    base = (int64_t)f->size;
+    base = (size_t)f->size;
     break;
   default:
     assert(0);
   }
 
-  int64_t soff = (int64_t)(intptr_t)offset;
-  int64_t new_off = base + soff;
-  if (soff > 0 && new_off < base) {
+  size_t new_off = base + offset;
+  if (new_off > f->size) {
     return (size_t)-1;
   }
-  if (soff < 0 && new_off > base) {
-    return (size_t)-1;
-  }
-  if (new_off < 0) {
-    return (size_t)-1;
-  }
-
-  if ((uint64_t)new_off > (uint64_t)SIZE_MAX) {
-    return (size_t)-1;
-  }
-
-  f->open_offset = (size_t)new_off;
+  f->open_offset = new_off;
   return (size_t)new_off;
 }
 
