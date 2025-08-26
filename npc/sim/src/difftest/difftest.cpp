@@ -35,13 +35,13 @@ typedef struct {
 static riscv32_CPU_state dut_riscv32_cpu_state;
 static riscv32_CPU_state ref_riscv32_cpu_state;
 
-static void checkregs(riscv32_CPU_state *ref, uint32_t pc);
+static void checkregs(riscv32_CPU_state *ref, paddr_t pc);
 static void difftest_dut2ref();
 
 bool ref_skip_difftest = false;
 static bool last_skip_difftest = false;
 
-void (*ref_difftest_memcpy)(uint32_t addr, void *buf, size_t n,
+void (*ref_difftest_memcpy)(paddr_t addr, void *buf, size_t n,
                             bool direction) = NULL;
 void (*ref_difftest_regcpy)(void *dut, bool direction) = NULL;
 void (*ref_difftest_exec)(uint64_t n) = NULL;
@@ -54,8 +54,8 @@ void init_difftest(char *ref_so_file, long img_size, int port) {
   handle = dlopen(ref_so_file, RTLD_LAZY);
   assert(handle);
 
-  ref_difftest_memcpy = (void (*)(uint32_t, void *, size_t, bool))dlsym(
-      handle, "difftest_memcpy");
+  ref_difftest_memcpy =
+      (void (*)(paddr_t, void *, size_t, bool))dlsym(handle, "difftest_memcpy");
   assert(ref_difftest_memcpy);
 
   ref_difftest_regcpy =
@@ -88,7 +88,7 @@ void init_difftest(char *ref_so_file, long img_size, int port) {
   difftest_dut2ref();
 }
 
-void difftest_step(uint32_t pc) {
+void difftest_step(paddr_t pc) {
   if (last_skip_difftest) {
     difftest_dut2ref();
     last_skip_difftest = false;
@@ -105,7 +105,7 @@ void difftest_step(uint32_t pc) {
   checkregs(&ref_riscv32_cpu_state, pc);
 }
 
-static void checkregs(riscv32_CPU_state *ref, uint32_t pc) {
+static void checkregs(riscv32_CPU_state *ref, paddr_t pc) {
   difftest_check_value("pc", pc, ref->pc, get_npc_pc());
   for (int i = 0; i < nr_reg; i++) {
     difftest_check_value(npc_reg_name(i), pc, ref->gpr[i], get_npc_reg(i));
