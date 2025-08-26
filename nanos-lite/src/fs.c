@@ -106,10 +106,6 @@ size_t fs_lseek(int fd, size_t offset, int whence) {
     break;
   case SEEK_END:
     new_offset = f->size + offset;
-    if (new_offset > f->size)
-      new_offset = f->size;
-    if (new_offset < 0)
-      new_offset = 0;
     break;
   default:
     panic("should not reach here");
