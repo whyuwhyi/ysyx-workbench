@@ -5,6 +5,20 @@
 
 enum { DIFFTEST_TO_DUT, DIFFTEST_TO_REF };
 
+static inline void difftest_check_value(const char *name, paddr_t pc,
+                                        word_t ref, word_t dut) {
+  if (ref != dut) {
+    Log("%s is different after executing instruction at pc = " FMT_WORD
+        ", right = " FMT_WORD ", wrong = " FMT_WORD ", diff = " FMT_WORD,
+        name, pc, ref, dut, ref ^ dut);
+    npc_reg_display();
+    assert(0);
+  }
+}
+
+#define DIFFTEST_CHECK_CSR(name, field)                                        \
+  difftest_check_value(name##_NAME, pc, ref->csr.field, get_npc_csr(name))
+
 typedef struct {
   word_t mstatus;
   word_t mtvec;
@@ -19,8 +33,10 @@ typedef struct {
 } riscv32_CPU_state;
 
 static riscv32_CPU_state dut_riscv32_cpu_state;
-
 static riscv32_CPU_state ref_riscv32_cpu_state;
+
+static void checkregs(riscv32_CPU_state *ref, uint32_t pc);
+static void difftest_dut2ref();
 
 bool ref_skip_difftest = false;
 static bool last_skip_difftest = false;
@@ -69,60 +85,12 @@ void init_difftest(char *ref_so_file, long img_size, int port) {
   extern uint8_t pmem[];
   ref_difftest_memcpy(CONFIG_MBASE, pmem, img_size, DIFFTEST_TO_REF);
 
-  for (int i = 0; i < nr_reg; i++) {
-    dut_riscv32_cpu_state.gpr[i] = get_npc_reg(i);
-  }
-  dut_riscv32_cpu_state.pc = get_npc_pc();
-  ref_difftest_regcpy(&dut_riscv32_cpu_state, DIFFTEST_TO_REF);
-}
-
-static void checkregs(riscv32_CPU_state *ref, uint32_t pc) {
-  bool diff_found = false;
-
-  uint32_t dut_pc = get_npc_pc();
-  if (ref->pc != dut_pc) {
-    Log("PC differs: REF=0x%08x, DUT=0x%08x at pc=0x%08x", ref->pc, dut_pc, pc);
-    diff_found = true;
-  }
-
-  for (int i = 0; i < nr_reg; i++) {
-    uint32_t dut_reg = get_npc_reg(i);
-    if (ref->gpr[i] != dut_reg) {
-      Log("Register x%d differs: REF=0x%08x, DUT=0x%08x at pc=0x%08x", i,
-          ref->gpr[i], dut_reg, pc);
-      diff_found = true;
-    }
-  }
-
-  if (diff_found) {
-    Log("DiffTest failed at pc=0x%08x", pc);
-    Log("REF registers:");
-    for (int i = 0; i < nr_reg; i++) {
-      Log("x%d=0x%08x ", i, ref->gpr[i]);
-      if ((i + 1) % 4 == 0)
-        Log("");
-    }
-    Log("pc=0x%08x", ref->pc);
-
-    Log("DUT registers:");
-    for (int i = 0; i < nr_reg; i++) {
-      Log("x%d=0x%08x ", i, get_npc_reg(i));
-      if ((i + 1) % 4 == 0)
-        Log("");
-    }
-    Log("pc=0x%08x", get_npc_pc());
-
-    assert(0);
-  }
+  difftest_dut2ref();
 }
 
 void difftest_step(uint32_t pc) {
   if (last_skip_difftest) {
-    for (int i = 0; i < nr_reg; i++) {
-      dut_riscv32_cpu_state.gpr[i] = get_npc_reg(i);
-    }
-    dut_riscv32_cpu_state.pc = get_npc_pc();
-    ref_difftest_regcpy(&dut_riscv32_cpu_state, DIFFTEST_TO_REF);
+    difftest_dut2ref();
     last_skip_difftest = false;
     return;
   }
@@ -135,4 +103,27 @@ void difftest_step(uint32_t pc) {
   ref_difftest_exec(1);
   ref_difftest_regcpy(&ref_riscv32_cpu_state, DIFFTEST_TO_DUT);
   checkregs(&ref_riscv32_cpu_state, pc);
+}
+
+static void checkregs(riscv32_CPU_state *ref, uint32_t pc) {
+  difftest_check_value("pc", pc, ref->pc, get_npc_pc());
+  for (int i = 0; i < nr_reg; i++) {
+    difftest_check_value(npc_reg_name(i), pc, ref->gpr[i], get_npc_reg(i));
+  }
+  DIFFTEST_CHECK_CSR(MSTATUS, mstatus);
+  DIFFTEST_CHECK_CSR(MTVEC, mtvec);
+  DIFFTEST_CHECK_CSR(MEPC, mepc);
+  DIFFTEST_CHECK_CSR(MCAUSE, mcause);
+}
+
+static inline void difftest_dut2ref() {
+  for (int i = 0; i < nr_reg; i++) {
+    dut_riscv32_cpu_state.gpr[i] = get_npc_reg(i);
+  }
+  dut_riscv32_cpu_state.pc = get_npc_pc();
+  dut_riscv32_cpu_state.csr.mstatus = get_npc_csr(MSTATUS);
+  dut_riscv32_cpu_state.csr.mtvec = get_npc_csr(MTVEC);
+  dut_riscv32_cpu_state.csr.mepc = get_npc_csr(MEPC);
+  dut_riscv32_cpu_state.csr.mcause = get_npc_csr(MCAUSE);
+  ref_difftest_regcpy(&dut_riscv32_cpu_state, DIFFTEST_TO_REF);
 }

@@ -6,6 +6,8 @@ static const char *regs[] = {
     "a1",   "a2", "a3", "a4", "a5",  "a6",  "a7", "s2", "s3", "s4", "s5",
     "s6",   "s7", "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"};
 
+const char *npc_reg_name(int index) { return regs[index]; }
+
 static inline void riscv_csr_display(int addr, const char *name) {
   printf("%-11s %-11d " FMT_WORD "\n", name, (int32_t)get_npc_csr(addr),
          get_npc_csr(addr));

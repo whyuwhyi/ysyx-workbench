@@ -26,6 +26,7 @@ word_t get_npc_inst();
 word_t get_npc_reg(int reg_idx);
 word_t get_npc_csr(int csr);
 
+const char *npc_reg_name(int index);
 void npc_reg_display();
 word_t npc_reg_str2val(const char *reg_name, bool *success);
 

@@ -17,7 +17,7 @@
 #include <cpu/difftest.h>
 #include <isa.h>
 
-#define CHECK_CSR(ADDR, field)                                                 \
+#define DIFFTEST_CHECK_CSR(ADDR, field)                                        \
   do {                                                                         \
     if (!difftest_check_reg(csr_name(ADDR), pc, ref_r->csr.field,              \
                             cpu.csr.field)) {                                  \
@@ -32,10 +32,10 @@ bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
   }
   bool diff = false;
 
-  CHECK_CSR(MSTATUS, mstatus);
-  CHECK_CSR(MTVEC, mtvec);
-  CHECK_CSR(MEPC, mepc);
-  CHECK_CSR(MCAUSE, mcause);
+  DIFFTEST_CHECK_CSR(MSTATUS, mstatus);
+  DIFFTEST_CHECK_CSR(MTVEC, mtvec);
+  DIFFTEST_CHECK_CSR(MEPC, mepc);
+  DIFFTEST_CHECK_CSR(MCAUSE, mcause);
 
   for (int i = 0; i < RISCV_GPR_NUM; i++) {
     if (!difftest_check_reg(reg_name(i), pc, ref_r->gpr[i], cpu.gpr[i])) {
