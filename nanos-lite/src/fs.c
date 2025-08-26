@@ -63,7 +63,7 @@ size_t fs_read(int fd, void *buf, size_t len) {
     return (size_t)-1;
   }
 
-  if (fd == FD_STDOUT || fd == FD_STDERR) {
+  if (fd == FD_STDOUT || fd == FD_STDERR || fd == FD_STDIN) {
     return (size_t)-1;
   }
 
