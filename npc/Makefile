@@ -1,9 +1,3 @@
-# Check if .config exists
-# ifeq ($(wildcard $(NPC_HOME)/sim/.config),)
-# $(error Error: .config does not exist!)
-# $(error To build the project, first run 'make menuconfig'.)
-# endif
-#
 # Project roots
 PROJ_ROOT    := $(abspath $(shell pwd))
 SIM_DIR      := $(abspath $(PROJ_ROOT)/sim)
@@ -46,14 +40,18 @@ include $(FILELIST_MK)
 # Sources
 SRCS_DIRS := $(shell find -L $(addprefix $(SIM_DIR)/,$(DIRS-y)) -name "*.c" -o -name "*.cpp" 2>/dev/null || true)
 SRCS_LIST := $(shell find -L $(addprefix $(SIM_DIR)/,$(SRCS-y)) -name "*.c" -o -name "*.cpp" 2>/dev/null || true)
-
 SRCS := $(abspath $(SRCS_LIST) $(SRCS_DIRS))
+
+VSRCS = $(SAN_CORE)
 
 # Libraries
 LIBS :=
 LIBS += -lreadline
 LIBS += $(if $(CONFIG_DIFFTEST),-ldl)
 LIBS += $(if $(CONFIG_ITRACE),-ldl)
+
+# Header files for dependency tracking
+HEADERS := $(shell find $(SIM_DIR)/include -name "*.h" 2>/dev/null || true)
 
 # RTL sources: sanitize a copy of Core.sv
 CORE_SV_SRC := $(PROJ_ROOT)/rtl/Core.sv
@@ -65,12 +63,10 @@ $(SAN_CORE): $(CORE_SV_SRC)
 	@cp $(CORE_SV_SRC) $(SAN_CORE)
 	@sed -i -e '/$(BBX_MARKER)/,$$d' $(SAN_CORE) || true
 
-VSRCS := $(SAN_CORE)
-
 # Default target
 .DEFAULT_GOAL := $(TARGET)
 
-$(TARGET): $(VSRCS) $(SRCS) $(if $(CONFIG_NVBOARD),$(SRC_AUTO_BIND))
+$(TARGET): $(VSRCS) $(SRCS) $(HEADERS) $(if $(CONFIG_NVBOARD),$(SRC_AUTO_BIND))
 	@$(VERILATOR) $(VERILATOR_CFLAGS) \
 		--top-module $(TOPNAME) $(VSRCS) $(SRCS) $(if $(CONFIG_NVBOARD),$(SRC_AUTO_BIND)) \
 		$(addprefix -CFLAGS , $(CXXFLAGS)) \

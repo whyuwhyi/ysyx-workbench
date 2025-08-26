@@ -12,9 +12,9 @@
 
 typedef uint32_t word_t;
 typedef int32_t sword_t;
-#define FMT_WORD "0x%08" PRIx32
-
 typedef word_t paddr_t;
+
+#define FMT_WORD "0x%08" PRIx32
 #define FMT_PADDR "0x%08" PRIx32
 
 enum { NPC_RUNNING, NPC_STOP, NPC_END, NPC_ABORT, NPC_QUIT };

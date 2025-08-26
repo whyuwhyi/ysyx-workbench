@@ -6,39 +6,56 @@ static const char *regs[] = {
     "a1",   "a2", "a3", "a4", "a5",  "a6",  "a7", "s2", "s3", "s4", "s5",
     "s6",   "s7", "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"};
 
-void npc_reg_display() {
-  printf("Name Dec         Hex        \n");
-
-  for (int i = 0; i < 32; i++) {
-    uint32_t reg_val = get_npc_reg(i);
-    printf("%-4s %-11d 0x%08x\n", regs[i], (int32_t)reg_val, reg_val);
-  }
-
-  uint32_t pc_val = get_npc_pc();
-  printf("%-4s %-11d 0x%08x\n", "pc", (int32_t)pc_val, pc_val);
+static inline void riscv_csr_display(int addr, const char *name) {
+  printf("%-11s %-11d " FMT_WORD "\n", name, (int32_t)get_npc_csr(addr),
+         get_npc_csr(addr));
 }
 
-uint32_t npc_reg_str2val(const char *reg_name, bool *success) {
-  *success = true;
+#define DISPLAY_CSR(name) riscv_csr_display(name, name##_NAME)
 
-  for (int i = 0; i < 32; i++) {
-    if (strcmp(reg_name, regs[i]) == 0) {
+void npc_reg_display() {
+  printf("Name        Dec         Hex        \n");
+  printf("-----General Purpose Registers-----\n");
+  for (int i = 0; i < nr_reg; ++i) {
+    printf("%-11s %-11d " FMT_WORD "\n", regs[i], (sword_t)get_npc_reg(i),
+           get_npc_reg(i));
+  }
+
+  printf("----Control and Status Registers----\n");
+  DISPLAY_CSR(MSTATUS);
+  DISPLAY_CSR(MTVEC);
+  DISPLAY_CSR(MEPC);
+  DISPLAY_CSR(MCAUSE);
+
+  printf("----------Program Counter-----------\n");
+  printf("%-11s %-11d " FMT_WORD "\n", "pc", (sword_t)get_npc_pc(),
+         get_npc_pc());
+}
+
+#define CSR2VAL(name)                                                          \
+  if (strcmp(name##_NAME, s) == 0) {                                           \
+    *success = true;                                                           \
+    return get_npc_csr(name);                                                  \
+  }
+
+word_t npc_reg_str2val(const char *s, bool *success) {
+  for (int i = 0; i < 32; ++i) {
+    if (strcmp(regs[i], s) == 0) {
+      *success = true;
       return get_npc_reg(i);
     }
   }
 
-  if (reg_name[0] == 'x' && strlen(reg_name) >= 2) {
-    int reg_idx = atoi(reg_name + 1);
-    if (reg_idx >= 0 && reg_idx < 32) {
-      return get_npc_reg(reg_idx);
-    }
-  }
+  CSR2VAL(MSTATUS)
+  CSR2VAL(MTVEC)
+  CSR2VAL(MEPC)
+  CSR2VAL(MCAUSE)
 
-  if (strcmp(reg_name, "pc") == 0) {
+  if (strcmp("pc", s) == 0) {
+    *success = true;
     return get_npc_pc();
   }
 
-  Log("Unknown register: %s", reg_name);
   *success = false;
   return 0;
 }

@@ -28,7 +28,7 @@ const char *csrs[] = {[MSTATUS] = "mstatus",
                       [MCAUSE] = "mcause"};
 
 static inline void riscv_csr_display(int addr) {
-  printf("%-11s %-11d " FMT_WORD "\n", csrs[addr], (int32_t)csr(addr),
+  printf("%-11s %-11d " FMT_WORD "\n", csrs[addr], (sword_t)csr(addr),
          csr(addr));
 }
 
@@ -36,7 +36,7 @@ void isa_reg_display() {
   printf("Name        Dec         Hex        \n");
   printf("-----General Purpose Registers-----\n");
   for (int i = 0; i < 32; ++i) {
-    printf("%-11s %-11d " FMT_WORD "\n", regs[i], (int32_t)gpr(i), gpr(i));
+    printf("%-11s %-11d " FMT_WORD "\n", regs[i], (sword_t)gpr(i), gpr(i));
   }
 
   printf("----Control and Status Registers----\n");
@@ -46,7 +46,7 @@ void isa_reg_display() {
   riscv_csr_display(MCAUSE);
 
   printf("----------Program Counter-----------\n");
-  printf("%-11s %-11d " FMT_WORD "\n", "pc", (int32_t)cpu.pc, cpu.pc);
+  printf("%-11s %-11d " FMT_WORD "\n", "pc", (sword_t)cpu.pc, cpu.pc);
 }
 
 #define CSR2VAL(addr)                                                          \

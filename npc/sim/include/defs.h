@@ -11,6 +11,16 @@ void init_device(void);
 void serial_putchar(char c);
 int timer_get_time(void);
 
+#define MSTATUS 0x300
+#define MTVEC 0x305
+#define MEPC 0x341
+#define MCAUSE 0x342
+
+#define MSTATUS_NAME "mstatus"
+#define MTVEC_NAME "mtvec"
+#define MEPC_NAME "mepc"
+#define MCAUSE_NAME "mcause"
+
 paddr_t get_npc_pc();
 word_t get_npc_inst();
 word_t get_npc_reg(int reg_idx);

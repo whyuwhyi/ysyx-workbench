@@ -14,7 +14,7 @@ typedef struct {
 
 typedef struct {
   word_t gpr[32];
-  word_t mstatus;
+  RISCV_csr csr;
   paddr_t pc;
 } riscv32_CPU_state;
 
