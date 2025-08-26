@@ -15,6 +15,7 @@ int main() {
     char c;
     fscanf(fp, "%c", &c);
     fscanf(fp, "%d", &n);
+    printf("%d\n", n);
 
     assert(n == i + 1);
   }
