@@ -45,7 +45,6 @@ size_t ramdisk_write(const void *buf, size_t offset, size_t len);
 int fs_open(const char *pathname, int flags, int mode) {
   for (int i = 0; i < FD_MAX; i++) {
     if (strcmp(pathname, file_table[i].name) == 0) {
-      printf("%d\n", i);
       return i;
     }
   }
@@ -61,8 +60,8 @@ size_t fs_read(int fd, void *buf, size_t len) {
   }
   Finfo *f = &file_table[fd];
 
-  size_t read_len =
-      (len + f->open_offset > f->size) ? (f->size - f->open_offset) : len;
+  size_t avail_len = f->size - f->open_offset;
+  size_t read_len = avail_len < len ? avail_len : len;
   ramdisk_read(buf, f->disk_offset + f->open_offset, read_len);
   f->open_offset += read_len;
   return read_len;
@@ -80,8 +79,8 @@ size_t fs_write(int fd, const void *buf, size_t len) {
   }
   Finfo *f = &file_table[fd];
 
-  size_t write_len =
-      (len + f->open_offset > f->size) ? (f->size - f->open_offset) : len;
+  size_t avail_len = f->size - f->open_offset;
+  size_t write_len = f->size < len ? avail_len : len;
   ramdisk_write(buf, f->disk_offset + f->open_offset, write_len);
   f->open_offset += write_len;
   return write_len;
