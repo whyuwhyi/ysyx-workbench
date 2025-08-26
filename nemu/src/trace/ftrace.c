@@ -75,7 +75,8 @@ void init_ftrace(const char *elf_path) {
   fread(strtab, 1, strtab_hdr->sh_size, fp);
 
   for (int i = 0; i < sym_count; i++) {
-    if (ELF_ST_TYPE(syms[i].st_info) == STT_FUNC && syms[i].st_size > 0) {
+    if (ELF_ST_TYPE(syms[i].st_info) == STT_FUNC && syms[i].st_size > 0 &&
+        func_cnt < MAX_FUNC) {
       funcs[func_cnt].addr = syms[i].st_value;
       funcs[func_cnt].size = syms[i].st_size;
       snprintf(funcs[func_cnt].name, MAX_FUNC_NAME_LEN, "%s",
