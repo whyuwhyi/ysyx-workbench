@@ -29,10 +29,10 @@ void do_syscall(Context *c) {
     c->GPRx = sys_yield();
     break;
   case SYS_open:
-    sys_open((const char *)c->GPR2, c->GPR3, c->GPR4);
+    c->GPRx = sys_open((const char *)c->GPR2, c->GPR3, c->GPR4);
     break;
   case SYS_read:
-    sys_read(c->GPR2, (void *)c->GPR3, c->GPR4);
+    c->GPRx = sys_read(c->GPR2, (void *)c->GPR3, c->GPR4);
   case SYS_write:
     c->GPRx = sys_write(c->GPR2, (void *)c->GPR3, c->GPR4);
     break;
