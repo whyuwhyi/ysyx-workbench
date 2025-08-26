@@ -40,7 +40,6 @@ void init_fs() {
 }
 
 size_t ramdisk_read(void *buf, size_t offset, size_t len);
-
 size_t ramdisk_write(const void *buf, size_t offset, size_t len);
 
 int fs_open(const char *pathname, int flags, int mode) {
@@ -64,6 +63,7 @@ size_t fs_read(int fd, void *buf, size_t len) {
   size_t read_len =
       (len + f->open_offset > f->size) ? (f->size - f->open_offset) : len;
   ramdisk_read(buf, f->disk_offset + f->open_offset, read_len);
+  f->open_offset += read_len;
   return read_len;
 }
 
@@ -82,6 +82,7 @@ size_t fs_write(int fd, const void *buf, size_t len) {
   size_t write_len =
       (len + f->open_offset > f->size) ? (f->size - f->open_offset) : len;
   ramdisk_write(buf, f->disk_offset + f->open_offset, write_len);
+  f->open_offset += write_len;
   return write_len;
 }
 

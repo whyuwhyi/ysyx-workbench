@@ -1,4 +1,5 @@
 #include <elf.h>
+#include <fs.h>
 #include <proc.h>
 #include <stdint.h>
 
@@ -29,16 +30,24 @@
 void ramdisk_read(void *buf, size_t offset, size_t len);
 
 static uintptr_t loader(PCB *pcb, const char *filename) {
+  int fd = fs_open(filename, 0, 0);
+  if (fd < 0) {
+    panic("file %s not found\n", filename);
+  }
   Elf_Ehdr ehdr;
-  ramdisk_read(&ehdr, 0, sizeof(Elf_Ehdr));
+  fs_read(fd, &ehdr, sizeof(Elf_Ehdr));
   assert(*(uint32_t *)ehdr.e_ident == 0x464c457f);
   assert(ehdr.e_machine == EXPECT_TYPE);
 
   Elf_Phdr ph[ehdr.e_phnum];
-  ramdisk_read(ph, ehdr.e_phoff, sizeof(Elf_Phdr) * ehdr.e_phnum);
+  fs_lseek(fd, ehdr.e_phoff, SEEK_SET);
+  fs_read(fd, ph, sizeof(Elf_Phdr) * ehdr.e_phnum);
+  // ramdisk_read(ph, ehdr.e_phoff, sizeof(Elf_Phdr) * ehdr.e_phnum);
   for (int i = 0; i < ehdr.e_phnum; i++) {
     if (ph[i].p_type == PT_LOAD) {
-      ramdisk_read((void *)ph[i].p_vaddr, ph[i].p_offset, ph[i].p_memsz);
+      fs_lseek(fd, ph[i].p_offset, SEEK_SET);
+      fs_read(fd, (void *)ph[i].p_vaddr, ph[i].p_filesz);
+      // ramdisk_read((void *)ph[i].p_vaddr, ph[i].p_offset, ph[i].p_memsz);
       memset((void *)(ph[i].p_vaddr + ph[i].p_filesz), 0,
              ph[i].p_memsz - ph[i].p_filesz);
     }
