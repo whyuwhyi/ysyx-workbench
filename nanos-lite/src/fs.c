@@ -51,66 +51,120 @@ int fs_open(const char *pathname, int flags, int mode) {
   assert(0);
 }
 
+static inline size_t min_sz(size_t a, size_t b) { return a < b ? a : b; }
+
 size_t fs_read(int fd, void *buf, size_t len) {
-  if (fd <= 0 || fd >= FD_MAX) {
-    return -1;
+  if (fd < 0 || fd >= FD_MAX) {
+    return (size_t)-1;
   }
-  if (fd == FD_STDIN || fd == FD_STDOUT || fd == FD_STDERR) {
+  if (len == 0)
     return 0;
+  if (buf == NULL) {
+    return (size_t)-1;
   }
+
+  if (fd == FD_STDOUT || fd == FD_STDERR) {
+    return (size_t)-1;
+  }
+
   Finfo *f = &file_table[fd];
 
-  size_t avail_len = f->size - f->open_offset;
-  size_t read_len = avail_len < len ? avail_len : len;
-  ramdisk_read(buf, f->disk_offset + f->open_offset, read_len);
-  f->open_offset += read_len;
-  return read_len;
+  if (f->open_offset >= f->size)
+    return 0;
+
+  size_t avail = f->size - f->open_offset;
+  size_t n = min_sz(len, avail);
+  if (n == 0)
+    return 0;
+
+  ramdisk_read(buf, f->disk_offset + f->open_offset, n);
+  f->open_offset += n;
+  return n;
 }
 
 size_t fs_write(int fd, const void *buf, size_t len) {
-  if (fd <= 0 || fd >= FD_MAX) {
-    return -1;
+  if (fd < 0 || fd >= FD_MAX) {
+    return (size_t)-1;
   }
+  if (len == 0)
+    return 0;
+  if (buf == NULL) {
+    return (size_t)-1;
+  }
+
+  if (fd == FD_STDIN) {
+
+    return (size_t)-1;
+  }
+
   if (fd == FD_STDOUT || fd == FD_STDERR) {
-    for (size_t i = 0; i < len; i++) {
-      putch(((char *)buf)[i]);
-    }
+    const char *p = (const char *)buf;
+    for (size_t i = 0; i < len; i++)
+      putch(p[i]);
     return len;
   }
+
   Finfo *f = &file_table[fd];
 
-  size_t avail_len = f->size - f->open_offset;
-  size_t write_len = f->size < len ? avail_len : len;
-  ramdisk_write(buf, f->disk_offset + f->open_offset, write_len);
-  f->open_offset += write_len;
-  return write_len;
+  if (f->open_offset >= f->size) {
+    return (size_t)-1;
+  }
+
+  size_t avail = f->size - f->open_offset;
+  size_t n = min_sz(len, avail);
+  if (n == 0) {
+    return (size_t)-1;
+  }
+
+  ramdisk_write(buf, f->disk_offset + f->open_offset, n);
+  f->open_offset += n;
+  return n;
 }
 
 size_t fs_lseek(int fd, size_t offset, int whence) {
   if (fd < 0 || fd >= FD_MAX) {
-    return -1;
+    return (size_t)-1;
   }
-  Finfo *f = &file_table[fd];
-  size_t new_offset;
 
+  if (fd == FD_STDIN || fd == FD_STDOUT || fd == FD_STDERR) {
+    return (size_t)-1;
+  }
+
+  Finfo *f = &file_table[fd];
+
+  int64_t base = 0;
   switch (whence) {
   case SEEK_SET:
-    new_offset = offset > f->size ? f->size : offset;
+    base = 0;
     break;
   case SEEK_CUR:
-    new_offset = f->open_offset + offset;
-    if (new_offset > f->size)
-      new_offset = f->size;
-    if (new_offset < 0)
-      new_offset = 0;
+    base = (int64_t)f->open_offset;
     break;
   case SEEK_END:
-    new_offset = f->size + offset;
+    base = (int64_t)f->size;
     break;
   default:
-    panic("should not reach here");
+    assert(0);
   }
-  return f->open_offset = new_offset;
+
+  int64_t soff = (int64_t)(intptr_t)offset;
+  int64_t new_off = base + soff;
+  if (soff > 0 && new_off < base) {
+    return (size_t)-1;
+  }
+  if (soff < 0 && new_off > base) {
+    return (size_t)-1;
+  }
+  if (new_off < 0) {
+    return (size_t)-1;
+  }
+
+  if ((uint64_t)new_off > (uint64_t)SIZE_MAX) {
+    return (size_t)-1;
+  }
+
+  f->open_offset = (size_t)new_off;
+  return (size_t)new_off;
 }
 
 int fs_close(int fd) { return 0; }
