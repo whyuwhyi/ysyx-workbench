@@ -40,7 +40,7 @@ menu "Testing and Debugging"
   config DIFFTEST_REF_PATH
     depends on DIFFTEST
     string "NEMU reference path"
-    default "tools/difftest/ref.so"
+    default "tools/difftest/riscv32-nemu-interpreter-so"
 
 endmenu
 
