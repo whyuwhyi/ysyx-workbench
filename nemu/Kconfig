@@ -159,7 +159,7 @@ config MTRACE
 config FTRACE
   depends on TRACE && TARGET_NATIVE_ELF && ENGINE_INTERPRETER
   bool "Enable function tracer"
-  default y
+  default n
 
 config DTRACE
   depends on TRACE && TARGET_NATIVE_ELF && ENGINE_INTERPRETER
@@ -169,7 +169,7 @@ config DTRACE
 config ETRACE
   depends on TRACE && TARGET_NATIVE_ELF && ENGINE_INTERPRETER
   bool "Enable Exception tracer"
-  default y
+  default n
 
 config DIFFTEST
   depends on TARGET_NATIVE_ELF

@@ -16,12 +16,12 @@ endmenu
 menu "Testing and Debugging"
   config TRACE
     bool "Enable tracing"
-    default y
+    default n
 
   config ITRACE
     depends on TRACE
     bool "Enable instruction tracing"
-    default y
+    default n
 
   config FTRACE
     depends on TRACE  
@@ -31,6 +31,16 @@ menu "Testing and Debugging"
   config MTRACE
     depends on TRACE
     bool "Enable memory access tracing"
+    default n
+
+  config DTRACE
+    depends on TRACE
+    bool "Enable Device tracer"
+    default n
+
+  config ETRACE
+    depends on TRACE
+    bool "Enable Exception tracer"
     default n
 
   config DIFFTEST
