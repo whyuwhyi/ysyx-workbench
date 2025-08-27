@@ -9,26 +9,10 @@ Context *__am_irq_handle(Context *c) {
     Event ev = {0};
     switch (c->mcause) {
     case 11:
-      switch (c->GPR1) {
-      case -1:
+      if (c->GPR1 == -1)
         ev.event = EVENT_YIELD;
-        break;
-      case 0:
-      case 1:
-      case 2:
-      case 3:
-      case 4:
-      case 5:
-      case 6:
-      case 7:
-      case 8:
-      case 9:
+      else
         ev.event = EVENT_SYSCALL;
-        break;
-      default:
-        ev.event = EVENT_ERROR;
-        break;
-      }
       break;
     default:
       ev.event = EVENT_ERROR;
