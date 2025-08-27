@@ -59,6 +59,7 @@ int fs_open(const char *pathname, int flags, int mode) {
 static inline size_t min_sz(size_t a, size_t b) { return a < b ? a : b; }
 
 size_t fs_read(int fd, void *buf, size_t len) {
+  printf("fs_read: fd=%d, buf=%p, len=%zu\n", fd, buf, len);
   if (fd < 0 || fd >= FD_MAX) {
     return (size_t)-1;
   }
@@ -72,8 +73,6 @@ size_t fs_read(int fd, void *buf, size_t len) {
   if (f->read) {
     return f->read(buf, f->open_offset, len);
   }
-  printf("fd=%d, name=%s, size=%d, disk_offset=%d, open_offset=%d\n", fd,
-         f->name, f->size, f->disk_offset, f->open_offset);
 
   if (f->open_offset >= f->size)
     return 0;
