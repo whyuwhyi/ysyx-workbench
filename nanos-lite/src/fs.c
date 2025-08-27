@@ -70,8 +70,8 @@ size_t fs_read(int fd, void *buf, size_t len) {
 
   Finfo *f = &file_table[fd];
 
-  printf("fs_read: fd=%d, offset=%zu, size=%zu, len=%zu\n", 
-         fd, f->open_offset, f->size, len);
+  printf("fs_read: fd=%d, offset=%u, size=%u, len=%u\n", 
+         fd, (unsigned)f->open_offset, (unsigned)f->size, (unsigned)len);
 
   if (f->open_offset >= f->size) {
     printf("fs_read: at EOF\n");
