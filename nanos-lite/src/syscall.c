@@ -87,7 +87,7 @@ static int sys_lseek(int fd, size_t offset, int whence) {
 static int sys_sbrk(intptr_t program_break) { return 0; }
 
 static int sys_gettimeofday(struct timeval *tv, struct timezone *tz) {
-  assert(tv == NULL);
+  assert(tv != NULL);
   long usec = io_read(AM_TIMER_UPTIME).us;
   tv->tv_sec = usec / 1000000;
   tv->tv_usec = usec % 1000000;
