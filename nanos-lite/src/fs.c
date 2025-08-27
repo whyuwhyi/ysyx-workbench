@@ -1,5 +1,6 @@
 // #include <cstddef>
 #include <fs.h>
+#include <stdint.h>
 
 typedef size_t (*ReadFn)(void *buf, size_t offset, size_t len);
 typedef size_t (*WriteFn)(const void *buf, size_t offset, size_t len);
@@ -148,9 +149,12 @@ size_t fs_lseek(int fd, size_t offset, int whence) {
     assert(0);
   }
 
-  size_t new_off = base + offset;
-  if (new_off > f->size) {
-    return (size_t)-1;
+  int64_t new_off = (int64_t)base + (int64_t)offset;
+  if (new_off < 0) {
+    new_off = 0;
+  }
+  if (new_off > (int64_t)f->size) {
+    new_off = f->size;
   }
   f->open_offset = new_off;
   return (size_t)new_off;
