@@ -1,3 +1,4 @@
+#include <fcntl.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,6 +20,7 @@ uint32_t NDL_GetTicks() {
 int NDL_PollEvent(char *buf, int len) { return read(evtdev, buf, len); }
 
 void NDL_OpenCanvas(int *w, int *h) {
+  printf("NDL_OpenCanvas %d %d\n", screen_w, screen_h);
   if (getenv("NWM_APP")) {
     int fbctl = 4;
     fbdev = 5;
@@ -56,6 +58,10 @@ int NDL_Init(uint32_t flags) {
     evtdev = 3;
   }
   return 0;
+  int fd = open("/proc/disinfo", 0);
+  char buf[64];
+  size_t nread = read(fd, buf, sizeof(buf) - 1);
+  sscanf(buf, "WIDTH:%d\nHEIGHT:%d\n", &screen_w, &screen_h);
 }
 
 void NDL_Quit() {}
