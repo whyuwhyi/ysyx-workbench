@@ -70,26 +70,16 @@ size_t fs_read(int fd, void *buf, size_t len) {
 
   Finfo *f = &file_table[fd];
 
-  printf("fs_read: fd=%d, offset=%u, size=%u, len=%u\n", 
-         fd, (unsigned)f->open_offset, (unsigned)f->size, (unsigned)len);
-
-  if (f->open_offset >= f->size) {
-    printf("fs_read: at EOF\n");
+  if (f->open_offset >= f->size)
     return 0;
-  }
 
   size_t avail = f->size - f->open_offset;
   size_t n = min_sz(len, avail);
-  if (n == 0) {
-    printf("fs_read: nothing to read\n");
+  if (n == 0)
     return 0;
-  }
 
-  printf("fs_read: reading %u bytes from disk offset %u\n", 
-         (unsigned)n, (unsigned)(f->disk_offset + f->open_offset));
   ramdisk_read(buf, f->disk_offset + f->open_offset, n);
   f->open_offset += n;
-  printf("fs_read: returning %u bytes\n", (unsigned)n);
   return n;
 }
 
