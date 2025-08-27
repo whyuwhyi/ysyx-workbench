@@ -25,10 +25,12 @@ size_t invalid_write(const void *buf, size_t offset, size_t len) {
   return 0;
 }
 
+size_t serial_write(const void *buf, size_t offset, size_t len);
+
 /* This is the information about all files in disk. */
 static Finfo file_table[] __attribute__((used)) = {
     [FD_STDIN] = {"stdin", 0, 0, invalid_read, invalid_write},
-    [FD_STDOUT] = {"stdout", 0, 0, invalid_read, invalid_write},
+    [FD_STDOUT] = {"stdout", 0, 0, invalid_read, serial_write},
     [FD_STDERR] = {"stderr", 0, 0, invalid_read, invalid_write},
 #include "files.h"
 };
@@ -64,11 +66,10 @@ size_t fs_read(int fd, void *buf, size_t len) {
     return (size_t)-1;
   }
 
-  if (fd == FD_STDOUT || fd == FD_STDERR || fd == FD_STDIN) {
-    return (size_t)-1;
-  }
-
   Finfo *f = &file_table[fd];
+  if (f->read) {
+    return f->read(buf, f->open_offset, len);
+  }
 
   if (f->open_offset >= f->size)
     return 0;
@@ -93,19 +94,10 @@ size_t fs_write(int fd, const void *buf, size_t len) {
     return (size_t)-1;
   }
 
-  if (fd == FD_STDIN) {
-
-    return (size_t)-1;
-  }
-
-  if (fd == FD_STDOUT || fd == FD_STDERR) {
-    const char *p = (const char *)buf;
-    for (size_t i = 0; i < len; i++)
-      putch(p[i]);
-    return len;
-  }
-
   Finfo *f = &file_table[fd];
+  if (f->write) {
+    return f->write(buf, f->open_offset, len);
+  }
 
   if (f->open_offset > f->size) {
     return (size_t)-1;
