@@ -108,14 +108,14 @@ size_t fs_write(int fd, const void *buf, size_t len) {
 
   Finfo *f = &file_table[fd];
 
-  if (f->open_offset >= f->size) {
+  if (f->open_offset > f->size) {
     return (size_t)-1;
   }
 
   size_t avail = f->size - f->open_offset;
   size_t n = min_sz(len, avail);
   if (n == 0) {
-    return (size_t)-1;
+    return 0;
   }
 
   ramdisk_write(buf, f->disk_offset + f->open_offset, n);
