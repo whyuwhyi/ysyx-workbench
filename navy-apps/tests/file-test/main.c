@@ -10,10 +10,12 @@ int main() {
   assert(size == 5000);
 
   fseek(fp, 500 * 5, SEEK_SET);
+  printf("After fseek to 2500, ftell = %ld\n", ftell(fp));
   int i, n;
   for (i = 500; i < 1000; i++) {
-    fscanf(fp, "%d", &n);
-    printf("%d\n", n);
+    int result = fscanf(fp, "%d", &n);
+    printf("fscanf result=%d, n=%d, expected=%d\n", result, n, i + 1);
+    if (i >= 502) break;  // Only check first few
     assert(n == i + 1);
   }
 
