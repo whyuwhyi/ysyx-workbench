@@ -23,15 +23,17 @@ int SDL_WaitEvent(SDL_Event *event) {
     for (int i = 0; i < sizeof(keyname) / sizeof(keyname[0]); i++) {
       if (strcmp(key_name, keyname[i]) == 0) {
         keycode = i;
-        break;
+
+        event->key.keysym.sym = keycode;
+
+        printf("key %s %s %d\n", type, key_name, keycode);
+
+        return 1;
       }
     }
-    event->key.keysym.sym = keycode;
-    printf("key %s %s %d\n", type, key_name, keycode);
 
-    return 1;
+    assert(0);
   }
-  return 0;
 }
 
 int SDL_PeepEvents(SDL_Event *ev, int numevents, int action, uint32_t mask) {
