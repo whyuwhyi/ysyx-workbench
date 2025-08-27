@@ -89,6 +89,7 @@ size_t fs_read(int fd, void *buf, size_t len) {
          (unsigned)n, (unsigned)(f->disk_offset + f->open_offset));
   ramdisk_read(buf, f->disk_offset + f->open_offset, n);
   f->open_offset += n;
+  printf("fs_read: returning %u bytes\n", (unsigned)n);
   return n;
 }
 
