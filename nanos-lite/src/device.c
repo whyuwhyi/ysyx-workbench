@@ -1,4 +1,6 @@
+#include "fs.h"
 #include <common.h>
+#include <stdint.h>
 
 #if defined(MULTIPROGRAM) && !defined(TIME_SHARING)
 #define MULTIPROGRAM_YIELD() yield()
@@ -33,7 +35,18 @@ size_t dispinfo_read(void *buf, size_t offset, size_t len) {
   return snprintf(buf, len, "WIDTH:%d\nHEIGHT:%d\n", cfg.width, cfg.height);
 }
 
-size_t fb_write(const void *buf, size_t offset, size_t len) { return 0; }
+int fs_open(const char *pathname, int flags, int mode);
+
+size_t fb_write(const void *buf, size_t offset, size_t len) {
+  AM_GPU_CONFIG_T cfg = io_read(AM_GPU_CONFIG);
+  int width = cfg.width;
+  int pixel_start = offset / 4;
+  int x = pixel_start % width;
+  int y = pixel_start / width;
+  int w = len / 4;
+  io_write(AM_GPU_FBDRAW, x, y, (void *)buf, w, 1, true);
+  return len;
+}
 
 void init_device() {
   Log("Initializing devices...");
