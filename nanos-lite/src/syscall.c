@@ -3,9 +3,13 @@
 #include <fs.h>
 #include <sys/time.h>
 
-// #define SYSCALL_TRACE 1
+#define SYSCALL_TRACE 1
 
-static void strace(int id);
+#define STRACE(...)                                                            \
+  do {                                                                         \
+    if (SYSCALL_TRACE)                                                         \
+      Log(__VA_ARGS__);                                                        \
+  } while (0)
 
 static void sys_exit(int code) __attribute__((noreturn));
 static int sys_yield(void);
@@ -58,50 +62,53 @@ void do_syscall(Context *c) {
   default:
     panic("Unhandled syscall ID = %d", a[0]);
   }
-  strace(a[0]);
 }
 
-static void sys_exit(int code) { halt(code); }
+static void sys_exit(int code) {
+  STRACE("sys_exit(%d) called", code);
+  halt(code);
+}
 
 static int sys_yield(void) {
+  STRACE("sys_yield() called");
   yield();
   return 0;
 }
 
 static int sys_open(const char *path, int flags, int mode) {
+  STRACE("sys_open(\"%s\", %d, %d) called", path, flags, mode);
   return fs_open(path, flags, mode);
 }
 static int sys_read(int fd, void *buf, size_t count) {
+  STRACE("sys_read(%d, %p, %u) called", fd, buf, count);
   return fs_read(fd, buf, count);
 }
 
 static int sys_write(int fd, void *buf, size_t count) {
+  STRACE("sys_write(%d, %p, %u) called", fd, buf, count);
   return fs_write(fd, buf, count);
 }
 
-static int sys_close(int fd) { return fs_close(fd); }
+static int sys_close(int fd) {
+  STRACE("sys_close(%d) called", fd);
+  return fs_close(fd);
+}
+
 static int sys_lseek(int fd, size_t offset, int whence) {
+  STRACE("sys_lseek(%d, %u, %d) called", fd, offset, whence);
   return fs_lseek(fd, offset, whence);
 }
 
-static int sys_sbrk(intptr_t program_break) { return 0; }
+static int sys_sbrk(intptr_t program_break) {
+  STRACE("sys_sbrk(%d) called", program_break);
+  return 0;
+}
 
 static int sys_gettimeofday(struct timeval *tv, struct timezone *tz) {
+  STRACE("sys_gettimeofday called");
   assert(tv != NULL);
   long usec = io_read(AM_TIMER_UPTIME).us;
   tv->tv_sec = usec / 1000000;
   tv->tv_usec = usec % 1000000;
   return 0;
-}
-
-const char *syscall_name[] = {
-    "SYS_exit",  "SYS_yield",  "SYS_open",   "SYS_read",   "SYS_write",
-    "SYS_kill",  "SYS_getpid", "SYS_close",  "SYS_lseek",  "SYS_brk",
-    "SYS_fstat", "SYS_time",   "SYS_signal", "SYS_execve", "SYS_fork",
-    "SYS_link",  "SYS_unlink", "SYS_wait",   "SYS_times",  "SYS_gettimeofday"};
-
-static void strace(int id) {
-#ifdef SYSCALL_TRACE
-  Log("Syscall %s is invoked.", syscall_name[id]);
-#endif
 }
