@@ -1,6 +1,7 @@
 #include "syscall.h"
 #include <common.h>
 #include <fs.h>
+#include <sys/time.h>
 
 // #define SYSCALL_TRACE 1
 
@@ -15,6 +16,8 @@ static int sys_close(int fd);
 static int sys_lseek(int fd, size_t offset, int whence);
 
 static int sys_sbrk(intptr_t program_break);
+
+static int sys_gettimeofday(struct timeval *tv, struct timezone *tz);
 
 void do_syscall(Context *c) {
   uintptr_t a[4];
@@ -47,6 +50,10 @@ void do_syscall(Context *c) {
   case SYS_brk:
     c->GPRx = sys_sbrk(c->GPR2);
     break;
+  case SYS_gettimeofday:
+    c->GPRx =
+        sys_gettimeofday((struct timeval *)c->GPR2, (struct timezone *)c->GPR3);
+    break;
 
   default:
     panic("Unhandled syscall ID = %d", a[0]);
@@ -78,6 +85,14 @@ static int sys_lseek(int fd, size_t offset, int whence) {
 }
 
 static int sys_sbrk(intptr_t program_break) { return 0; }
+
+static int sys_gettimeofday(struct timeval *tv, struct timezone *tz) {
+  assert(tv == NULL);
+  long usec = io_read(AM_TIMER_UPTIME).us;
+  tv->tv_sec = usec / 1000000;
+  tv->tv_usec = usec % 1000000;
+  return 0;
+}
 
 const char *syscall_name[] = {
     "SYS_exit",  "SYS_yield",  "SYS_open",   "SYS_read",   "SYS_write",
