@@ -1,18 +1,14 @@
+#include <NDL.h>
 #include <stdio.h>
-#include <sys/time.h>
 
 int main() {
-  struct timeval tv;
-
-  struct timeval new_tv;
-  gettimeofday(&tv, NULL);
-  int tick = 500;
+  uint32_t start = NDL_GetTicks();
+  uint32_t end = 0;
   while (1) {
-    gettimeofday(&new_tv, NULL);
-    if (new_tv.tv_sec - tv.tv_sec >= 1 ||
-        new_tv.tv_usec - tv.tv_usec >= tick * 1000) {
+    end = NDL_GetTicks();
+    if (end - start >= 500) {
       printf("tick\n");
-      tv = new_tv;
+      start = end;
     }
   }
 }
