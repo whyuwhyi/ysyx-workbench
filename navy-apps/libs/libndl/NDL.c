@@ -16,7 +16,7 @@ uint32_t NDL_GetTicks() {
   return tv.tv_sec * 1000 + tv.tv_usec / 1000;
 }
 
-int NDL_PollEvent(char *buf, int len) { return read(evtdev, buf, len); }
+int NDL_PollEvent(char *buf, int len) { return read(3, buf, len); }
 
 void NDL_OpenCanvas(int *w, int *h) {
   if (getenv("NWM_APP")) {

@@ -59,7 +59,6 @@ int fs_open(const char *pathname, int flags, int mode) {
 static inline size_t min_sz(size_t a, size_t b) { return a < b ? a : b; }
 
 size_t fs_read(int fd, void *buf, size_t len) {
-  printf("fs_read: fd=%d, buf=%p, len=%zu\n", fd, buf, len);
   if (fd < 0 || fd >= FD_MAX) {
     return (size_t)-1;
   }
