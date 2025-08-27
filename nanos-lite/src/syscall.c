@@ -3,7 +3,7 @@
 #include <fs.h>
 #include <sys/time.h>
 
-#define SYSCALL_TRACE 1
+#define SYSCALL_TRACE false
 
 #define STRACE(...)                                                            \
   do {                                                                         \
