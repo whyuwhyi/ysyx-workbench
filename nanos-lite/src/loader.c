@@ -42,12 +42,10 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   Elf_Phdr ph[ehdr.e_phnum];
   fs_lseek(fd, ehdr.e_phoff, SEEK_SET);
   fs_read(fd, ph, sizeof(Elf_Phdr) * ehdr.e_phnum);
-  // ramdisk_read(ph, ehdr.e_phoff, sizeof(Elf_Phdr) * ehdr.e_phnum);
   for (int i = 0; i < ehdr.e_phnum; i++) {
     if (ph[i].p_type == PT_LOAD) {
       fs_lseek(fd, ph[i].p_offset, SEEK_SET);
       fs_read(fd, (void *)ph[i].p_vaddr, ph[i].p_filesz);
-      // ramdisk_read((void *)ph[i].p_vaddr, ph[i].p_offset, ph[i].p_memsz);
       memset((void *)(ph[i].p_vaddr + ph[i].p_filesz), 0,
              ph[i].p_memsz - ph[i].p_filesz);
     }
