@@ -15,7 +15,7 @@ int main() {
   // Test raw reading
   char buffer[20];
   size_t bytes_read = fread(buffer, 1, 10, fp);
-  printf("fread returned %zu bytes\n", bytes_read);
+  printf("fread returned %u bytes\n", (unsigned)bytes_read);
   if (bytes_read > 0) {
     buffer[bytes_read] = 0;
     printf("Raw data: '");
