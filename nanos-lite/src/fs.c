@@ -72,6 +72,8 @@ size_t fs_read(int fd, void *buf, size_t len) {
   if (f->read) {
     return f->read(buf, f->open_offset, len);
   }
+  printf("fd=%d, name=%s, size=%d, disk_offset=%d, open_offset=%d\n", fd,
+         f->name, f->size, f->disk_offset, f->open_offset);
 
   if (f->open_offset >= f->size)
     return 0;
