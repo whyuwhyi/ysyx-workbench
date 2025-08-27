@@ -22,6 +22,7 @@ int NDL_PollEvent(char *buf, int len) { return read(evtdev, buf, len); }
 void NDL_OpenCanvas(int *w, int *h) {
   printf("NDL_OpenCanvas %d %d\n", screen_w, screen_h);
   if (getenv("NWM_APP")) {
+    printf("hello\n");
     int fbctl = 4;
     fbdev = 5;
     screen_w = *w;
@@ -57,11 +58,12 @@ int NDL_Init(uint32_t flags) {
   if (getenv("NWM_APP")) {
     evtdev = 3;
   }
-  return 0;
-  int fd = open("/proc/disinfo", 0);
+  int fd = open("/proc/dispinfo", 0);
   char buf[64];
   size_t nread = read(fd, buf, sizeof(buf) - 1);
   sscanf(buf, "WIDTH:%d\nHEIGHT:%d\n", &screen_w, &screen_h);
+
+  return 0;
 }
 
 void NDL_Quit() {}
