@@ -75,7 +75,7 @@ static int sys_write(int fd, void *buf, size_t count) {
     }
     return count;
   }
-  return -1;
+  return fs_write(fd, buf, count);
 }
 
 static int sys_close(int fd) { return fs_close(fd); }
