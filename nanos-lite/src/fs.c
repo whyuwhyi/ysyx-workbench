@@ -44,9 +44,9 @@ static Finfo file_table[] __attribute__((used)) = {
 #define FD_MAX (sizeof(file_table) / sizeof(file_table[0]))
 
 void init_fs() {
-  AM_GPU_CONFIG_T cfg = io_read(AM_GPU_CONFIG);
-  int fd = fs_open("/dev/fb", 0, 0);
-  file_table[fd].size = cfg.width * cfg.height * sizeof(uint32_t);
+  // AM_GPU_CONFIG_T cfg = io_read(AM_GPU_CONFIG);
+  // int fd = fs_open("/dev/fb", 0, 0);
+  // file_table[fd].size = cfg.width * cfg.height * sizeof(uint32_t);
 }
 
 size_t ramdisk_read(void *buf, size_t offset, size_t len);
