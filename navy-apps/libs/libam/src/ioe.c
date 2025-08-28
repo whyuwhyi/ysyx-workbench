@@ -53,7 +53,7 @@ static void __am_timer_rtc(AM_TIMER_RTC_T *rtc) {
   rtc->year = 1900;
 }
 static void __am_timer_uptime(AM_TIMER_UPTIME_T *uptime) {
-  uptime->us = (uint64_t)NDL_GetTicks() / 1000;
+  uptime->us = (uint64_t)NDL_GetTicks() * 1000;
 }
 static void __am_input_keybrd(AM_INPUT_KEYBRD_T *kbd) {
   kbd->keydown = 0;

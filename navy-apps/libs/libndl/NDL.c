@@ -9,13 +9,10 @@
 static int evtdev = -1;
 static int fbdev = -1;
 static int screen_w = 0, screen_h = 0;
-// static int canvas_w = 0, canvas_h = 0;
 
 uint32_t NDL_GetTicks() {
   struct timeval tv;
   gettimeofday(&tv, NULL);
-  printf("time: %ld s, %ld us\n", tv.tv_sec, tv.tv_usec);
-  printf("ticks: %ld ms\n", tv.tv_sec * 1000 + tv.tv_usec / 1000);
 
   return tv.tv_sec * 1000 + tv.tv_usec / 1000;
 }
