@@ -77,11 +77,14 @@ void *_sbrk(intptr_t increment) {
   static intptr_t current = (intptr_t)&_end;
   intptr_t prev = current;
   intptr_t next = current + increment;
+  printf("[DEBUG] _sbrk(0x%x) _end=0x%x current=0x%x next=0x%x\n", increment, (uint32_t)&_end, current, next);
   if (!_syscall_(SYS_brk, next, 0, 0)) {
     current = next;
+    printf("[DEBUG] _sbrk SUCCESS returning 0x%x\n", prev);
     return (void *)prev;
   }
 
+  printf("[DEBUG] _sbrk FAILED returning -1\n");
   return (void *)-1;
 }
 
