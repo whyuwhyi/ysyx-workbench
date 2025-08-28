@@ -9,7 +9,7 @@
 static int evtdev = -1;
 static int fbdev = -1;
 static int screen_w = 0, screen_h = 0;
-static int canvas_w = 0, canvas_h = 0;
+// static int canvas_w = 0, canvas_h = 0;
 
 uint32_t NDL_GetTicks() {
   struct timeval tv;
@@ -52,13 +52,16 @@ void NDL_OpenCanvas(int *w, int *h) {
     real_w = screen_w;
   if (real_h <= 0 || real_h > screen_h)
     real_h = screen_h;
-  canvas_w = real_w;
-  canvas_h = real_h;
+  // canvas_w = real_w;
+  // canvas_h = real_h;
+
+  *w = real_w;
+  *h = real_h;
 }
 
 void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
-  x += (screen_w - canvas_w) / 2;
-  y += (screen_h - canvas_h) / 2;
+  x += (screen_w - w) / 2;
+  y += (screen_h - h) / 2;
   int fd = open("/dev/fb", 0);
   for (int i = 0; i < h; i++) {
     lseek(fd, 4 * (x + (y + i) * screen_w), SEEK_SET);
