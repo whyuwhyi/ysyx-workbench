@@ -50,7 +50,6 @@ void next(int rep) {
 int main() {
   SDL_Init(0);
   screen = SDL_SetVideoMode(W, H, 32, SDL_HWSURFACE);
-  printf("N-Slider: %d slides\n", N);
 
   int rep = 0, g = 0;
 
