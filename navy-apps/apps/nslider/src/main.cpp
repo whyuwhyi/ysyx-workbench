@@ -25,7 +25,6 @@ void render() {
   SDL_Surface *slide = SDL_LoadBMP(fname);
   assert(slide);
   SDL_BlitSurface(slide, NULL, screen, NULL);
-  printf("Rendering slide %d/%d: %s\n", cur + 1, N, fname);
   SDL_UpdateRect(screen, 0, 0, 0, 0);
   SDL_FreeSurface(slide);
 }
@@ -51,6 +50,7 @@ void next(int rep) {
 int main() {
   SDL_Init(0);
   screen = SDL_SetVideoMode(W, H, 32, SDL_HWSURFACE);
+  printf("N-Slider: %d slides\n", N);
 
   int rep = 0, g = 0;
 
