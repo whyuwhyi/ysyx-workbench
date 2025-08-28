@@ -8,10 +8,3 @@ Area heap = {_heap, _heap + HEAP_SIZE};
 void putch(char ch) { putchar(ch); }
 
 void halt(int code) { exit(code); }
-
-// void _trm_init() {
-//   extern int main(const char *args);
-//   const char *args = getenv("mainargs");
-//   int ret = main(args);
-//   halt(ret);
-// }

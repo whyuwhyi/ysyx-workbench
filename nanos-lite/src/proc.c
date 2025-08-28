@@ -25,7 +25,7 @@ void init_proc() {
 
   void naive_uload(PCB * pcb, const char *filename);
   // load program here
-  naive_uload(NULL, "/bin/nterm");
+  naive_uload(NULL, "/bin/coremark");
 }
 
 Context *schedule(Context *prev) { return NULL; }
