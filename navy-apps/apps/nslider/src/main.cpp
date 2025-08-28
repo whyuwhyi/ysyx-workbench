@@ -20,8 +20,11 @@ static SDL_Surface *screen = NULL;
 static int cur = 0;
 
 void render() {
+  printf("[DEBUG] render() start, cur=%d\n", cur);
   char fname[256];
+  printf("[DEBUG] before sprintf, fname=%p\n", fname);
   sprintf(fname, path, cur);
+  printf("[DEBUG] after sprintf, fname=%s\n", fname);
   SDL_Surface *slide = SDL_LoadBMP(fname);
   assert(slide);
   SDL_BlitSurface(slide, NULL, screen, NULL);

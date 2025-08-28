@@ -32,6 +32,7 @@ void* BMP_Load(const char *filename, int *width, int *height) {
   int w = hdr.width;
   int h = hdr.height;
   uint32_t *pixels = malloc(w * h * sizeof(uint32_t));
+  printf("[DEBUG] BMP malloc(%dx%dx4=%d) = 0x%x\n", w, h, w*h*4, (uint32_t)pixels);
   int depth = (hdr.bitcount == 32 ? 4 : 3);
 
   int line_off = (depth == 4 ? w * 4 : (w * 3 + 3) & ~0x3);
