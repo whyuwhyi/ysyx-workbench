@@ -80,6 +80,7 @@ int NDL_Init(uint32_t flags) {
   if (getenv("NWM_APP")) {
     evtdev = 3;
   }
+  NDL_GetTicks();
   int fd = open("/proc/dispinfo", 0);
   char buf[64];
   size_t nread = read(fd, buf, sizeof(buf) - 1);
