@@ -31,8 +31,6 @@ int SDL_WaitEvent(SDL_Event *event) {
         return 1;
       }
     }
-
-    assert(0);
   }
 }
 
