@@ -76,7 +76,10 @@ size_t fs_read(int fd, void *buf, size_t len) {
 
   Finfo *f = &file_table[fd];
   if (f->read) {
-    return f->read(buf, f->open_offset, len);
+
+    int ret = f->read(buf, f->open_offset, len);
+    f->open_offset += ret;
+    return ret;
   }
 
   if (f->open_offset >= f->size)
@@ -104,7 +107,9 @@ size_t fs_write(int fd, const void *buf, size_t len) {
 
   Finfo *f = &file_table[fd];
   if (f->write) {
-    return f->write(buf, f->open_offset, len);
+    int ret = f->write(buf, f->open_offset, len);
+    f->open_offset += ret;
+    return ret;
   }
 
   if (f->open_offset > f->size) {
