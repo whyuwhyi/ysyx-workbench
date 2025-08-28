@@ -21,8 +21,10 @@ static void sh_banner() {
 static void sh_prompt() { sh_printf("sh> "); }
 
 static void sh_handle_cmd(const char *cmd) {
-  sh_printf("%s\n", cmd);
-  execvp(cmd, NULL);
+  char temp_cmd[64];
+  strcpy(temp_cmd, cmd);
+  temp_cmd[strlen(cmd) - 1] = '\0';
+  execvp(temp_cmd, NULL);
 }
 
 void builtin_sh_run() {
