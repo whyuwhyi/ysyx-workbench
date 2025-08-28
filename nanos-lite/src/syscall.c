@@ -77,7 +77,7 @@ void do_syscall(Context *c) {
 
 static void sys_exit(int code) {
   STRACE("sys_exit(%d) called", code);
-  sys_execve("/bin/menu", NULL, NULL);
+  sys_execve("/bin/nterm", NULL, NULL);
 }
 
 static int sys_yield(void) {
