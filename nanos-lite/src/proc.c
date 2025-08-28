@@ -25,7 +25,7 @@ void init_proc() {
 
   void naive_uload(PCB * pcb, const char *filename);
   // load program here
-  naive_uload(NULL, "/bin/bird");
+  naive_uload(NULL, "/bin/pal");
 }
 
 Context *schedule(Context *prev) { return NULL; }
