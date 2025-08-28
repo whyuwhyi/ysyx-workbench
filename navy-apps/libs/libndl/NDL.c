@@ -52,8 +52,6 @@ void NDL_OpenCanvas(int *w, int *h) {
     real_w = screen_w;
   if (real_h <= 0 || real_h > screen_h)
     real_h = screen_h;
-  // canvas_w = real_w;
-  // canvas_h = real_h;
 
   *w = real_w;
   *h = real_h;
