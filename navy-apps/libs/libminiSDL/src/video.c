@@ -164,13 +164,10 @@ void SDL_FreeSurface(SDL_Surface *s) {
 }
 
 SDL_Surface *SDL_SetVideoMode(int width, int height, int bpp, uint32_t flags) {
-  printf("[DEBUG] SDL_SetVideoMode(%d, %d, %d, 0x%x)\n", width, height, bpp, flags);
   if (flags & SDL_HWSURFACE)
     NDL_OpenCanvas(&width, &height);
-  SDL_Surface *surface = SDL_CreateRGBSurface(flags, width, height, bpp, DEFAULT_RMASK,
+  return SDL_CreateRGBSurface(flags, width, height, bpp, DEFAULT_RMASK,
                               DEFAULT_GMASK, DEFAULT_BMASK, DEFAULT_AMASK);
-  printf("[DEBUG] SDL_SetVideoMode returns %p, pixels=%p\n", surface, surface ? surface->pixels : NULL);
-  return surface;
 }
 
 void SDL_SoftStretch(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst,
