@@ -103,9 +103,7 @@ static int sys_lseek(int fd, size_t offset, int whence) {
 }
 
 static int sys_sbrk(intptr_t program_break) {
-  extern Area heap;
-  STRACE("sys_sbrk(0x%x) called, heap=[0x%x,0x%x]", program_break, (uint32_t)heap.start, (uint32_t)heap.end);
-  printf("[DEBUG] sys_sbrk(0x%x) heap=[0x%x,0x%x]\n", program_break, (uint32_t)heap.start, (uint32_t)heap.end);
+  STRACE("sys_sbrk(%d) called", program_break);
   return 0;
 }
 
