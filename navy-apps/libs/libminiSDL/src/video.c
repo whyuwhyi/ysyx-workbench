@@ -30,6 +30,8 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst,
 
   uint32_t *src_pixels = (uint32_t *)src->pixels;
   uint32_t *dst_pixels = (uint32_t *)dst->pixels;
+  printf("[DEBUG] SDL_BlitSurface: src_pixels=%p dst_pixels=%p w=%d h=%d\n", src_pixels, dst_pixels, w, h);
+  printf("[DEBUG] SDL_BlitSurface: src->w=%d dst->w=%d\n", src->w, dst->w);
   for (int i = 0; i < h; i++) {
     for (int j = 0; j < w; j++) {
       dst_pixels[(dst_y + i) * dst->w + dst_x + j] =
@@ -165,10 +167,13 @@ void SDL_FreeSurface(SDL_Surface *s) {
 }
 
 SDL_Surface *SDL_SetVideoMode(int width, int height, int bpp, uint32_t flags) {
+  printf("[DEBUG] SDL_SetVideoMode(%d, %d, %d, 0x%x)\n", width, height, bpp, flags);
   if (flags & SDL_HWSURFACE)
     NDL_OpenCanvas(&width, &height);
-  return SDL_CreateRGBSurface(flags, width, height, bpp, DEFAULT_RMASK,
+  SDL_Surface *surface = SDL_CreateRGBSurface(flags, width, height, bpp, DEFAULT_RMASK,
                               DEFAULT_GMASK, DEFAULT_BMASK, DEFAULT_AMASK);
+  printf("[DEBUG] SDL_SetVideoMode returns %p, pixels=%p\n", surface, surface ? surface->pixels : NULL);
+  return surface;
 }
 
 void SDL_SoftStretch(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst,
