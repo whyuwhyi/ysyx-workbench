@@ -31,10 +31,7 @@ static int sys_execve(const char *fname, char *const argv[], char *const envp[])
 static int sys_gettimeofday(struct timeval *tv, struct timezone *tz);
 
 void do_syscall(Context *c) {
-  uintptr_t a[4];
-  a[0] = c->GPR1;
-
-  switch (a[0]) {
+  switch (c->GPR1) {
   case SYS_exit:
     sys_exit(c->GPR2);
     break;
@@ -71,7 +68,7 @@ void do_syscall(Context *c) {
     break;
 
   default:
-    panic("Unhandled syscall ID = %d", a[0]);
+    panic("Unhandled syscall ID = %d", c->GPR1);
   }
 }
 
