@@ -1,4 +1,5 @@
 #include "syscall.h"
+#include "proc.h"
 #include <common.h>
 #include <fs.h>
 #include <sys/time.h>
@@ -22,7 +23,10 @@ static int sys_write(int fd, void *buf, size_t count);
 static int sys_close(int fd);
 static int sys_lseek(int fd, size_t offset, int whence);
 
-static int sys_sbrk(intptr_t program_break);
+static int sys_brk(intptr_t program_break);
+
+static int sys_execve(const char *fname, char *const argv[], char *const envp[])
+    __attribute__((noreturn));
 
 static int sys_gettimeofday(struct timeval *tv, struct timezone *tz);
 
@@ -55,7 +59,11 @@ void do_syscall(Context *c) {
     break;
 
   case SYS_brk:
-    c->GPRx = sys_sbrk(c->GPR2);
+    c->GPRx = sys_brk(c->GPR2);
+    break;
+  case SYS_execve:
+    c->GPRx = sys_execve((const char *)c->GPR2, (char *const *)c->GPR3,
+                         (char *const *)c->GPR4);
     break;
   case SYS_gettimeofday:
     c->GPRx =
@@ -69,7 +77,7 @@ void do_syscall(Context *c) {
 
 static void sys_exit(int code) {
   STRACE("sys_exit(%d) called", code);
-  halt(code);
+  sys_execve("/bin/menu", NULL, NULL);
 }
 
 static int sys_yield(void) {
@@ -102,9 +110,19 @@ static int sys_lseek(int fd, size_t offset, int whence) {
   return fs_lseek(fd, offset, whence);
 }
 
-static int sys_sbrk(intptr_t program_break) {
-  STRACE("sys_sbrk(%d) called", program_break);
+static int sys_brk(intptr_t program_break) {
+  STRACE("sys_brk(%d) called", program_break);
   return 0;
+}
+
+static int sys_execve(const char *fname, char *const argv[],
+                      char *const envp[]) {
+  STRACE("sys_execve(\"%s\") called", fname);
+
+  void naive_uload(PCB * pcb, const char *filename);
+  naive_uload(NULL, fname);
+  while (1)
+    ;
 }
 
 static int sys_gettimeofday(struct timeval *tv, struct timezone *tz) {
