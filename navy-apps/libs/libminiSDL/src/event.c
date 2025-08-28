@@ -4,6 +4,7 @@
 #define keyname(k) #k,
 
 static const char *keyname[] = {"NONE", _KEYS(keyname)};
+static uint8_t keystate[sizeof(keyname) / sizeof(keyname[0])] = {0};
 
 int SDL_PushEvent(SDL_Event *ev) { return 0; }
 
@@ -48,4 +49,8 @@ int SDL_PeepEvents(SDL_Event *ev, int numevents, int action, uint32_t mask) {
   return 0;
 }
 
-uint8_t *SDL_GetKeyState(int *numkeys) { return NULL; }
+uint8_t *SDL_GetKeyState(int *numkeys) {
+  if (numkeys)
+    *numkeys = sizeof(keystate) / sizeof(keystate[0]);
+  return keystate;
+}
