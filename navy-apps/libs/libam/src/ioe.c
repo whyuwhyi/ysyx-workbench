@@ -36,7 +36,7 @@ bool ioe_init() {
       lut[i] = fail;
   __am_timer_init();
 
-  NDL_Init(0);
+  // NDL_Init(0);
   return true;
 }
 
