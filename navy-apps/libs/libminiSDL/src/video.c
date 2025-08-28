@@ -56,7 +56,8 @@ void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
 }
 
 void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
-  NDL_DrawRect((uint32_t *)s->pixels, x, y, w, h);
+  uint32_t *ptr = (uint32_t *)s->pixels + (size_t)y * s->w + x;
+  NDL_DrawRect(ptr, x, y, w, h);
 }
 
 // APIs below are already implemented.
