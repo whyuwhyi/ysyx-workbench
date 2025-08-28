@@ -58,7 +58,7 @@ void NDL_OpenCanvas(int *w, int *h) {
 }
 
 void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
-  // x += (screen_w - w) / 2;
+  x += (screen_w - w) / 2;
   // y += (screen_h - h) / 2;
   int fd = open("/dev/fb", 0);
   for (int i = 0; i < h; i++) {
