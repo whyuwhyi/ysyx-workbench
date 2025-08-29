@@ -29,7 +29,7 @@
 
 void ramdisk_read(void *buf, size_t offset, size_t len);
 
-static uintptr_t loader(PCB *pcb, const char *filename) {
+uintptr_t loader(PCB *pcb, const char *filename) {
   int fd = fs_open(filename, 0, 0);
   if (fd < 0) {
     panic("file %s not found\n", filename);

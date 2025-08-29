@@ -1,3 +1,5 @@
+#include "am.h"
+#include <common.h>
 #include <proc.h>
 
 #define MAX_NR_PROC 4
@@ -20,7 +22,7 @@ void hello_fun(void *arg) {
 
 void init_proc() {
   context_kload(&pcb[0], hello_fun, "1");
-  context_kload(&pcb[1], hello_fun, "2");
+  context_uload(&pcb[1], "/bin/pal");
   switch_boot_pcb();
 }
 
@@ -33,4 +35,12 @@ Context *schedule(Context *prev) {
 void context_kload(PCB *pcb, void *entry, void *arg) {
   Area stack_area = (Area){pcb->stack, pcb->stack + STACK_SIZE};
   pcb->cp = kcontext(stack_area, entry, arg);
+}
+
+uintptr_t loader(PCB *pcb, const char *filename);
+void context_uload(PCB *pcb, const char *filename) {
+  uintptr_t entry = loader(pcb, filename);
+  Area stack_area = (Area){pcb->stack, pcb->stack + STACK_SIZE};
+  pcb->cp = ucontext(NULL, stack_area, (void *)entry);
+  pcb->cp->GPRx = (uintptr_t)heap.end;
 }
