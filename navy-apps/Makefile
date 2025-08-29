@@ -47,11 +47,16 @@ ARCHIVE  = $(WORK_DIR)/build/$(NAME)-$(ISA).a
 
 ### Add default libraries for ISA != native
 ifneq ($(ISA), native)
-LIBS += libc libos libndl libminiSDL libbmp libfixedptc libSDL_image
+LIBS += libc libos libminiSDL
 CFLAGS += -U_FORTIFY_SOURCE  # fix compile error in Newlib on ubuntu
 else
 WL = -Wl,
 endif
+
+### RISC-V32E needs libgcc for all applications
+# ifeq ($(ISA), riscv32e)
+# LIBS += libgcc
+# endif
 
 ### 32-bit ISA may need compiler-rt to support 64-bit mul/div
 ifneq ($(findstring $(ISA), x86|mips32|riscv32|riscv32e|loongarch32r),)
