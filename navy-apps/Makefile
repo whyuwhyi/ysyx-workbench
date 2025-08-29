@@ -54,13 +54,8 @@ WL = -Wl,
 endif
 
 ### 32-bit ISA may need compiler-rt to support 64-bit mul/div
-ifneq ($(findstring $(ISA), x86|mips32|riscv32|loongarch32r),)
+ifneq ($(findstring $(ISA), x86|mips32|riscv32|riscv32e|loongarch32r),)
 LIBS += compiler-rt
-endif
-
-### RISC-V32E uses libgcc instead of compiler-rt (no M extension support)
-ifeq ($(ISA), riscv32e)
-LIBS += libgcc
 endif
 
 ### All libraries to add to the include path
