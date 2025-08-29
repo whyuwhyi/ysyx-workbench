@@ -8,4 +8,4 @@ Area heap = {_heap, _heap + HEAP_SIZE};
 
 void putch(char ch) {}
 
-void halt(int code) { exit(code); }
+void halt(int code) {}
