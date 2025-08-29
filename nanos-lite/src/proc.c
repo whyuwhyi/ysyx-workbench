@@ -22,7 +22,8 @@ void hello_fun(void *arg) {
 
 void init_proc() {
   context_kload(&pcb[0], hello_fun, "1");
-  context_uload(&pcb[1], "/bin/pal");
+  char *args[] = {"/bin/pal", "--skip", NULL};
+  context_uload(&pcb[1], "/bin/pal", args, NULL);
   switch_boot_pcb();
 }
 
@@ -37,10 +38,44 @@ void context_kload(PCB *pcb, void *entry, void *arg) {
   pcb->cp = kcontext(stack_area, entry, arg);
 }
 
-uintptr_t loader(PCB *pcb, const char *filename);
-void context_uload(PCB *pcb, const char *filename) {
+void context_uload(PCB *pcb, const char *filename, char *const argv[],
+                   char *const envp[]) {
   uintptr_t entry = loader(pcb, filename);
   Area stack_area = (Area){pcb->stack, pcb->stack + STACK_SIZE};
   pcb->cp = ucontext(NULL, stack_area, (void *)entry);
-  pcb->cp->GPRx = (uintptr_t)heap.end;
+  uintptr_t sp = (uintptr_t)heap.end;
+  int envc = 0;
+  int argc = 0;
+
+  for (int i = 0; envp[i]; i++) {
+    sp -= strlen(envp[i]) + 1;
+    strcpy((char *)sp, envp[i]);
+    envc++;
+  }
+
+  for (int i = 0; argv[i]; i++) {
+    sp -= strlen(argv[i]) + 1;
+    strcpy((char *)sp, argv[i]);
+    argc++;
+  }
+
+  int argc_cp = argc;
+
+  sp -= sizeof(char *);
+  sp = 0;
+  for (; envc; envc--) {
+    sp -= sizeof(char **);
+    *(char **)sp = envp[envc - 1];
+  }
+
+  sp -= sizeof(char *);
+  sp = 0;
+  for (; argc; argc--) {
+    sp -= sizeof(char **);
+    *(char **)sp = argv[argc - 1];
+  }
+
+  sp -= sizeof(int *);
+  *(int *)sp = argc_cp;
+  pcb->cp->GPRx = sp;
 }
