@@ -44,10 +44,26 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   fs_read(fd, ph, sizeof(Elf_Phdr) * ehdr.e_phnum);
   for (int i = 0; i < ehdr.e_phnum; i++) {
     if (ph[i].p_type == PT_LOAD) {
+      Log("LOAD segment %d: vaddr=0x%x, filesz=0x%x, memsz=0x%x", 
+          i, ph[i].p_vaddr, ph[i].p_filesz, ph[i].p_memsz);
+      
       fs_lseek(fd, ph[i].p_offset, SEEK_SET);
       fs_read(fd, (void *)ph[i].p_vaddr, ph[i].p_filesz);
+      
+      // Check seed4_volatile before memset
+      if (ph[i].p_vaddr <= 0x83014c08 && 0x83014c08 < ph[i].p_vaddr + ph[i].p_memsz) {
+        uint32_t *seed4_ptr = (uint32_t *)0x83014c08;
+        Log("seed4_volatile before memset: 0x%x", *seed4_ptr);
+      }
+      
       memset((void *)(ph[i].p_vaddr + ph[i].p_filesz), 0,
              ph[i].p_memsz - ph[i].p_filesz);
+             
+      // Check seed4_volatile after memset  
+      if (ph[i].p_vaddr <= 0x83014c08 && 0x83014c08 < ph[i].p_vaddr + ph[i].p_memsz) {
+        uint32_t *seed4_ptr = (uint32_t *)0x83014c08;
+        Log("seed4_volatile after memset: 0x%x", *seed4_ptr);
+      }
     }
   }
   fs_close(fd);
