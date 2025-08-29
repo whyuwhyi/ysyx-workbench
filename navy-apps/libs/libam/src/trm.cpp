@@ -6,6 +6,6 @@
 static unsigned char _heap[HEAP_SIZE];
 Area heap = {_heap, _heap + HEAP_SIZE};
 
-void putch(char ch) { write(1, &ch, 1); }
+void putch(char ch) {}
 
 void halt(int code) { exit(code); }
