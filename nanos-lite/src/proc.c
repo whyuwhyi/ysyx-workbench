@@ -84,5 +84,4 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[],
   sp -= sizeof(int *);
   *(int *)sp = argc;
   pcb->cp->GPRx = sp;
-  assert(0);
 }
