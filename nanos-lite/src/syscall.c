@@ -1,7 +1,7 @@
 #include "syscall.h"
-#include "proc.h"
 #include <common.h>
 #include <fs.h>
+#include <proc.h>
 #include <sys/time.h>
 
 #define SYSCALL_TRACE false
@@ -116,8 +116,6 @@ static int sys_execve(const char *fname, char *const argv[],
                       char *const envp[]) {
   STRACE("sys_execve(\"%s\") called", fname);
 
-  void naive_uload(PCB * pcb, const char *filename);
-  naive_uload(NULL, fname);
   while (1)
     ;
 }
