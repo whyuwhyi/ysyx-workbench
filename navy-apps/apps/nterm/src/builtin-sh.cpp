@@ -1,6 +1,7 @@
 #include <SDL.h>
 #include <nterm.h>
 #include <stdarg.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 char handle_key(SDL_Event *ev);
@@ -21,10 +22,19 @@ static void sh_banner() {
 static void sh_prompt() { sh_printf("sh> "); }
 
 static void sh_handle_cmd(const char *cmd) {
-  char temp_cmd[64];
+  char temp_cmd[128];
   strcpy(temp_cmd, cmd);
   temp_cmd[strlen(cmd) - 1] = '\0';
-  execvp(temp_cmd, NULL);
+  char *argv[16];
+  int argc = 0;
+  char *token = strtok(temp_cmd, " ");
+  argv[argc++] = token;
+  while (token != NULL && argc < 15) {
+    token = strtok(NULL, " ");
+    argv[argc++] = token;
+  }
+
+  execvp(argv[0], argv);
 }
 
 void builtin_sh_run() {
