@@ -4,7 +4,7 @@
 #include <fs.h>
 #include <sys/time.h>
 
-#define SYSCALL_TRACE false
+// #define SYSCALL_TRACE false
 #ifndef SYSCALL_TRACE
 #define SYSCALL_TRACE true
 #endif
