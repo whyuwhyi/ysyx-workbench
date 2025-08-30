@@ -10,8 +10,7 @@ class ALU extends Module with Constants {
     val opA = Input(UInt(XLEN.W))
     val opB = Input(UInt(XLEN.W))
     val aluOp = Input(AluOp())
-    val out = Output(UInt(XLEN.W))
-    val zero = Output(Bool())
+    val aluOut = Output(UInt(XLEN.W))
     val branchFlags = Output(new BranchFlags)
   })
 
@@ -40,7 +39,7 @@ class ALU extends Module with Constants {
   val sltRes = Mux(sltSigned, 1.U, 0.U)
   val sltuRes = Mux(sltUnsigned, 1.U, 0.U)
 
-  io.out := MuxLookup(io.aluOp, sum)(
+  io.aluOut := MuxLookup(io.aluOp, sum)(
     Seq(
       AluOp.ADD -> sum,
       AluOp.SUB -> sum,
@@ -55,7 +54,6 @@ class ALU extends Module with Constants {
       AluOp.COPY_B -> io.opB
     )
   )
-  io.zero := io.out === 0.U
   io.branchFlags.isZero := sum === 0.U
   io.branchFlags.isLessSigned := sltSigned
   io.branchFlags.isLessUnsigned := sltUnsigned

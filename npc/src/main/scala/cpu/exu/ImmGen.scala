@@ -8,7 +8,7 @@ import common.ImmSel
 class ImmGen extends Module with Constants {
   val io = IO(new Bundle {
     val inst = Input(UInt(32.W))
-    val sel = Input(ImmSel())
+    val immSel = Input(ImmSel())
     val imm = Output(UInt(XLEN.W))
   })
 
@@ -30,13 +30,13 @@ class ImmGen extends Module with Constants {
     0.U(1.W)
   )
 
-  val out = MuxLookup(io.sel.asUInt, 0.U)(
+  val out = MuxLookup(io.immSel, 0.U)(
     Seq(
-      ImmSel.I.asUInt -> immI,
-      ImmSel.S.asUInt -> immS,
-      ImmSel.B.asUInt -> immB,
-      ImmSel.U.asUInt -> immU,
-      ImmSel.J.asUInt -> immJ
+      ImmSel.I -> immI,
+      ImmSel.S -> immS,
+      ImmSel.B -> immB,
+      ImmSel.U -> immU,
+      ImmSel.J -> immJ
     )
   )
   io.imm := out

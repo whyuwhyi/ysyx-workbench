@@ -115,6 +115,10 @@ static int sys_brk(intptr_t program_break) {
 static int sys_execve(const char *fname, char *const argv[],
                       char *const envp[]) {
   STRACE("sys_execve(\"%s\") called", fname);
+  extern PCB *current;
+  context_uload(current, fname, argv, envp);
+  switch_boot_pcb();
+  yield();
 
   while (1)
     ;

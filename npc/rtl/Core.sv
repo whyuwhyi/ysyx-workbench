@@ -162,7 +162,7 @@ endmodule
 
 module ImmGen(	// src/main/scala/cpu/exu/ImmGen.scala:8:7
   input  [31:0] io_inst,	// src/main/scala/cpu/exu/ImmGen.scala:9:14
-  input  [2:0]  io_sel,	// src/main/scala/cpu/exu/ImmGen.scala:9:14
+  input  [2:0]  io_immSel,	// src/main/scala/cpu/exu/ImmGen.scala:9:14
   output [31:0] io_imm	// src/main/scala/cpu/exu/ImmGen.scala:9:14
 );
 
@@ -174,27 +174,27 @@ module ImmGen(	// src/main/scala/cpu/exu/ImmGen.scala:8:7
      {{{20{io_inst[31]}}, io_inst[7], io_inst[30:25], io_inst[11:8], 1'h0}},
      {{{20{io_inst[31]}}, io_inst[31:25], io_inst[11:7]}},
      {{{20{io_inst[31]}}, io_inst[31:20]}},
-     {32'h0}};	// src/main/scala/cpu/exu/ImmGen.scala:15:{17,22,34,48}, :16:{17,22,48,65}, :17:17, :18:9, :19:12, :20:12, :21:12, :24:{17,25}, :25:17, :26:9, :27:12, :28:12, :29:12, :33:42
-  assign io_imm = _GEN[io_sel];	// src/main/scala/cpu/exu/ImmGen.scala:8:7, :33:42
+     {32'h0}};	// src/main/scala/cpu/exu/ImmGen.scala:15:{17,22,34,48}, :16:{17,22,48,65}, :17:17, :18:9, :19:12, :20:12, :21:12, :24:{17,25}, :25:17, :26:9, :27:12, :28:12, :29:12, :33:38
+  assign io_imm = _GEN[io_immSel];	// src/main/scala/cpu/exu/ImmGen.scala:8:7, :33:38
 endmodule
 
 module ALU(	// src/main/scala/cpu/exu/ALU.scala:8:7
   input  [31:0] io_opA,	// src/main/scala/cpu/exu/ALU.scala:9:14
                 io_opB,	// src/main/scala/cpu/exu/ALU.scala:9:14
   input  [3:0]  io_aluOp,	// src/main/scala/cpu/exu/ALU.scala:9:14
-  output [31:0] io_out,	// src/main/scala/cpu/exu/ALU.scala:9:14
+  output [31:0] io_aluOut,	// src/main/scala/cpu/exu/ALU.scala:9:14
   output        io_branchFlags_isZero,	// src/main/scala/cpu/exu/ALU.scala:9:14
                 io_branchFlags_isLessSigned,	// src/main/scala/cpu/exu/ALU.scala:9:14
                 io_branchFlags_isLessUnsigned	// src/main/scala/cpu/exu/ALU.scala:9:14
 );
 
-  wire        cin = io_aluOp == 4'h2 | io_aluOp == 4'h9 | io_aluOp == 4'hA;	// src/main/scala/cpu/exu/ALU.scala:19:{14,40,54,66}
-  wire [32:0] _wide_T_1 = {1'h0, io_opA} + {1'h0, {32{cin}} ^ io_opB} + {32'h0, cin};	// src/main/scala/cpu/exu/ALU.scala:19:54, :20:17, :22:{21,29}, :59:32
-  wire        sltRes = io_opA[31] ^ io_opB[31] ? io_opA[31] : _wide_T_1[31];	// src/main/scala/cpu/exu/ALU.scala:22:29, :23:17, :26:21, :27:21, :28:20, :29:{22,29}
-  wire [31:0] _GEN = {27'h0, io_opB[4:0]};	// src/main/scala/cpu/exu/ALU.scala:32:21, :33:20
+  wire        cin = io_aluOp == 4'h2 | io_aluOp == 4'h9 | io_aluOp == 4'hA;	// src/main/scala/cpu/exu/ALU.scala:18:{14,40,54,66}
+  wire [32:0] _wide_T_1 = {1'h0, io_opA} + {1'h0, {32{cin}} ^ io_opB} + {32'h0, cin};	// src/main/scala/cpu/exu/ALU.scala:18:54, :19:17, :21:{21,29}, :57:32
+  wire        sltRes = io_opA[31] ^ io_opB[31] ? io_opA[31] : _wide_T_1[31];	// src/main/scala/cpu/exu/ALU.scala:21:29, :22:17, :25:21, :26:21, :27:20, :28:{22,29}
+  wire [31:0] _GEN = {27'h0, io_opB[4:0]};	// src/main/scala/cpu/exu/ALU.scala:31:21, :32:20
   wire [7:0]  _GEN_0 =
     {{io_opA[11:8], io_opA[15:14]} & 6'h33, 2'h0} | {io_opA[15:12], io_opA[19:16]}
-    & 8'h33;	// src/main/scala/cpu/exu/ALU.scala:35:28
+    & 8'h33;	// src/main/scala/cpu/exu/ALU.scala:34:28
   wire [18:0] _GEN_1 =
     {io_opA[5:4],
      io_opA[7:6],
@@ -202,7 +202,7 @@ module ALU(	// src/main/scala/cpu/exu/ALU.scala:8:7
      _GEN_0,
      io_opA[19:18],
      io_opA[21:20],
-     io_opA[23]} & 19'h55555;	// src/main/scala/cpu/exu/ALU.scala:35:28
+     io_opA[23]} & 19'h55555;	// src/main/scala/cpu/exu/ALU.scala:34:28
   wire [31:0] _sll_T_49 =
     {io_opA[0],
      io_opA[1],
@@ -222,10 +222,10 @@ module ALU(	// src/main/scala/cpu/exu/ALU.scala:8:7
      io_opA[28],
      io_opA[29],
      io_opA[30],
-     io_opA[31]} >> _GEN;	// src/main/scala/cpu/exu/ALU.scala:22:21, :33:20, :35:{28,37}, :43:37
+     io_opA[31]} >> _GEN;	// src/main/scala/cpu/exu/ALU.scala:21:21, :32:20, :34:{28,37}, :42:40
   wire [7:0]  _GEN_2 =
     {{_sll_T_49[11:8], _sll_T_49[15:14]} & 6'h33, 2'h0}
-    | {_sll_T_49[15:12], _sll_T_49[19:16]} & 8'h33;	// src/main/scala/cpu/exu/ALU.scala:35:{20,28,37}
+    | {_sll_T_49[15:12], _sll_T_49[19:16]} & 8'h33;	// src/main/scala/cpu/exu/ALU.scala:34:{20,28,37}
   wire [18:0] _GEN_3 =
     {_sll_T_49[5:4],
      _sll_T_49[7:6],
@@ -233,8 +233,8 @@ module ALU(	// src/main/scala/cpu/exu/ALU.scala:8:7
      _GEN_2,
      _sll_T_49[19:18],
      _sll_T_49[21:20],
-     _sll_T_49[23]} & 19'h55555;	// src/main/scala/cpu/exu/ALU.scala:35:{20,28,37}
-  assign io_out =
+     _sll_T_49[23]} & 19'h55555;	// src/main/scala/cpu/exu/ALU.scala:34:{20,28,37}
+  assign io_aluOut =
     io_aluOp == 4'hB
       ? io_opB
       : io_aluOp == 4'hA
@@ -270,25 +270,25 @@ module ALU(	// src/main/scala/cpu/exu/ALU.scala:8:7
                               ? io_opA ^ io_opB
                               : io_aluOp == 4'h4
                                   ? io_opA | io_opB
-                                  : io_aluOp == 4'h3 ? io_opA & io_opB : _wide_T_1[31:0];	// src/main/scala/cpu/exu/ALU.scala:8:7, :19:{40,66}, :22:{21,29}, :23:17, :24:22, :29:22, :30:21, :33:20, :34:28, :35:{20,28,37}, :37:23, :38:22, :39:23, :43:37
-  assign io_branchFlags_isZero = _wide_T_1[31:0] == 32'h0;	// src/main/scala/cpu/exu/ALU.scala:8:7, :22:29, :23:17, :59:32
-  assign io_branchFlags_isLessSigned = sltRes;	// src/main/scala/cpu/exu/ALU.scala:8:7, :29:22
-  assign io_branchFlags_isLessUnsigned = ~(_wide_T_1[32]);	// src/main/scala/cpu/exu/ALU.scala:8:7, :22:29, :24:22, :30:21
+                                  : io_aluOp == 4'h3 ? io_opA & io_opB : _wide_T_1[31:0];	// src/main/scala/cpu/exu/ALU.scala:8:7, :18:{40,66}, :21:{21,29}, :22:17, :23:22, :28:22, :29:21, :32:20, :33:28, :34:{20,28,37}, :36:23, :37:22, :38:23, :42:40
+  assign io_branchFlags_isZero = _wide_T_1[31:0] == 32'h0;	// src/main/scala/cpu/exu/ALU.scala:8:7, :21:29, :22:17, :57:32
+  assign io_branchFlags_isLessSigned = sltRes;	// src/main/scala/cpu/exu/ALU.scala:8:7, :28:22
+  assign io_branchFlags_isLessUnsigned = ~(_wide_T_1[32]);	// src/main/scala/cpu/exu/ALU.scala:8:7, :21:29, :23:22, :29:21
 endmodule
 
 // external module SimDMem
 
 module LSU(	// src/main/scala/cpu/lsu/LSU.scala:8:7
-  input  [31:0] io_addrIn,	// src/main/scala/cpu/lsu/LSU.scala:9:14
-                io_wdataIn,	// src/main/scala/cpu/lsu/LSU.scala:9:14
-  input  [2:0]  io_memTypeIn,	// src/main/scala/cpu/lsu/LSU.scala:9:14
+  input  [31:0] io_addr,	// src/main/scala/cpu/lsu/LSU.scala:9:14
+                io_wdata,	// src/main/scala/cpu/lsu/LSU.scala:9:14
+  input  [2:0]  io_memType,	// src/main/scala/cpu/lsu/LSU.scala:9:14
   input         io_ren,	// src/main/scala/cpu/lsu/LSU.scala:9:14
                 io_wen,	// src/main/scala/cpu/lsu/LSU.scala:9:14
-  output [31:0] io_rdataOut	// src/main/scala/cpu/lsu/LSU.scala:9:14
+  output [31:0] io_rdata	// src/main/scala/cpu/lsu/LSU.scala:9:14
 );
 
   wire [31:0]      _simDMemInst_rdata;	// src/main/scala/cpu/lsu/LSU.scala:44:29
-  wire [7:0][7:0]  _GEN = '{8'h4, 8'h4, 8'h3, 8'h1, 8'hF, 8'h3, 8'h1, 8'h4};	// src/main/scala/cpu/lsu/LSU.scala:31:48
+  wire [7:0][7:0]  _GEN = '{8'h4, 8'h4, 8'h3, 8'h1, 8'hF, 8'h3, 8'h1, 8'h4};	// src/main/scala/cpu/lsu/LSU.scala:31:46
   wire [7:0][31:0] _GEN_0 =
     {{_simDMemInst_rdata},
      {_simDMemInst_rdata},
@@ -297,18 +297,18 @@ module LSU(	// src/main/scala/cpu/lsu/LSU.scala:8:7
      {_simDMemInst_rdata},
      {{{16{_simDMemInst_rdata[15]}}, _simDMemInst_rdata[15:0]}},
      {{{24{_simDMemInst_rdata[7]}}, _simDMemInst_rdata[7:0]}},
-     {_simDMemInst_rdata}};	// src/main/scala/cpu/lsu/LSU.scala:44:29, :53:{16,44}, :54:{16,45}, :55:{16,21,40}, :56:{16,21,41}, :58:51
+     {_simDMemInst_rdata}};	// src/main/scala/cpu/lsu/LSU.scala:44:29, :53:{16,44}, :54:{16,45}, :55:{16,21,40}, :56:{16,21,41}, :58:46
   SimDMem #(
     .XLEN(32)
   ) simDMemInst (	// src/main/scala/cpu/lsu/LSU.scala:44:29
-    .addr  (io_addrIn),
+    .addr  (io_addr),
     .ren   (io_ren),
     .rdata (_simDMemInst_rdata),
     .wen   (io_wen),
-    .wmask (_GEN[io_memTypeIn]),	// src/main/scala/cpu/lsu/LSU.scala:31:48
-    .wdata (io_wdataIn)
+    .wmask (_GEN[io_memType]),	// src/main/scala/cpu/lsu/LSU.scala:31:46
+    .wdata (io_wdata)
   );
-  assign io_rdataOut = _GEN_0[io_memTypeIn];	// src/main/scala/cpu/lsu/LSU.scala:8:7, :58:51
+  assign io_rdata = _GEN_0[io_memType];	// src/main/scala/cpu/lsu/LSU.scala:8:7, :58:46
 endmodule
 
 // external module SimProbeRF
@@ -498,8 +498,8 @@ module Datapath(	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:10:7
 
   wire [31:0] _registerFileInst_io_rs1Data;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:38:32
   wire [31:0] _registerFileInst_io_rs2Data;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:38:32
-  wire [31:0] _lsuInst_io_rdataOut;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:37:23
-  wire [31:0] _aluInst_io_out;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:36:23
+  wire [31:0] _lsuInst_io_rdata;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:37:23
+  wire [31:0] _aluInst_io_aluOut;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:36:23
   wire        _aluInst_io_branchFlags_isZero;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:36:23
   wire        _aluInst_io_branchFlags_isLessSigned;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:36:23
   wire        _aluInst_io_branchFlags_isLessUnsigned;	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:36:23
@@ -524,9 +524,9 @@ module Datapath(	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:10:7
     .io_pc4                        (_ifuInst_io_pc4)
   );
   ImmGen immGenInst (	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:35:26
-    .io_inst (_ifuInst_io_inst),	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:34:23
-    .io_sel  (io_immSel),
-    .io_imm  (_immGenInst_io_imm)
+    .io_inst   (_ifuInst_io_inst),	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:34:23
+    .io_immSel (io_immSel),
+    .io_imm    (_immGenInst_io_imm)
   );
   ALU aluInst (	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:36:23
     .io_opA
@@ -534,18 +534,18 @@ module Datapath(	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:10:7
     .io_opB
       (io_opBSel == 2'h2 ? _immGenInst_io_imm : _registerFileInst_io_rs2Data),	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:35:26, :38:32, :65:15, :69:16, :70:15
     .io_aluOp                      (io_aluOp),
-    .io_out                        (_aluInst_io_out),
+    .io_aluOut                     (_aluInst_io_aluOut),
     .io_branchFlags_isZero         (_aluInst_io_branchFlags_isZero),
     .io_branchFlags_isLessSigned   (_aluInst_io_branchFlags_isLessSigned),
     .io_branchFlags_isLessUnsigned (_aluInst_io_branchFlags_isLessUnsigned)
   );
   LSU lsuInst (	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:37:23
-    .io_addrIn    (_aluInst_io_out),	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:36:23
-    .io_wdataIn   (_registerFileInst_io_rs2Data),	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:38:32
-    .io_memTypeIn (io_memType),
-    .io_ren       (io_memRen),
-    .io_wen       (io_memWen),
-    .io_rdataOut  (_lsuInst_io_rdataOut)
+    .io_addr    (_aluInst_io_aluOut),	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:36:23
+    .io_wdata   (_registerFileInst_io_rs2Data),	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:38:32
+    .io_memType (io_memType),
+    .io_ren     (io_memRen),
+    .io_wen     (io_memWen),
+    .io_rdata   (_lsuInst_io_rdata)
   );
   RegisterFile registerFileInst (	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:38:32
     .clock      (clock),
@@ -558,7 +558,7 @@ module Datapath(	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:10:7
          ? io_csrRdata
          : io_wbSel == 3'h3
              ? _ifuInst_io_pc4
-             : io_wbSel == 3'h2 ? _lsuInst_io_rdataOut : _aluInst_io_out),	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:34:23, :36:23, :37:23, :85:51
+             : io_wbSel == 3'h2 ? _lsuInst_io_rdata : _aluInst_io_aluOut),	// src/main/scala/cpu/arch/single_cycle/Datapath.scala:34:23, :36:23, :37:23, :85:54
     .io_wen     (io_regWen),
     .io_rs1Data (_registerFileInst_io_rs1Data),
     .io_rs2Data (_registerFileInst_io_rs2Data)

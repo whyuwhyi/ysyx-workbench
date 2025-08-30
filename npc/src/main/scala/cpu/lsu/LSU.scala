@@ -7,18 +7,18 @@ import common.BuildFlags
 
 class LSU extends Module with Constants {
   val io = IO(new Bundle {
-    val addrIn = Input(UInt(XLEN.W))
-    val wdataIn = Input(UInt(XLEN.W))
-    val memTypeIn = Input(MemType())
+    val addr = Input(UInt(XLEN.W))
+    val wdata = Input(UInt(XLEN.W))
+    val memType = Input(MemType())
     val ren = Input(Bool())
     val wen = Input(Bool())
-    val rdataOut = Output(UInt(XLEN.W))
+    val rdata = Output(UInt(XLEN.W))
     val misalign = Output(Bool())
   })
 
-  val byteSel = io.addrIn(1, 0)
+  val byteSel = io.addr(1, 0)
 
-  io.misalign := MuxLookup(io.memTypeIn, false.B)(
+  io.misalign := MuxLookup(io.memType, false.B)(
     Seq(
       MemType.B -> false.B,
       MemType.H -> byteSel(0),
@@ -28,7 +28,7 @@ class LSU extends Module with Constants {
     )
   )
 
-  val wmask = MuxLookup(io.memTypeIn, 4.U(8.W))(
+  val wmask = MuxLookup(io.memType, 4.U(8.W))(
     Seq(
       MemType.B -> 1.U,
       MemType.H -> 3.U,
@@ -42,11 +42,11 @@ class LSU extends Module with Constants {
 
   if (BuildFlags.sim) {
     val simDMemInst = Module(new sim.SimDMem(xlen = XLEN))
-    simDMemInst.io.addr := io.addrIn
+    simDMemInst.io.addr := io.addr
     simDMemInst.io.ren := io.ren
     rawRdata := simDMemInst.io.rdata
     simDMemInst.io.wen := io.wen
-    simDMemInst.io.wdata := io.wdataIn
+    simDMemInst.io.wdata := io.wdata
     simDMemInst.io.wmask := wmask
   }
 
@@ -55,7 +55,7 @@ class LSU extends Module with Constants {
   val rBS = Cat(Fill(XLEN - 8, rawRdata(7)), rawRdata(7, 0))
   val rHS = Cat(Fill(XLEN - 16, rawRdata(15)), rawRdata(15, 0))
 
-  io.rdataOut := MuxLookup(io.memTypeIn, rawRdata)(
+  io.rdata := MuxLookup(io.memType, rawRdata)(
     Seq(
       MemType.B -> rBS,
       MemType.H -> rHS,

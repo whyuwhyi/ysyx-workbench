@@ -14,8 +14,8 @@ class CSRFile extends Module with Constants {
     val csrOp = Input(CSROp())
     val addr = Input(UInt(12.W))
     val wdata = Input(UInt(XLEN.W))
-    val rdata = Output(UInt(XLEN.W))
     val pc = Input(UInt(XLEN.W))
+    val rdata = Output(UInt(XLEN.W))
     val nextPc = Output(UInt(XLEN.W))
   })
 

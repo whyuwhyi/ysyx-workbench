@@ -51,7 +51,7 @@ class Datapath extends Module with Constants {
   io.rs1Data := registerFileInst.io.rs1Data
 
   immGenInst.io.inst := io.inst
-  immGenInst.io.sel := io.immSel
+  immGenInst.io.immSel := io.immSel
 
   ifuInst.io.pcSel := io.pcSel
   ifuInst.io.branchCond := io.branchCond
@@ -75,16 +75,16 @@ class Datapath extends Module with Constants {
   aluInst.io.opB := opB
   aluInst.io.aluOp := io.aluOp
 
-  lsuInst.io.addrIn := aluInst.io.out
-  lsuInst.io.wdataIn := registerFileInst.io.rs2Data
-  lsuInst.io.memTypeIn := io.memType
+  lsuInst.io.addr := aluInst.io.aluOut
+  lsuInst.io.wdata := registerFileInst.io.rs2Data
+  lsuInst.io.memType := io.memType
   lsuInst.io.ren := io.memRen
   lsuInst.io.wen := io.memWen
   io.misalign := lsuInst.io.misalign
 
-  val wbData = MuxLookup(io.wbSel, aluInst.io.out)(
+  val wbData = MuxLookup(io.wbSel, aluInst.io.aluOut)(
     Seq(
-      WBSel.MEM -> lsuInst.io.rdataOut,
+      WBSel.MEM -> lsuInst.io.rdata,
       WBSel.PC4 -> ifuInst.io.pc4,
       WBSel.CSR -> io.csrRdata
     )
