@@ -7,14 +7,13 @@ extern char **environ;
 void call_main(uintptr_t *args) {
   uintptr_t sp = (uintptr_t)args;
   int argc = *(int *)sp;
-
+  assert(0);
   char *argv[argc + 1];
   for (int i = 0; i < argc; i++) {
     sp += sizeof(char *);
     argv[i] = *(char **)sp;
   }
 
-  assert(0);
   argv[argc] = NULL;
   sp += sizeof(char *);
 
