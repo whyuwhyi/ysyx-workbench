@@ -17,7 +17,7 @@ void call_main(uintptr_t *args) {
   sp += sizeof(char *);
 
   int envc = 0;
-  while (sp) {
+  while (*(char **)sp) {
     envc++;
     sp += sizeof(char *);
   }
