@@ -58,6 +58,7 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[],
       envc++;
     }
   }
+  assert(0);
 
   if (argv) {
     for (int i = 0; argv[i]; i++) {
