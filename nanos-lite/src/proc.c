@@ -44,6 +44,8 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[],
   Area stack_area = (Area){pcb->stack, pcb->stack + STACK_SIZE};
   pcb->cp = ucontext(NULL, stack_area, (void *)entry);
   uintptr_t sp = (uintptr_t)heap.end;
+  char *args[1024];
+  char *envs[1024];
   int envc = 0;
   int argc = 0;
 
@@ -51,6 +53,7 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[],
     for (int i = 0; envp[i]; i++) {
       sp -= strlen(envp[i]) + 1;
       strcpy((char *)sp, envp[i]);
+      envs[envc] = (char *)sp;
       envc++;
     }
   }
@@ -59,6 +62,7 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[],
     for (int i = 0; argv[i]; i++) {
       sp -= strlen(argv[i]) + 1;
       strcpy((char *)sp, argv[i]);
+      args[argc] = (char *)sp;
       argc++;
     }
   }
@@ -67,15 +71,14 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[],
   sp = 0;
   for (; envc; envc--) {
     sp -= sizeof(char **);
-    *(char **)sp = envp[envc - 1];
+    *(char **)sp = envs[envc - 1];
   }
 
   sp -= sizeof(char *);
   sp = 0;
-  int i = argc;
-  for (; i; i--) {
+  for (int i = argc; i; i--) {
     sp -= sizeof(char **);
-    *(char **)sp = argv[i - 1];
+    *(char **)sp = args[i - 1];
   }
 
   sp -= sizeof(int *);
