@@ -16,6 +16,8 @@ void call_main(uintptr_t *args) {
   argv[argc] = NULL;
   sp += sizeof(char *);
 
+  assert(0);
+
   int envc = 0;
   while (sp) {
     envc++;
