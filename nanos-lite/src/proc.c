@@ -44,6 +44,7 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[],
   Area stack_area = (Area){pcb->stack, pcb->stack + STACK_SIZE};
   pcb->cp = ucontext(NULL, stack_area, (void *)entry);
   uintptr_t sp = (uintptr_t)heap.end;
+  printf("heap end %p\n", (void *)sp);
   char *args[1024];
   char *envs[1024];
   int envc = 0;
