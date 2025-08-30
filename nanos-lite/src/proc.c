@@ -47,19 +47,21 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[],
   int envc = 0;
   int argc = 0;
 
-  for (int i = 0; envp[i]; i++) {
-    sp -= strlen(envp[i]) + 1;
-    strcpy((char *)sp, envp[i]);
-    envc++;
+  if (envp) {
+    for (int i = 0; envp[i]; i++) {
+      sp -= strlen(envp[i]) + 1;
+      strcpy((char *)sp, envp[i]);
+      envc++;
+    }
   }
 
-  for (int i = 0; argv[i]; i++) {
-    sp -= strlen(argv[i]) + 1;
-    strcpy((char *)sp, argv[i]);
-    argc++;
+  if (argv) {
+    for (int i = 0; argv[i]; i++) {
+      sp -= strlen(argv[i]) + 1;
+      strcpy((char *)sp, argv[i]);
+      argc++;
+    }
   }
-
-  int argc_cp = argc;
 
   sp -= sizeof(char *);
   sp = 0;
@@ -70,12 +72,13 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[],
 
   sp -= sizeof(char *);
   sp = 0;
-  for (; argc; argc--) {
+  int i = argc;
+  for (; i; i--) {
     sp -= sizeof(char **);
-    *(char **)sp = argv[argc - 1];
+    *(char **)sp = argv[i - 1];
   }
 
   sp -= sizeof(int *);
-  *(int *)sp = argc_cp;
+  *(int *)sp = argc;
   pcb->cp->GPRx = sp;
 }
