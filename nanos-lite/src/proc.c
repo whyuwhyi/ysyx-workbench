@@ -1,5 +1,6 @@
-#include "am.h"
+#include <am.h>
 #include <common.h>
+#include <memory.h>
 #include <proc.h>
 
 #define MAX_NR_PROC 4
@@ -43,7 +44,8 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[],
   uintptr_t entry = loader(pcb, filename);
   Area stack_area = (Area){pcb->stack, pcb->stack + STACK_SIZE};
   pcb->cp = ucontext(NULL, stack_area, (void *)entry);
-  uintptr_t sp = (uintptr_t)heap.end;
+
+  uintptr_t sp = (uintptr_t)new_page(8) + 8 * PGSIZE;
   char *args[1024];
   char *envs[1024];
   int envc = 0;
