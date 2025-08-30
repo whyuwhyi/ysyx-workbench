@@ -28,7 +28,6 @@ void call_main(uintptr_t *args) {
     envp[envc] = *(char **)sp;
     sp += sizeof(char *);
   }
-  printf("envc %d, argc %d\n", envc, argc);
 
   environ = envp;
   exit(main(argc, argv, envp));
