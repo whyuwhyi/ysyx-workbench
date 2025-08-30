@@ -13,6 +13,8 @@ void call_main(uintptr_t *args) {
     sp += sizeof(char *);
     argv[i] = *(char **)sp;
   }
+
+  assert(0);
   argv[argc] = NULL;
   sp += sizeof(char *);
 
