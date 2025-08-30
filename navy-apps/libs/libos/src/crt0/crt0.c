@@ -5,9 +5,9 @@
 int main(int argc, char *argv[], char *envp[]);
 extern char **environ;
 void call_main(uintptr_t *args) {
+  assert(0);
   uintptr_t sp = (uintptr_t)args;
   int argc = *(int *)sp;
-  assert(0);
   char *argv[argc + 1];
   for (int i = 0; i < argc; i++) {
     sp += sizeof(char *);
