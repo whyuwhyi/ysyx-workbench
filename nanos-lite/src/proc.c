@@ -67,17 +67,15 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[],
     }
   }
 
-  assert(0);
-
   sp -= sizeof(char *);
-  sp = 0;
+  *(int *)sp = 0;
   for (; envc; envc--) {
     sp -= sizeof(char **);
     *(char **)sp = envs[envc - 1];
   }
 
   sp -= sizeof(char *);
-  sp = 0;
+  *(int *)sp = 0;
   for (int i = argc; i; i--) {
     sp -= sizeof(char **);
     *(char **)sp = args[i - 1];
