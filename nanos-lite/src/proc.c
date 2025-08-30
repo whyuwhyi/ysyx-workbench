@@ -23,7 +23,7 @@ void hello_fun(void *arg) {
 
 void init_proc() {
   context_kload(&pcb[0], hello_fun, "1");
-  char *args[] = {"/bin/pal", "--skip", NULL};
+  char *args[] = {"/bin/exec-test", NULL};
   context_uload(&pcb[1], "/bin/exec-test", args, NULL);
   switch_boot_pcb();
 }
