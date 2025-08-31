@@ -25,6 +25,7 @@ static void sh_handle_cmd(const char *cmd) {
   char temp_cmd[128];
   strcpy(temp_cmd, cmd);
   temp_cmd[strlen(cmd) - 1] = '\0';
+
   char *argv[16];
   int argc = 0;
   char *token = strtok(temp_cmd, " ");
@@ -32,6 +33,12 @@ static void sh_handle_cmd(const char *cmd) {
   while (token != NULL && argc < 15) {
     token = strtok(NULL, " ");
     argv[argc++] = token;
+  }
+
+  sh_printf("Executing command: %s\n", argv[0]);
+  sh_printf("Arguments count: %d\n", argc);
+  for (int i = 0; i < argc; i++) {
+    sh_printf("argv[%d]: %s\n", i, argv[i]);
   }
 
   execvp(argv[0], argv);
