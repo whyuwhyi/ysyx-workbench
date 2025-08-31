@@ -40,6 +40,7 @@ static void sh_handle_cmd(const char *cmd) {
   for (int i = 0; i < argc; i++) {
     sh_printf("argv[%d]: %s\n", i, argv[i]);
   }
+  assert(0);
 
   execvp(argv[0], argv);
 }
