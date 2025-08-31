@@ -23,7 +23,7 @@ void hello_fun(void *arg) {
 
 void init_proc() {
   context_kload(&pcb[0], hello_fun, "1");
-  char *args[] = {"/bin/menu", NULL};
+  char *args[] = {"/bin/nterm", NULL};
   context_uload(&pcb[1], "/bin/nterm", args, NULL);
   switch_boot_pcb();
 }
@@ -46,26 +46,30 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[],
   pcb->cp = ucontext(NULL, stack_area, (void *)entry);
 
   uintptr_t sp = (uintptr_t)new_page(8) + 8 * PGSIZE;
-  char *args[1024];
-  char *envs[1024];
+  char *args[16];
+  char *envs[16];
   int envc = 0;
   int argc = 0;
+  printf("Load new program '%s' at entry = %p, sp = %p\n", filename,
+         (void *)entry, (void *)sp);
 
   if (envp) {
-    for (int i = 0; envp[i]; i++) {
-      sp -= strlen(envp[i]) + 1;
-      strcpy((char *)sp, envp[i]);
+    printf("envp: %p\n", envp);
+    for (; envp[envc]; envc++) {
+      printf("envp[%d] = %p\n", envc, envp[envc]);
+      printf("envs[%d] = %s\n", envc, envp[envc]);
+      sp -= strlen(envp[envc]) + 1;
+      strcpy((char *)sp, envp[envc]);
       envs[envc] = (char *)sp;
-      envc++;
     }
   }
 
   if (argv) {
-    for (int i = 0; argv[i]; i++) {
-      sp -= strlen(argv[i]) + 1;
-      strcpy((char *)sp, argv[i]);
+    for (; argv[argc]; argc++) {
+      sp -= strlen(argv[argc]) + 1;
+      strcpy((char *)sp, argv[argc]);
       args[argc] = (char *)sp;
-      argc++;
+      printf("args[%d] = %s\n", argc, args[argc]);
     }
   }
 
