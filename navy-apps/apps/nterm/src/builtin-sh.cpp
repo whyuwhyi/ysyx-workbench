@@ -35,19 +35,13 @@ static void sh_handle_cmd(const char *cmd) {
     argv[argc++] = token;
   }
 
-  printf("Executing command: %s\n", argv[0]);
-  printf("Arguments count: %d\n", argc);
-  for (int i = 0; i < argc; i++) {
-    printf("argv[%d]: %s\n", i, argv[i]);
-  }
-
+  setenv("PATH", "/bin:/usr/bin", 0);
   execvp(argv[0], argv);
 }
 
 void builtin_sh_run() {
   sh_banner();
   sh_prompt();
-  setenv("PATH", "/bin", 0);
 
   while (1) {
     SDL_Event ev;

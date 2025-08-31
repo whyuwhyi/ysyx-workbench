@@ -59,7 +59,7 @@ int fs_open(const char *pathname, int flags, int mode) {
       return i;
     }
   }
-  assert(0);
+  return -1;
 }
 
 static inline size_t min_sz(size_t a, size_t b) { return a < b ? a : b; }

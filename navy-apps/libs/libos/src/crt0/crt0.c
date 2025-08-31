@@ -29,14 +29,6 @@ void call_main(uintptr_t *args) {
     sp += sizeof(char *);
   }
 
-  printf("argc = %d\n", argc);
-  for (int i = 0; i < argc; i++) {
-    printf("argv[%d] = %s\n", i, argv[i]);
-  }
-  for (int i = 0; i < envc; i++) {
-    printf("envp[%d] = %s\n", i, envp[i]);
-  }
-
   environ = envp;
   exit(main(argc, argv, envp));
   assert(0);

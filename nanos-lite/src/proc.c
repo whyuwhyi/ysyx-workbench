@@ -41,23 +41,14 @@ void context_kload(PCB *pcb, void *entry, void *arg) {
 
 void context_uload(PCB *pcb, const char *filename, char *const argv[],
                    char *const envp[]) {
-  uintptr_t entry = loader(pcb, filename);
-  Area stack_area = (Area){pcb->stack, pcb->stack + STACK_SIZE};
-  pcb->cp = ucontext(NULL, stack_area, (void *)entry);
-
   uintptr_t sp = (uintptr_t)new_page(8) + 8 * PGSIZE;
   char *args[16];
   char *envs[16];
   int envc = 0;
   int argc = 0;
-  printf("Load new program '%s' at entry = %p, sp = %p\n", filename,
-         (void *)entry, (void *)sp);
 
   if (envp) {
-    printf("envp: %p\n", envp);
     for (; envp[envc]; envc++) {
-      printf("envp[%d] = %p\n", envc, envp[envc]);
-      printf("envs[%d] = %s\n", envc, envp[envc]);
       sp -= strlen(envp[envc]) + 1;
       strcpy((char *)sp, envp[envc]);
       envs[envc] = (char *)sp;
@@ -69,7 +60,6 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[],
       sp -= strlen(argv[argc]) + 1;
       strcpy((char *)sp, argv[argc]);
       args[argc] = (char *)sp;
-      printf("args[%d] = %s\n", argc, args[argc]);
     }
   }
 
@@ -89,5 +79,9 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[],
 
   sp -= sizeof(int *);
   *(int *)sp = argc;
+
+  uintptr_t entry = loader(pcb, filename);
+  Area stack_area = (Area){pcb->stack, pcb->stack + STACK_SIZE};
+  pcb->cp = ucontext(NULL, stack_area, (void *)entry);
   pcb->cp->GPRx = sp;
 }

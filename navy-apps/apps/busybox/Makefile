@@ -14,6 +14,7 @@ ifeq ($(ISA), native)
 CFLAGS += -I$(WORK_DIR)/include/native/
 else
 CFLAGS += -I$(WORK_DIR)/include/navy/ -D__GLIBC__ -fdata-sections -ffunction-sections -nostdlib
+CFLAGS += -Wno-error
 comma = ,
 LDFLAGS := $(addprefix -Wl$(comma), $(LDFLAGS))
 export LDFLAGS

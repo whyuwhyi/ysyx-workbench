@@ -25,8 +25,8 @@ static int sys_lseek(int fd, size_t offset, int whence);
 
 static int sys_brk(intptr_t program_break);
 
-static int sys_execve(const char *fname, char *const argv[], char *const envp[])
-    __attribute__((noreturn));
+static int sys_execve(const char *fname, char *const argv[],
+                      char *const envp[]);
 
 static int sys_gettimeofday(struct timeval *tv, struct timezone *tz);
 
@@ -75,6 +75,8 @@ void do_syscall(Context *c) {
 static void sys_exit(int code) {
   STRACE("sys_exit(%d) called", code);
   sys_execve("/bin/nterm", NULL, NULL);
+  while (1)
+    ;
 }
 
 static int sys_yield(void) {
@@ -115,13 +117,15 @@ static int sys_brk(intptr_t program_break) {
 static int sys_execve(const char *fname, char *const argv[],
                       char *const envp[]) {
   STRACE("sys_execve(\"%s\") called", fname);
+  int fd = fs_open(fname, 0, 0);
+  if (fd < 0) {
+    return -2;
+  }
   extern PCB *current;
   context_uload(current, fname, argv, envp);
   switch_boot_pcb();
   yield();
-
-  while (1)
-    ;
+  return 0;
 }
 
 static int sys_gettimeofday(struct timeval *tv, struct timezone *tz) {
