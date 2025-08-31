@@ -35,10 +35,10 @@ static void sh_handle_cmd(const char *cmd) {
     argv[argc++] = token;
   }
 
-  sh_printf("Executing command: %s\n", argv[0]);
-  sh_printf("Arguments count: %d\n", argc);
+  printf("Executing command: %s\n", argv[0]);
+  printf("Arguments count: %d\n", argc);
   for (int i = 0; i < argc; i++) {
-    sh_printf("argv[%d]: %s\n", i, argv[i]);
+    printf("argv[%d]: %s\n", i, argv[i]);
   }
   while (1)
     ;
